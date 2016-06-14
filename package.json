@@ -1,0 +1,103 @@
+{
+  "name": "vscode-node-cdp-debug",
+  "displayName": "Node Debugger via CDP",
+  "version": "0.0.1",
+  "description": "Debug Node using the Chrome Debug Protocol",
+  "publisher": "microsoft",
+  "engines": {
+    "vscode": "*"
+  },
+  "categories": [
+    "Debuggers"
+  ],
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "dependencies": {
+    "vscode-chrome-debug-core": "0.1.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-tslint": "^3.3.1",
+    "gulp-typescript": "^2.12.1",
+    "gulp-util": "^3.0.5",
+    "tslint": "^2.5.1",
+    "typescript": "^1.8.9",
+    "typings": "^0.7.12"
+  },
+  "scripts": {
+    "postinstall": "typings install"
+  },
+  "contributes": {
+    "debuggers": [
+      {
+        "type": "node",
+        "label": "Node.js via CDP",
+        "enableBreakpointsFor": {
+          "languageIds": [
+            "javascript",
+            "typescriptreact",
+            "javascriptreact"
+          ]
+        },
+        "program": "./out/src/nodeDebug.js",
+        "runtime": "node",
+        "initialConfigurations": [
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [],
+            "properties": {
+              "port": {
+                "type": "number",
+                "description": "Debug port to attach to.",
+                "default": 9222
+              },
+              "sourceMaps": {
+                "type": "boolean",
+                "description": "Use JavaScript source maps (if they exist).",
+                "default": true
+              },
+              "diagnosticLogging": {
+                "type": "boolean",
+                "description": "When true, the adapter logs its own diagnostic info to the console",
+                "default": true
+              },
+              "verboseDiagnosticLogging": {
+                "type": "boolean",
+                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+                "default": true
+              }
+            }
+          },
+          "attach": {
+            "required": [
+              "port"
+            ],
+            "properties": {
+              "port": {
+                "type": "number",
+                "description": "Debug port to attach to.",
+                "default": 9222
+              },
+              "sourceMaps": {
+                "type": "boolean",
+                "description": "Use JavaScript source maps (if they exist).",
+                "default": true
+              },
+              "diagnosticLogging": {
+                "type": "boolean",
+                "description": "When true, the adapter logs its own diagnostic info to the console",
+                "default": true
+              },
+              "verboseDiagnosticLogging": {
+                "type": "boolean",
+                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+                "default": true
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
