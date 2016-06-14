@@ -15,7 +15,7 @@ Open your app's directory in Code and set up a launch config. It should look som
             "name": "Node",
             "type": "chrome",
             "request": "attach",
-            "port": 9229,
+            "port": 9229, // Default port, check the message printed - "Debugger listening on port X"
             "sourceMaps": true,
             "webRoot": "${workspaceRoot}"
             // "diagnosticLogging": true // May be useful for debugging
