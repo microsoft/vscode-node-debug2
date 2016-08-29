@@ -12,7 +12,8 @@
   ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
-    "vscode-chrome-debug-core": "0.1.19"
+    "vscode-chrome-debug-core": "0.1.19",
+    "vscode-nls": "^1.0.4"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
