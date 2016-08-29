@@ -58,10 +58,12 @@ export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArgum
 	runtimeArgs?: string[];
 	/** Optional environment variables to pass to the debuggee. The string valued properties of the 'environmentVariables' are used as key/value pairs. */
 	env?: { [key: string]: string; };
-	/** Deprecated: if true launch the target in an external console. */
-	externalConsole?: boolean;
 	/** Where to launch the debug target. */
 	console?: ConsoleType;
+
+	/** Logging options */
+	diagnosticLogging?: boolean;
+    verboseDiagnosticLogging?: boolean;
 }
 
 /**

@@ -3,6 +3,6 @@ node_modules/
 out/
 lib/
 *.vsix
-vscode-chrome-debug.txt
+vscode-node-cdp-debug.txt
 typings/
 .browse.VC.db
