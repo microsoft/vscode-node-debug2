@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, logger, utils as coreUtils} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {TerminatedEvent, OutputEvent} from 'vscode-debugadapter';
 
@@ -28,8 +28,30 @@ function localize(id: string, msg: string, ...args: any[]): string {
 
 export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
+    private static RUNINTERMINAL_TIMEOUT = 3000;
+    private static NODE_TERMINATION_POLL_INTERVAL = 3000;
 
     private _nodeProcessId: number;
+    private _pollForNodeProcess: boolean;
+
+    public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilites {
+        // Override super for loc
+        // This debug adapter supports two exception breakpoint filters
+        return {
+            exceptionBreakpointFilters: [
+                {
+                    label: 'All Exceptions',
+                    filter: 'all',
+                    default: false
+                },
+                {
+                    label: 'Uncaught Exceptions',
+                    filter: 'uncaught',
+                    default: true
+                }
+            ]
+        };
+    }
 
     public launch(args: LaunchRequestArguments): Promise<void> {
         this.setupLogging(args);
@@ -112,71 +134,88 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
-
-        const address = args.address;
-        const timeout = args.timeout;
-
         this.logLaunchCommand(launchArgs);
 
-        // merge environment variables into a copy of the process.env
-        const env = Object.assign({}, process.env, args.env);
+        if (args.console === 'integratedTerminal') {
+            const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
+                kind: 'integrated',
+                title: localize('node.console.title', "Node Debug Console"),
+                cwd,
+                args: launchArgs,
+                env: args.env
+            };
 
-        const options = {
-            cwd,
-            env
-        };
+            return new Promise<void>((resolve, reject) => {
+                this.sendRequest('runInTerminal', termArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
+                    if (response.success) {
+                        // since node starts in a terminal, we cannot track it with an 'exit' handler
+                        // plan for polling after we have gotten the process pid.
+                        this._pollForNodeProcess = true;
 
-        const nodeProcess = cp.spawn(runtimeExecutable, launchArgs.slice(1), options);
+                        if (args.noDebug) {
+                            resolve();
+                        } else {
+                            this.doAttach(port, undefined, args.address, args.timeout).then(resolve, reject);
+                        }
+                    } else {
+                        reject(<DebugProtocol.Message>{
+                            id: 2011,
+                            format: localize('VSND2011', "Cannot launch debug target in terminal ({0}).", '{_error}'),
+                            variables: { _error: response.message }
+                        });
 
-        return new Promise<void>((resolve, reject) => {
-            nodeProcess.on('error', (error) => {
-                reject(<DebugProtocol.Message>{
-                    id: 2017,
-                    format: localize('VSND2017', "Cannot launch debug target ({0}).", '{_error}'),
-                    variables: { _error: error.message },
-                    showUser: true,
-                    sendTelemetry: true
+                        this.terminated('terminal error: ' + response.message);
+                    }
+                });
+            });
+        } else if (args.console === 'internalConsole') {
+            // merge environment variables into a copy of the process.env
+            const env = Object.assign({}, process.env, args.env);
+
+            const options = {
+                cwd,
+                env
+            };
+
+            const nodeProcess = cp.spawn(runtimeExecutable, launchArgs.slice(1), options);
+
+            return new Promise<void>((resolve, reject) => {
+                nodeProcess.on('error', (error) => {
+                    reject(<DebugProtocol.Message>{
+                        id: 2017,
+                        format: localize('VSND2017', "Cannot launch debug target ({0}).", '{_error}'),
+                        variables: { _error: error.message },
+                        showUser: true,
+                        sendTelemetry: true
+                    });
+
+                    // Needed?
+                    // this._terminated(`failed to launch target (${error})`);
+                });
+                nodeProcess.on('exit', () => {
+                    this.terminated('target exited');
+                });
+                nodeProcess.on('close', (code) => {
+                    this.terminated('target closed');
                 });
 
-                // Needed?
-                // this._terminated(`failed to launch target (${error})`);
-            });
-            nodeProcess.on('exit', () => {
-                this.terminated('target exited');
-            });
-            nodeProcess.on('close', (code) => {
-                this.terminated('target closed');
-            });
+                this._nodeProcessId = nodeProcess.pid;
 
-            this._nodeProcessId = nodeProcess.pid;
+                // Capture process output
+                process.stdout.on('data', (data: string) => {
+                    this.fireEvent(new OutputEvent(data.toString(), 'stdout'));
+                });
+                process.stderr.on('data', (data: string) => {
+                    this.fireEvent(new OutputEvent(data.toString(), 'stderr'));
+                });
 
-            // Capture process output
-            process.stdout.on('data', (data: string) => {
-                this.fireEvent(new OutputEvent(data.toString(), 'stdout'));
+                return args.noDebug ?
+                    Promise.resolve() :
+                    this.doAttach(port, undefined, args.address, args.timeout);
             });
-            process.stderr.on('data', (data: string) => {
-                this.fireEvent(new OutputEvent(data.toString(), 'stderr'));
-            });
-
-            return args.noDebug ?
-                Promise.resolve() :
-                this.doAttach(port, undefined, address, timeout);
-        });
-    }
-
-    private logLaunchCommand(args: string[]) {
-        // print the command to launch the target to the debug console
-        let cli = '';
-        for (let a of args) {
-            if (a.indexOf(' ') >= 0) {
-                cli += '\'' + a + '\'';
-            } else {
-                cli += a;
-            }
-            cli += ' ';
+        } else {
+            return coreUtils.errP('NOT IMPLEMENTED');
         }
-
-        logger.log(cli, /*forceLog=*/true);
     }
 
     private terminated(reason: string): void {
@@ -198,6 +237,36 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         //         this.sendEvent(new TerminatedEvent());
         //     }
         // }
+    }
+
+    private _pollForNodeTermination(): void {
+        const id = setInterval(() => {
+            try {
+                if (this._nodeProcessId > 0) {
+                    (<any>process).kill(this._nodeProcessId, 0);	// node.d.ts doesn't like number argumnent
+                } else {
+                    clearInterval(id);
+                }
+            } catch (e) {
+                clearInterval(id);
+                this.terminated('node process kill exception');
+            }
+        }, NodeDebugAdapter.NODE_TERMINATION_POLL_INTERVAL);
+    }
+
+    private logLaunchCommand(args: string[]) {
+        // print the command to launch the target to the debug console
+        let cli = '';
+        for (let a of args) {
+            if (a.indexOf(' ') >= 0) {
+                cli += '\'' + a + '\'';
+            } else {
+                cli += a;
+            }
+            cli += ' ';
+        }
+
+        logger.log(cli);
     }
 
     /**

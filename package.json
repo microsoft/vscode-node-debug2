@@ -13,6 +13,8 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
     "vscode-chrome-debug-core": "0.1.19",
+    "vscode-debugadapter": "^1.12.0",
+    "vscode-debugprotocol": "^1.12.0",
     "vscode-nls": "^1.0.4"
   },
   "devDependencies": {
