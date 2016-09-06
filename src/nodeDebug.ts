@@ -10,8 +10,9 @@ import {NodeDebugAdapter} from './nodeDebugAdapter';
 ChromeDebugSession.run(ChromeDebugSession.getSession(
     {
         logFilePath: path.resolve(__dirname, '../../vscode-node-cdp-debug.txt'), // non-.txt file types can't be uploaded to github
-        adapter: new NodeDebugAdapter()
+        adapter: new NodeDebugAdapter(),
+        extensionName: 'node-debug'
     }));
 
 /* tslint:disable:no-var-requires */
-logger.log('debugger-for-chrome: ' + require('../../package.json').version);
+logger.log('node-debug: ' + require('../../package.json').version);
