@@ -1,0 +1,44 @@
+export function throwCaught(): void {
+
+}
+
+export function throwUncaught(): void {
+
+}
+
+export function evalDebugger() {
+    eval('var x = 1; debugger;');
+    eval('throwCaught()');
+    eval('throwUncaught()');
+}
+
+export function consoleAPIs() {
+    console.log({ a: 1, b: 'asdf', c: { d: 4 } });
+    console.log({ a: 1}, {b: 2});
+    console.count('count label');
+    console.count('count label');
+    console.dir({ z: 5 });
+    console.time('timing');
+    console.group('my group');
+    console.log('hello', 'world!');
+    console.error('with formatter:  %s world!', 'hello');
+    console.log('%d %i %f', -19, -32.5, -9.4);
+    console.groupEnd();
+    console.timeEnd('timing');
+    console.trace();
+
+    eval('console.trace()');
+    (() => console.trace())();
+
+    try {
+        console.assert(1 == 2, '1 is not 2');
+    } catch (e) { }
+}
+
+export function anotherFn(): void {
+    let qqq;
+    const str = 'hello';
+    let xyz = 1;
+    const obj = { a: 2, get thing() { throw new Error('xyz'); }, set thing(x) { } };
+    xyz++;                     xyz++;
+}

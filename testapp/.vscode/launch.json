@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "debugServer": "4712",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/out/app.js",
+            "stopOnEntry": false,
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "/Users/roblou/Downloads/node-v7.0.0-nightly2016082451f96dfcfc-darwin-x64/bin/node",
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "verboseDiagnosticLogging": true,
+            "outDir": "${workspaceRoot}/out"
+        },
+        {
+            "name": "Attach",
+            "type": "node",
+            "request": "attach",
+            "port": 5858,
+            "address": "localhost",
+            "restart": false,
+            "sourceMaps": false,
+            "outDir": null,
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": null
+        },
+        {
+            "name": "Attach to Process",
+            "type": "node",
+            "request": "attach",
+            "processId": "${command.PickProcess}",
+            "port": 5858,
+            "sourceMaps": false,
+            "outDir": null
+        }
+    ]
+}

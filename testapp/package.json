@@ -1,0 +1,15 @@
+{
+  "name": "node-testapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^2.0.0"
+  },
+  "scripts": {
+    "build": "tsc -w -p ."
+  },
+  "author": "",
+  "license": ""
+}
