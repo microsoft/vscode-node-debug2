@@ -54,7 +54,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public launch(args: LaunchRequestArguments): Promise<void> {
-        this.setupLogging(args);
+        super.launch(args);
 
         const port = args.port || utils.random(3000, 50000);
 
@@ -127,8 +127,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const runtimeArgs = args.runtimeArgs || [];
         const programArgs = args.args || [];
 
-        // we always break on entry (but if user did not request this, we will not stop in the UI).
-        let launchArgs = [runtimeExecutable];
+        let launchArgs = [runtimeExecutable, '--nolazy'];
         if (!args.noDebug) {
             launchArgs.push(`--inspect=${port}`);
         }
@@ -203,10 +202,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
                 // Capture process output
                 process.stdout.on('data', (data: string) => {
-                    this.fireEvent(new OutputEvent(data.toString(), 'stdout'));
+                    this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
                 });
                 process.stderr.on('data', (data: string) => {
-                    this.fireEvent(new OutputEvent(data.toString(), 'stderr'));
+                    this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
                 });
 
                 return args.noDebug ?
@@ -221,7 +220,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private terminated(reason: string): void {
         logger.log(`_terminated: ${reason}`);
 
-        this.fireEvent(new TerminatedEvent());
+        this.sendEvent(new TerminatedEvent());
 
         // if (this._terminalProcess) {
         //     // if the debug adapter owns a terminal,
