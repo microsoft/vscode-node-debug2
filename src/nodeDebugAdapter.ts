@@ -167,7 +167,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     }
                 });
             });
-        } else if (args.console === 'internalConsole') {
+        } else if (!args.console || args.console === 'internalConsole') {
             // merge environment variables into a copy of the process.env
             const env = Object.assign({}, process.env, args.env);
 
@@ -188,8 +188,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                         sendTelemetry: true
                     });
 
-                    // Needed?
-                    // this._terminated(`failed to launch target (${error})`);
+                    this.terminateSession(`failed to launch target (${error})`);
                 });
                 nodeProcess.on('exit', () => {
                     this.terminateSession('target exited');
@@ -222,6 +221,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.clearEverything();
 
         if (this._nodeProcessId) {
+            logger.log('Killing process with id: ' + this._nodeProcessId);
             Terminal.killTree(this._nodeProcessId);
         }
     }
@@ -229,6 +229,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public terminateSession(reason: string): void {
         this._nodeProcessId = 0;
 
+        // For restart
         // if (!this._isTerminated) {
         //     this._isTerminated = true;
         //     if (this._restartMode && !this._inShutdown) {
