@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
-import {Terminal} from './terminal';
+import {Terminal} from './terminal/terminal';
 import {LaunchRequestArguments, NodeDebugError} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
@@ -151,11 +151,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                         // plan for polling after we have gotten the process pid.
                         this._pollForNodeProcess = true;
 
-                        if (args.noDebug) {
-                            resolve();
-                        } else {
-                            this.doAttach(port, undefined, args.address, args.timeout).then(resolve, reject);
-                        }
+                        args.noDebug ?
+                            resolve() :
+                            this.doAttach(port, undefined, args.address, args.timeout)
+                                .then(() => this.getNodeProcessId())
+                                .then(resolve, reject);
                     } else {
                         reject(<DebugProtocol.Message>{
                             id: 2011,
@@ -163,7 +163,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                             variables: { _error: response.message }
                         });
 
-                        this.terminated('terminal error: ' + response.message);
+                        this.terminateSession('terminal error: ' + response.message);
                     }
                 });
             });
@@ -192,10 +192,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     // this._terminated(`failed to launch target (${error})`);
                 });
                 nodeProcess.on('exit', () => {
-                    this.terminated('target exited');
+                    this.terminateSession('target exited');
                 });
                 nodeProcess.on('close', (code) => {
-                    this.terminated('target closed');
+                    this.terminateSession('target closed');
                 });
 
                 this._nodeProcessId = nodeProcess.pid;
@@ -210,23 +210,24 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
                 return args.noDebug ?
                     Promise.resolve() :
-                    this.doAttach(port, undefined, args.address, args.timeout);
+                    this.doAttach(port, undefined, args.address, args.timeout)
+                        .then(() => this.getNodeProcessId());
             });
         } else {
             return coreUtils.errP('NOT IMPLEMENTED');
         }
     }
 
-    private terminated(reason: string): void {
-        logger.log(`_terminated: ${reason}`);
+    public clearEverything(): void {
+        super.clearEverything();
 
-        this.sendEvent(new TerminatedEvent());
+        if (this._nodeProcessId) {
+            Terminal.killTree(this._nodeProcessId);
+        }
+    }
 
-        // if (this._terminalProcess) {
-        //     // if the debug adapter owns a terminal,
-        //     // we delay the TerminatedEvent so that the user can see the result of the process in the terminal.
-        //     return;
-        // }
+    public terminateSession(reason: string): void {
+        this._nodeProcessId = 0;
 
         // if (!this._isTerminated) {
         //     this._isTerminated = true;
@@ -236,19 +237,33 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         //         this.sendEvent(new TerminatedEvent());
         //     }
         // }
+
+        super.terminateSession(reason);
     }
 
-    private _pollForNodeTermination(): void {
-        const id = setInterval(() => {
-            try {
-                if (this._nodeProcessId > 0) {
-                    (<any>process).kill(this._nodeProcessId, 0);	// node.d.ts doesn't like number argumnent
+    private getNodeProcessId(): Promise<void> {
+        return this._chromeConnection.runtime_evaluate('process.pid')
+            .then(result => {
+                if (result.error) {
+                    // retry?
                 } else {
-                    clearInterval(id);
+                    this._nodeProcessId = result.result.result.value;
+                    this.startPollingForNodeTermination();
+                }
+            });
+    }
+
+    private startPollingForNodeTermination(): void {
+        const intervalId = setInterval(() => {
+            try {
+                if (this._nodeProcessId) {
+                    process.kill(this._nodeProcessId, 0);
+                } else {
+                    clearInterval(intervalId);
                 }
             } catch (e) {
-                clearInterval(id);
-                this.terminated('node process kill exception');
+                clearInterval(intervalId);
+                this.terminateSession('Target process is dead');
             }
         }, NodeDebugAdapter.NODE_TERMINATION_POLL_INTERVAL);
     }

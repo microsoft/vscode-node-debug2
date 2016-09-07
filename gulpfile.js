@@ -15,6 +15,10 @@ const sources = [
     'typings/main'
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
+const scripts = [
+    'src/terminal/terminateProcess.sh'
+];
+
 const lintSources = [
     'src'
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
@@ -33,11 +37,16 @@ function computeSourceRoot(file) {
 }
 
 const tsProject = ts.createProject(projectConfig);
-gulp.task('build', function () {
+gulp.task('build', ['copy-scripts'], function () {
 	return gulp.src(sources, { base: '.' })
         .pipe(sourcemaps.init())
         .pipe(ts(projectConfig)).js
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: computeSourceRoot }))
+        .pipe(gulp.dest('out'));
+});
+
+gulp.task('copy-scripts', () => {
+    return gulp.src(scripts, { base: '.' })
         .pipe(gulp.dest('out'));
 });
 
