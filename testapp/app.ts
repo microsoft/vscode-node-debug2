@@ -1,15 +1,27 @@
 import * as app2 from './app2';
 
-setInterval(() => {
+function log() {
+    console.log('Hello, world!');
+    test();
+}
+
+log();
+setInterval(log, 3000);
+
+function test() {
+    debugger;
     locals();
-    app2.consoleAPIs();
-    app2.throwCaught();
-    app2.throwUncaught();
-}, 2000);
+
+    // set to true in the console to step into here
+    let doEverything = false;
+    if (doEverything) {
+        app2.consoleAPIs();
+        app2.throwCaught();
+        app2.throwUncaught();
+    }
+}
 
 function locals() {
-    console.log('Hello, world!');
-
     const manyPropsObj: any = { prop2: 'abc', prop1: 'def' };
     for (let i=0; i<=100; i++) manyPropsObj[i] = Math.random();
 
