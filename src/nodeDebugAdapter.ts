@@ -2,9 +2,10 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger, utils as coreUtils} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, logger, utils as coreUtils, ISetBreakpointsArgs, ISetBreakpointsResponseBody} from 'vscode-chrome-debug-core';
+import * as Chrome from 'vscode-chrome-debug-core/lib/src/chrome/chromeDebugProtocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {TerminatedEvent, OutputEvent} from 'vscode-debugadapter';
+import {TerminatedEvent, OutputEvent, InitializedEvent} from 'vscode-debugadapter';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -34,24 +35,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
 
-    public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilites {
-        // Override super for loc
-        // This debug adapter supports two exception breakpoint filters
-        return {
-            exceptionBreakpointFilters: [
-                {
-                    label: 'All Exceptions',
-                    filter: 'all',
-                    default: false
-                },
-                {
-                    label: 'Uncaught Exceptions',
-                    filter: 'uncaught',
-                    default: true
-                }
-            ]
-        };
-    }
+    private _continueAfterConfigDone = true;
+    private _entryPauseEvent: Chrome.Debugger.PausedParams;
 
     public launch(args: LaunchRequestArguments): Promise<void> {
         super.launch(args);
@@ -131,6 +116,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         if (!args.noDebug) {
             launchArgs.push(`--inspect=${port}`);
         }
+
+        // Always stop on entry to set breakpoints
+        launchArgs.push('--debug-brk');
+        this._continueAfterConfigDone = !args.stopOnEntry;
 
         launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
         this.logLaunchCommand(launchArgs);
@@ -217,6 +206,27 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
+    /**
+     * Override so that -core's call on attach will be ignored, and we can wait until the first break when ready to set BPs.
+     */
+    protected sendInitializedEvent(): void {
+        if (this._entryPauseEvent) {
+            super.sendInitializedEvent();
+        }
+    }
+
+    public configurationDone(): Promise<void> {
+        // This message means that all breakpoints have been set by the client. We should be paused at this point.
+        // So, either tell the target to continue, or tell the client that we paused.
+        if (this._continueAfterConfigDone) {
+            this.continue();
+        } else {
+            this.onDebuggerPaused(this._entryPauseEvent);
+        }
+
+        return super.configurationDone();
+    }
+
     public clearEverything(): void {
         super.clearEverything();
 
@@ -226,7 +236,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
+    protected clearTargetContext(): void {
+        super.clearTargetContext();
+
+        // Mainly to ensure it's cleared in server mode, but if Node had some way to refresh in proc and stop on entry again,
+        // then this would also be hit.
+        this._entryPauseEvent = null;
+    }
+
     public terminateSession(reason: string): void {
+        super.terminateSession(reason);
         this._nodeProcessId = 0;
 
         // For restart
@@ -238,15 +257,41 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         //         this.sendEvent(new TerminatedEvent());
         //     }
         // }
+    }
 
-        super.terminateSession(reason);
+    protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
+        // If we don't have the entry location, this must be the entry pause
+        if (!this._entryPauseEvent) {
+            logger.log('Paused on entry');
+            this._entryPauseEvent = notification;
+            this.sendInitializedEvent();
+        } else {
+            super.onDebuggerPaused(notification);
+        }
+    }
+
+    /**
+     * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
+     */
+    protected addBreakpoints(url: string, lines: number[], cols?: number[]): Promise<Chrome.Debugger.SetBreakpointResponse[]> {
+        return super.addBreakpoints(url, lines, cols).then(responses => {
+            const entryLocation = this._entryPauseEvent.callFrames[0].location;
+            if (this._continueAfterConfigDone && responses.some(response => response.result.actualLocation === entryLocation)) {
+                // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
+                // the stopOnEntry flag is not set
+                logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
+                this._continueAfterConfigDone = false;
+            }
+
+            return responses;
+        });
     }
 
     private getNodeProcessId(): Promise<void> {
         return this._chromeConnection.runtime_evaluate('process.pid')
             .then(result => {
                 if (result.error) {
-                    // retry?
+                    // Retry, handle "process is not defined"
                 } else {
                     this._nodeProcessId = result.result.result.value;
                     this.startPollingForNodeTermination();
@@ -258,6 +303,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const intervalId = setInterval(() => {
             try {
                 if (this._nodeProcessId) {
+                    // kill with signal=0 just test for whether the proc is alive. It throws if not.
                     process.kill(this._nodeProcessId, 0);
                 } else {
                     clearInterval(intervalId);
