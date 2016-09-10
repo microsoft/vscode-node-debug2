@@ -37,6 +37,8 @@ newlines`;
 
     const m = new Map();
     m.set('a', 1);
+    m.set('bcd', [1, 2, 3]);
+    m.set('def', { m });
 
     let nan = NaN;
     let inf = 1/0;
