@@ -143,7 +143,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                         args.noDebug ?
                             resolve() :
                             this.doAttach(port, undefined, args.address, args.timeout)
-                                .then(() => this.getNodeProcessId())
+                                .then(() => this.getNodeProcessIdIfNeeded())
                                 .then(resolve, reject);
                     } else {
                         reject(<DebugProtocol.Message>{
@@ -199,7 +199,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 return args.noDebug ?
                     Promise.resolve() :
                     this.doAttach(port, undefined, args.address, args.timeout)
-                        .then(() => this.getNodeProcessId());
+                        .then(() => this.getNodeProcessIdIfNeeded());
             });
         } else {
             return coreUtils.errP('NOT IMPLEMENTED');
@@ -264,7 +264,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         if (!this._entryPauseEvent) {
             logger.log('Paused on entry');
             this._entryPauseEvent = notification;
-            this.sendInitializedEvent();
+            this.getNodeProcessIdIfNeeded()
+                .then(() => this.sendInitializedEvent());
         } else {
             super.onDebuggerPaused(notification);
         }
@@ -287,11 +288,22 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private getNodeProcessId(): Promise<void> {
+    private getNodeProcessIdIfNeeded(): Promise<void> {
+        if (this._nodeProcessId) {
+            return Promise.resolve<void>();
+        }
+
         return this._chromeConnection.runtime_evaluate('process.pid')
             .then(result => {
                 if (result.error) {
-                    // Retry, handle "process is not defined"
+                    logger.error('Error evaluating `process.pid`: ' + result.error);
+                } else if (result.result.exceptionDetails) {
+                    const details = result.result.exceptionDetails;
+                    if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
+                        logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
+                    } else {
+                        logger.error('Exception evaluating `process.pid`: ' + details.exception.description + '. Will try again later.');
+                    }
                 } else {
                     this._nodeProcessId = result.result.result.value;
                     this.startPollingForNodeTermination();
