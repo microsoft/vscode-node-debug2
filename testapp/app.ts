@@ -40,6 +40,11 @@ newlines`;
     m.set('bcd', [1, 2, 3]);
     m.set('def', { m });
 
+    const set = new Set();
+    set.add('blah');
+    set.add([1, 2, 3]);
+    set.add(set);
+
     let nan = NaN;
     let inf = 1/0;
     let infStr = "Infinity";
