@@ -15,17 +15,8 @@ import {Terminal} from './terminal/terminal';
 import {LaunchRequestArguments, NodeDebugError} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
-
-/**
- * Placeholder localize function
- */
-function localize(id: string, msg: string, ...args: any[]): string {
-    args.forEach((arg, i) => {
-        msg = msg.replace(new RegExp(`\\{${i}\\}`, 'g'), arg);
-    });
-
-    return msg;
-};
+import {localize} from './utils';
+import * as errors from './errors';
 
 export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
@@ -37,6 +28,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private _continueAfterConfigDone = true;
     private _entryPauseEvent: Chrome.Debugger.PausedParams;
+
+    private _supportsRunInTerminalRequest: boolean;
+
+    public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilites {
+        this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
+
+        return super.initialize(args);
+    }
 
     public launch(args: LaunchRequestArguments): Promise<void> {
         super.launch(args);
@@ -54,11 +53,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         } else {
             if (!Terminal.isOnPath(NodeDebugAdapter.NODE)) {
-                return Promise.reject(<DebugProtocol.Message>{
-                    id: 2001,
-                    format: localize('VSND2001', "Cannot find runtime '{0}' on PATH.", '{_runtime}'),
-                    variables: { _runtime: NodeDebugAdapter.NODE }
-                });
+                return Promise.reject(errors.runtimeNotFound(NodeDebugAdapter.NODE));
             }
 
             // use node from PATH
@@ -124,86 +119,74 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
         this.logLaunchCommand(launchArgs);
 
-        if (args.console === 'integratedTerminal') {
+        let launchP: Promise<void>;
+        if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
             const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
-                kind: 'integrated',
+                kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
                 title: localize('node.console.title', "Node Debug Console"),
                 cwd,
                 args: launchArgs,
                 env: args.env
             };
-
-            return new Promise<void>((resolve, reject) => {
-                this.sendRequest('runInTerminal', termArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
-                    if (response.success) {
-                        // since node starts in a terminal, we cannot track it with an 'exit' handler
-                        // plan for polling after we have gotten the process pid.
-                        this._pollForNodeProcess = true;
-
-                        args.noDebug ?
-                            resolve() :
-                            this.doAttach(port, undefined, args.address, args.timeout)
-                                .then(() => this.getNodeProcessIdIfNeeded())
-                                .then(resolve, reject);
-                    } else {
-                        reject(<DebugProtocol.Message>{
-                            id: 2011,
-                            format: localize('VSND2011', "Cannot launch debug target in terminal ({0}).", '{_error}'),
-                            variables: { _error: response.message }
-                        });
-
-                        this.terminateSession('terminal error: ' + response.message);
-                    }
-                });
-            });
+            launchP = this.launchInTerminal(termArgs);
         } else if (!args.console || args.console === 'internalConsole') {
             // merge environment variables into a copy of the process.env
             const env = Object.assign({}, process.env, args.env);
-
-            const options = {
-                cwd,
-                env
-            };
-
-            const nodeProcess = cp.spawn(runtimeExecutable, launchArgs.slice(1), options);
-
-            return new Promise<void>((resolve, reject) => {
-                nodeProcess.on('error', (error) => {
-                    reject(<DebugProtocol.Message>{
-                        id: 2017,
-                        format: localize('VSND2017', "Cannot launch debug target ({0}).", '{_error}'),
-                        variables: { _error: error.message },
-                        showUser: true,
-                        sendTelemetry: true
-                    });
-
-                    this.terminateSession(`failed to launch target (${error})`);
-                });
-                nodeProcess.on('exit', () => {
-                    this.terminateSession('target exited');
-                });
-                nodeProcess.on('close', (code) => {
-                    this.terminateSession('target closed');
-                });
-
-                this._nodeProcessId = nodeProcess.pid;
-
-                // Capture process output
-                process.stdout.on('data', (data: string) => {
-                    this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
-                });
-                process.stderr.on('data', (data: string) => {
-                    this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
-                });
-
-                return args.noDebug ?
-                    Promise.resolve() :
-                    this.doAttach(port, undefined, args.address, args.timeout)
-                        .then(() => this.getNodeProcessIdIfNeeded());
-            });
+            launchP = this.launchInIntegratedConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
         } else {
-            return coreUtils.errP('NOT IMPLEMENTED');
+            return Promise.reject(errors.unknownConsoleType(args.console));
         }
+
+        launchP
+            .then(() => {
+                return args.noDebug ?
+                    Promise.resolve<void>() :
+                    this.doAttach(port, undefined, args.address, args.timeout);
+            })
+            .then(() => this.getNodeProcessIdIfNeeded());
+    }
+
+    private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.sendRequest('runInTerminal', termArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
+                if (response.success) {
+                    // since node starts in a terminal, we cannot track it with an 'exit' handler
+                    // plan for polling after we have gotten the process pid.
+                    this._pollForNodeProcess = true;
+                    resolve();
+                } else {
+                    reject(errors.cannotLaunchInTerminal(response.message));
+                    this.terminateSession('terminal error: ' + response.message);
+                }
+            });
+        });
+    }
+
+    private launchInIntegratedConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: { cwd: string, env: string }): Promise<void> {
+        const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
+         return new Promise<void>((resolve, reject) => {
+            this._nodeProcessId = nodeProcess.pid;
+            nodeProcess.on('error', (error) => {
+                reject(errors.cannotLaunchDebugTarget(error));
+                this.terminateSession(`failed to launch target (${error})`);
+            });
+            nodeProcess.on('exit', () => {
+                this.terminateSession('target exited');
+            });
+            nodeProcess.on('close', (code) => {
+                this.terminateSession('target closed');
+            });
+
+            // Capture process output
+            process.stdout.on('data', (data: string) => {
+                this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
+            });
+            process.stderr.on('data', (data: string) => {
+                this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
+            });
+
+            resolve();
+         });
     }
 
     /**

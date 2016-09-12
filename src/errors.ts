@@ -1,0 +1,40 @@
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ *--------------------------------------------------------*/
+
+import {DebugProtocol} from 'vscode-debugprotocol';
+
+import {localize} from './utils';
+
+export function runtimeNotFound(_runtime: string): DebugProtocol.Message {
+    return {
+        id: 2001,
+        format: localize('VSND2001', "Cannot find runtime '{0}' on PATH.", '{_runtime}'),
+        variables: { _runtime }
+    };
+}
+
+export function cannotLaunchInTerminal(_error: string): DebugProtocol.Message {
+    return {
+        id: 2011,
+        format: localize('VSND2011', "Cannot launch debug target in terminal ({0}).", '{_error}'),
+        variables: { _error }
+    }
+}
+
+export function cannotLaunchDebugTarget(_error: string): DebugProtocol.Message {
+    return {
+        id: 2017,
+        format: localize('VSND2017', "Cannot launch debug target ({0}).", '{_error}'),
+        variables: { _error },
+        showUser: true,
+        sendTelemetry: true
+    }
+}
+
+export function unknownConsoleType(consoleType: string): DebugProtocol.Message {
+    return {
+        id: 2028,
+        format: localize('VSND2028', "Unknown console type '{0}'.", consoleType)
+    };
+}
