@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import * as cp from 'child_process';
 
 import {Terminal} from './terminal/terminal';
-import {LaunchRequestArguments, NodeDebugError} from './nodeDebugInterfaces';
+import {LaunchRequestArguments, AttachRequestArguments, NodeDebugError} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import {localize} from './utils';
@@ -28,8 +28,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private _continueAfterConfigDone = true;
     private _entryPauseEvent: Chrome.Debugger.PausedParams;
+    private _isTerminated: boolean;
 
     private _supportsRunInTerminalRequest: boolean;
+    private _restartMode: boolean;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilites {
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
@@ -146,6 +148,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             .then(() => this.getNodeProcessIdIfNeeded());
     }
 
+    public attach(args: AttachRequestArguments): Promise<void> {
+        this._restartMode = args.restart;
+        return super.attach(args);
+    }
+
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.sendRequest('runInTerminal', termArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
@@ -228,18 +235,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public terminateSession(reason: string): void {
-        super.terminateSession(reason);
         this._nodeProcessId = 0;
 
-        // For restart
-        // if (!this._isTerminated) {
-        //     this._isTerminated = true;
-        //     if (this._restartMode && !this._inShutdown) {
-        //         this.sendEvent(new TerminatedEvent(true));
-        //     } else {
-        //         this.sendEvent(new TerminatedEvent());
-        //     }
-        // }
+        const requestRestart = this._restartMode && !this._inShutdown;
+        super.terminateSession(reason, requestRestart);
     }
 
     protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
