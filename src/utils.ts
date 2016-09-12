@@ -4,6 +4,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
+import * as cp from 'child_process';
 
 const NODE_SHEBANG_MATCHER = new RegExp('#! */usr/bin/env +node');
 
@@ -42,4 +43,55 @@ export function localize(id: string, msg: string, ...args: any[]): string {
     });
 
     return msg;
+}
+
+export function killTree(processId: number): void {
+    if (process.platform === 'win32') {
+        const TASK_KILL = 'C:\\Windows\\System32\\taskkill.exe';
+
+        // when killing a process in Windows its child processes are *not* killed but become root processes.
+        // Therefore we use TASKKILL.EXE
+        try {
+            cp.execSync(`${TASK_KILL} /F /T /PID ${processId}`);
+        }
+        catch (err) {
+        }
+    } else {
+        // on linux and OS X we kill all direct and indirect child processes as well
+        try {
+            const cmd = path.join(__dirname, './terminateProcess.sh');
+            cp.spawnSync(cmd, [ processId.toString() ]);
+        } catch (err) {
+        }
+    }
+}
+
+export function isOnPath(program: string): boolean {
+	if (process.platform === 'win32') {
+		const WHERE = 'C:\\Windows\\System32\\where.exe';
+		try {
+			if (fs.existsSync(WHERE)) {
+				cp.execSync(`${WHERE} ${program}`);
+			} else {
+				// do not report error if 'where' doesn't exist
+			}
+			return true;
+		}
+		catch (Exception) {
+			// ignore
+		}
+	} else {
+		const WHICH = '/usr/bin/which';
+		try {
+			if (fs.existsSync(WHICH)) {
+				cp.execSync(`${WHICH} '${program}'`);
+			} else {
+				// do not report error if 'which' doesn't exist
+			}
+			return true;
+		}
+		catch (Exception) {
+		}
+	}
+	return false;
 }

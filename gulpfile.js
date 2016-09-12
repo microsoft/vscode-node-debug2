@@ -16,7 +16,7 @@ const sources = [
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
 const scripts = [
-    'src/terminal/terminateProcess.sh'
+    'src/terminateProcess.sh'
 ];
 
 const lintSources = [

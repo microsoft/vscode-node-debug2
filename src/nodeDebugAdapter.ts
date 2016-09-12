@@ -11,7 +11,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
-import {Terminal} from './terminal/terminal';
 import {LaunchRequestArguments, AttachRequestArguments, NodeDebugError} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
@@ -54,7 +53,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
             }
         } else {
-            if (!Terminal.isOnPath(NodeDebugAdapter.NODE)) {
+            if (!utils.isOnPath(NodeDebugAdapter.NODE)) {
                 return Promise.reject(errors.runtimeNotFound(NodeDebugAdapter.NODE));
             }
 
@@ -218,12 +217,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public clearEverything(): void {
-        super.clearEverything();
-
         if (this._nodeProcessId && !this._attachMode) {
             logger.log('Killing process with id: ' + this._nodeProcessId);
-            Terminal.killTree(this._nodeProcessId);
+            utils.killTree(this._nodeProcessId);
         }
+
+        this._nodeProcessId = 0;
+        super.clearEverything();
     }
 
     protected clearTargetContext(): void {
@@ -237,8 +237,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public terminateSession(reason: string): void {
         const requestRestart = this._restartMode && !this._inShutdown;
         super.terminateSession(reason, requestRestart);
-
-        this._nodeProcessId = 0;
     }
 
     protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
