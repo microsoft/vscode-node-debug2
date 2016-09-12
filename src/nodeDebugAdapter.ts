@@ -220,7 +220,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public clearEverything(): void {
         super.clearEverything();
 
-        if (this._nodeProcessId) {
+        if (this._nodeProcessId && !this._attachMode) {
             logger.log('Killing process with id: ' + this._nodeProcessId);
             Terminal.killTree(this._nodeProcessId);
         }
@@ -235,10 +235,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public terminateSession(reason: string): void {
-        this._nodeProcessId = 0;
-
         const requestRestart = this._restartMode && !this._inShutdown;
         super.terminateSession(reason, requestRestart);
+
+        this._nodeProcessId = 0;
     }
 
     protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
