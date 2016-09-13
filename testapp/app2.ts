@@ -31,7 +31,7 @@ export function consoleAPIs() {
     (() => console.trace())();
 
     try {
-        console.assert(1 == 2, '1 is not 2');
+        console.assert(1 == <any>2, '1 is not 2');
     } catch (e) { }
 }
 

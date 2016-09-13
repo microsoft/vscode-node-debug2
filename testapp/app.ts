@@ -4,11 +4,19 @@ function log() {
     console.log('Hello, world!');
     test();
 }
-
 log();
 setInterval(log, 3000);
 
 function test() {
+    // Test large callstack
+    // var count = 0;
+    // function rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890() {
+    //     if (++count === 60) debugger
+    //     else rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890();
+    // }
+
+    // rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890();
+
     debugger;
     locals();
 
@@ -22,6 +30,17 @@ function test() {
 }
 
 function locals() {
+    const veryLargeArray = [];
+    for (let i = 0; i <= 10000; i++) veryLargeArray[i] = veryLargeArray;
+    veryLargeArray[0] = new Array(10000).join('0');
+
+    let generator = function*() {
+        for (let i=0; i<10; i++)
+            yield i;
+    };
+    const gen = generator();
+    const genNext = gen.next();
+
     const manyPropsObj: any = { prop2: 'abc', prop1: 'def' };
     for (let i=0; i<=100; i++) manyPropsObj[i] = Math.random();
 
