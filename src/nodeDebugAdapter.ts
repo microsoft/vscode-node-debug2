@@ -25,12 +25,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
 
+    // Flags relevant during init
     private _continueAfterConfigDone = true;
     private _entryPauseEvent: Chrome.Debugger.PausedParams;
-    private _isTerminated: boolean;
+    private _waitingForEntryPauseEvent = true;
 
     private _supportsRunInTerminalRequest: boolean;
     private _restartMode: boolean;
+    private _isTerminated: boolean;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilites {
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
@@ -143,13 +145,20 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 return args.noDebug ?
                     Promise.resolve<void>() :
                     this.doAttach(port, undefined, args.address, args.timeout);
-            })
-            .then(() => this.getNodeProcessIdIfNeeded());
+            });
     }
 
     public attach(args: AttachRequestArguments): Promise<void> {
         this._restartMode = args.restart;
         return super.attach(args);
+    }
+
+    protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {
+        return super.doAttach(port, targetUrl, address, timeout)
+            .then(() => {
+                this.beginWaitingForDebuggerPaused();
+                return this.getNodeProcessIdIfNeeded();
+            });
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
@@ -199,17 +208,17 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * Override so that -core's call on attach will be ignored, and we can wait until the first break when ready to set BPs.
      */
     protected sendInitializedEvent(): void {
-        if (this._entryPauseEvent) {
+        if (!this._waitingForEntryPauseEvent) {
             super.sendInitializedEvent();
         }
     }
 
     public configurationDone(): Promise<void> {
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
-        // So, either tell the target to continue, or tell the client that we paused.
+        // So tell the target to continue, or tell the client that we paused, as needed
         if (this._continueAfterConfigDone) {
             this.continue();
-        } else {
+        } else if (this._entryPauseEvent) {
             this.onDebuggerPaused(this._entryPauseEvent);
         }
 
@@ -241,9 +250,17 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
         // If we don't have the entry location, this must be the entry pause
-        if (!this._entryPauseEvent) {
+        if (this._waitingForEntryPauseEvent) {
             logger.log('Paused on entry');
             this._entryPauseEvent = notification;
+            this._waitingForEntryPauseEvent = false;
+
+            if (this._attachMode) {
+                // In attach mode, and we did pause right away,
+                // so assume --debug-brk was set and we should show paused
+                this._continueAfterConfigDone = false;
+            }
+
             this.getNodeProcessIdIfNeeded()
                 .then(() => this.sendInitializedEvent());
         } else {
@@ -252,16 +269,41 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     /**
+     * Wait 500ms for the entry pause event, and if it doesn't come, move on with life.
+     * During attach, we don't know whether it's paused when attaching.
+     */
+    private beginWaitingForDebuggerPaused(): void {
+        let count = 10;
+        const id = setInterval(() => {
+            if (this._entryPauseEvent) {
+                // Got the entry pause, stop waiting
+                clearInterval(id);
+            } else if (--count <= 0) {
+                // No entry event, so fake it and continue
+                logger.log('Did not get a pause event 500ms after starting, so continuing');
+                clearInterval(id);
+                this._continueAfterConfigDone = false;
+                this._waitingForEntryPauseEvent = false;
+
+                this.getNodeProcessIdIfNeeded()
+                    .then(() => this.sendInitializedEvent());
+            }
+        }, 50);
+    }
+
+    /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
     protected addBreakpoints(url: string, lines: number[], cols?: number[]): Promise<Chrome.Debugger.SetBreakpointResponse[]> {
         return super.addBreakpoints(url, lines, cols).then(responses => {
-            const entryLocation = this._entryPauseEvent.callFrames[0].location;
-            if (this._continueAfterConfigDone && responses.some(response => response.result.actualLocation === entryLocation)) {
-                // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
-                // the stopOnEntry flag is not set
-                logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
-                this._continueAfterConfigDone = false;
+            if (this._entryPauseEvent) {
+                const entryLocation = this._entryPauseEvent.callFrames[0].location;
+                if (this._continueAfterConfigDone && responses.some(response => response.result.actualLocation === entryLocation)) {
+                    // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
+                    // the stopOnEntry flag is not set
+                    logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
+                    this._continueAfterConfigDone = false;
+                }
             }
 
             return responses;
