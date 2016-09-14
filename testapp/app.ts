@@ -67,6 +67,11 @@ newlines`;
     let nan = NaN;
     let inf = 1/0;
     let infStr = "Infinity";
+    const obj = {
+        '[test]': 1,
+        '.test2': 2,
+        ' ': 3
+    };
 
     eval('var evalVar3 = [1,2,3]');
     eval('var evalVar1 = 16');
@@ -77,6 +82,7 @@ newlines`;
         // Some fn
         const xyz = 321;
         app2.anotherFn();
+        return 5;
     };
     const fn2 = function() {
         const zzz = 333;
