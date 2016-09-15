@@ -19,7 +19,7 @@ import * as errors from './errors';
 
 export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
-    private static RUNINTERMINAL_TIMEOUT = 3000;
+    private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
 
     private _nodeProcessId: number;
