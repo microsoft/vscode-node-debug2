@@ -140,7 +140,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return Promise.reject(errors.unknownConsoleType(args.console));
         }
 
-        launchP
+        return launchP
             .then(() => {
                 return args.noDebug ?
                     Promise.resolve<void>() :
