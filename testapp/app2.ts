@@ -1,3 +1,5 @@
+console.log('app2.ts loaded');
+
 export function throwCaught(): void {
 
 }
