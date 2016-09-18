@@ -8,7 +8,7 @@
     "typescript": "^2.0.0"
   },
   "scripts": {
-    "build": "tsc -w --sourceMap -p ."
+    "build": "tsc -w -p ."
   },
   "author": "",
   "license": ""

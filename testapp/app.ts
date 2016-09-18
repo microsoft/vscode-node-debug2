@@ -31,8 +31,8 @@ function test() {
 
 function locals() {
     const veryLargeArray = [];
-    for (let i = 0; i <= 10000; i++) veryLargeArray[i] = veryLargeArray;
-    veryLargeArray[0] = new Array(10000).join('0');
+    for (let i = 0; i <= 1e6; i++) veryLargeArray[i] = Math.random();
+    veryLargeArray[0] = veryLargeArray;
 
     let generator = function*() {
         for (let i=0; i<10; i++)
@@ -42,7 +42,7 @@ function locals() {
     const genNext = gen.next();
 
     const manyPropsObj: any = { prop2: 'abc', prop1: 'def' };
-    for (let i=0; i<=100; i++) manyPropsObj[i] = Math.random();
+    for (let i=0; i<=10000; i++) manyPropsObj['prop' + i] = Math.random();
 
     const r = /^asdf.*$/g;
     const longStr = `this is a
