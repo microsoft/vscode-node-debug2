@@ -135,7 +135,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         } else if (!args.console || args.console === 'internalConsole') {
             // merge environment variables into a copy of the process.env
             const env = Object.assign({}, process.env, args.env);
-            launchP = this.launchInIntegratedConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
+            launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
         } else {
             return Promise.reject(errors.unknownConsoleType(args.console));
         }
@@ -177,7 +177,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private launchInIntegratedConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: { cwd: string, env: string }): Promise<void> {
+    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: { cwd: string, env: string }): Promise<void> {
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
          return new Promise<void>((resolve, reject) => {
             this._nodeProcessId = nodeProcess.pid;
