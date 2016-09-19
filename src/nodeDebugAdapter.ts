@@ -177,7 +177,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: { cwd: string, env: string }): Promise<void> {
+    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: cp.SpawnOptions): Promise<void> {
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
          return new Promise<void>((resolve, reject) => {
             this._nodeProcessId = nodeProcess.pid;
@@ -192,12 +192,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this.terminateSession('target closed');
             });
 
-            // Capture process output
-            process.stdout.on('data', (data: string) => {
-                this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
-            });
-            process.stderr.on('data', (data: string) => {
-                this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
+            nodeProcess.stderr.on('data', (data: string) => {
+                // Print stderr, but chop off the Chrome-specific message
+                let msg = data.toString();
+                const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
+                if (chromeMsgIndex >= 0) {
+                    msg = msg.substr(0, chromeMsgIndex);
+                }
+
+                this.sendEvent(new OutputEvent(msg, 'stderr'));
             });
 
             resolve();
