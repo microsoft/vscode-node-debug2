@@ -12,6 +12,21 @@
             "args": [ "--server=4712" ],
             "sourceMaps": true,
             "outDir": "${workspaceRoot}/out"
-        }
+        },
+        {
+			"name": "Run Tests",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceRoot}",
+			"program": "${workspaceRoot}/node_modules/.bin/mocha",
+			"args": [
+				"-u", "tdd",
+				"--timeout", "3000",
+				"--colors",
+				"./out/test"
+			],
+			"sourceMaps": true,
+			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ]
+		}
     ]
 }

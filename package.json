@@ -35,6 +35,7 @@
     "vscode-debugadapter-testsupport": "^1.12.0"
   },
   "scripts": {
+    "test": "mocha --timeout 10000 -u tdd ./out/test/"
   },
   "contributes": {
     "debuggers": [
