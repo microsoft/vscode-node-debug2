@@ -200,7 +200,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     msg = msg.substr(0, chromeMsgIndex);
                 }
 
-                this.sendEvent(new OutputEvent(msg, 'stderr'));
+                logger.error(msg);
             });
 
             resolve();
@@ -363,7 +363,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             cli += ' ';
         }
 
-        logger.log(cli);
+        logger.log(cli, /*forceLog=*/true);
     }
 
     /**
