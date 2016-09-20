@@ -220,6 +220,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
         // So tell the target to continue, or tell the client that we paused, as needed
         if (this._continueAfterConfigDone) {
+            this._expectingStopReason = undefined;
             this.continue();
         } else if (this._entryPauseEvent) {
             this.onDebuggerPaused(this._entryPauseEvent);
@@ -236,14 +237,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
-    protected clearTargetContext(): void {
-        super.clearTargetContext();
-
-        // Mainly to ensure it's cleared in server mode, but if Node had some way to refresh in proc and stop on entry again,
-        // then this would also be hit.
-        this._entryPauseEvent = null;
-    }
-
     public terminateSession(reason: string): void {
         const requestRestart = this._restartMode && !this._inShutdown;
         super.terminateSession(reason, requestRestart);
@@ -254,6 +247,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log('Paused on entry');
+            this._expectingStopReason = 'entry';
             this._entryPauseEvent = notification;
             this._waitingForEntryPauseEvent = false;
 
@@ -300,11 +294,20 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.addBreakpoints(url, lines, cols).then(responses => {
             if (this._entryPauseEvent) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;
-                if (this._continueAfterConfigDone && responses.some(response => response.result.actualLocation === entryLocation)) {
-                    // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
-                    // the stopOnEntry flag is not set
-                    logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
-                    this._continueAfterConfigDone = false;
+                if (this._continueAfterConfigDone) {
+                    const bpAtEntryLocation = responses.some(response => {
+                        // Don't compare column location, because you can have a bp at col 0, then break at some other column
+                        return response.result.actualLocation.lineNumber === entryLocation.lineNumber &&
+                            response.result.actualLocation.scriptId === entryLocation.scriptId;
+                    });
+
+                    if (bpAtEntryLocation) {
+                        // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
+                        // the stopOnEntry flag is not set
+                        logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
+                        this._continueAfterConfigDone = false;
+                        this._expectingStopReason = 'breakpoint';
+                    }
                 }
             }
 
