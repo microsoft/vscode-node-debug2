@@ -271,7 +271,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private beginWaitingForDebuggerPaused(): void {
         let count = 10;
         const id = setInterval(() => {
-            if (this._entryPauseEvent) {
+            if (this._entryPauseEvent || this._isTerminated) {
                 // Got the entry pause, stop waiting
                 clearInterval(id);
             } else if (--count <= 0) {
