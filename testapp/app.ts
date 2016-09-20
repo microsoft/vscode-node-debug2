@@ -30,7 +30,7 @@ function test() {
 
 function locals() {
     const veryLargeArray = [];
-    for (let i = 0; i <= 1e6; i++) veryLargeArray[i] = Math.random();
+    for (let i = 0; i <= 5; i++) veryLargeArray[i] = Math.random();
     veryLargeArray[0] = veryLargeArray;
 
     let generator = function*() {
@@ -41,7 +41,7 @@ function locals() {
     const genNext = gen.next();
 
     const manyPropsObj: any = { prop2: 'abc', prop1: 'def' };
-    for (let i=0; i<=10000; i++) manyPropsObj['prop' + i] = Math.random();
+    for (let i=0; i<=5; i++) manyPropsObj['prop' + i] = Math.random();
 
     const reg = /^asdf.*$/g;
     const longStr = `this is a

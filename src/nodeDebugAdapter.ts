@@ -228,14 +228,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.configurationDone();
     }
 
-    public clearEverything(): void {
+    private killNodeProcess(): void {
         if (this._nodeProcessId && !this._attachMode) {
             logger.log('Killing process with id: ' + this._nodeProcessId);
             utils.killTree(this._nodeProcessId);
+           this._nodeProcessId = 0;
         }
-
-        this._nodeProcessId = 0;
-        super.clearEverything();
     }
 
     protected clearTargetContext(): void {
@@ -249,6 +247,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public terminateSession(reason: string): void {
         const requestRestart = this._restartMode && !this._inShutdown;
         super.terminateSession(reason, requestRestart);
+        this.killNodeProcess();
     }
 
     protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
