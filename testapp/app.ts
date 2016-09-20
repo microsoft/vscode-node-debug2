@@ -17,7 +17,6 @@ function test() {
 
     // rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890rec1234567890();
 
-    debugger;
     locals();
 
     // set to true in the console to step into here
@@ -44,7 +43,7 @@ function locals() {
     const manyPropsObj: any = { prop2: 'abc', prop1: 'def' };
     for (let i=0; i<=10000; i++) manyPropsObj['prop' + i] = Math.random();
 
-    const r = /^asdf.*$/g;
+    const reg = /^asdf.*$/g;
     const longStr = `this is a
 string with
 newlines`;
@@ -57,7 +56,10 @@ newlines`;
     const m = new Map();
     m.set('a', 1);
     m.set('bcd', [1, 2, 3]);
-    m.set('def', { m });
+    m.set('def', m);
+    veryLargeArray.forEach(x => m.set('k' + x, x));
+    m['blah'] = 3;
+    m[5] = 1;
 
     const set = new Set();
     set.add('blah');
@@ -73,6 +75,7 @@ newlines`;
         ' ': 3
     };
 
+    debugger;
     eval('var evalVar3 = [1,2,3]');
     eval('var evalVar1 = 16');
     eval('var evalVar2 = "sdlfk"');
