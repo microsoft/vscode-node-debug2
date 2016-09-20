@@ -12,7 +12,9 @@ const tslint = require('gulp-tslint');
 
 const sources = [
     'src',
-    'typings/main'
+    'test',
+    'typings/main',
+    'node_modules/@types'
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
 const scripts = [
@@ -23,24 +25,15 @@ const lintSources = [
     'src'
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
-const projectConfig = {
-    noImplicitAny: false,
-    target: 'ES5',
-    module: 'commonjs',
-    declaration: true,
-    typescript,
-    outDir: 'out'
-};
-
 function computeSourceRoot(file) {
     return path.relative(path.dirname(file.path), __dirname);
 }
 
-const tsProject = ts.createProject(projectConfig);
+const tsProject = ts.createProject('tsconfig.json', { typescript });
 gulp.task('build', ['copy-scripts'], function () {
 	return gulp.src(sources, { base: '.' })
         .pipe(sourcemaps.init())
-        .pipe(ts(projectConfig)).js
+        .pipe(ts(tsProject)).js
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: computeSourceRoot }))
         .pipe(gulp.dest('out'));
 });

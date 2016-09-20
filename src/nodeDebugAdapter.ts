@@ -2,16 +2,15 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger, utils as coreUtils, ISetBreakpointsArgs, ISetBreakpointsResponseBody} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, logger} from 'vscode-chrome-debug-core';
 import * as Chrome from 'vscode-chrome-debug-core/lib/src/chrome/chromeDebugProtocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {TerminatedEvent, OutputEvent, InitializedEvent} from 'vscode-debugadapter';
 
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
-import {LaunchRequestArguments, AttachRequestArguments, NodeDebugError} from './nodeDebugInterfaces';
+import {LaunchRequestArguments, AttachRequestArguments} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import {localize} from './utils';

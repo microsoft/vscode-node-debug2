@@ -19,17 +19,22 @@
     "vscode-nls": "^1.0.4"
   },
   "devDependencies": {
+    "@types/es6-collections": "^0.5.29",
+    "@types/es6-promise": "0.0.32",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.39",
+    "@types/source-map": "^0.1.27",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-tslint": "^3.3.1",
     "gulp-typescript": "^2.12.1",
     "gulp-util": "^3.0.5",
+    "mocha": "^3.0.2",
     "tslint": "^2.5.1",
     "typescript": "^2.0.0",
-    "typings": "^0.7.12"
+    "vscode-debugadapter-testsupport": "^1.12.0"
   },
   "scripts": {
-    "postinstall": "typings install"
   },
   "contributes": {
     "debuggers": [
