@@ -144,7 +144,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             .then(() => {
                 return args.noDebug ?
                     Promise.resolve<void>() :
-                    this.doAttach(port, undefined, args.address, args.timeout);
+                    this.doAttach(port, undefined, args.address, args.timeout)
+                        .then(() => this.getNodeProcessIdIfNeeded());
             });
     }
 
@@ -157,7 +158,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.doAttach(port, targetUrl, address, timeout)
             .then(() => {
                 this.beginWaitingForDebuggerPaused();
-                return this.getNodeProcessIdIfNeeded();
             });
     }
 
@@ -313,7 +313,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private getNodeProcessIdIfNeeded(): Promise<void> {
-        if (this._nodeProcessId) {
+        if (this._nodeProcessId || !this._pollForNodeProcess) {
             return Promise.resolve<void>();
         }
 
