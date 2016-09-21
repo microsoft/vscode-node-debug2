@@ -80,72 +80,70 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return this.getAttributeMissingErrorResponse('program');
         }
 
-        if (utils.isJavaScript(programPath)) {
-            // resolve sourcemaps if needed
-        } else {
-            // error
-        }
+        return Promise.resolve().then(() => {
+            return this.resolveProgramPath(programPath, args.sourceMaps);
+        }).then(programPath => {
+            let program: string;
+            let cwd = args.cwd;
+            if (cwd) {
+                if (!path.isAbsolute(cwd)) {
+                    return this.getRelativePathErrorResponse('cwd', cwd);
+                }
 
-        let program: string;
-        let cwd = args.cwd;
-        if (cwd) {
-            if (!path.isAbsolute(cwd)) {
-                return this.getRelativePathErrorResponse('cwd', cwd);
+                if (!fs.existsSync(cwd)) {
+                    return this.getNotExistErrorResponse('cwd', cwd);
+                }
+
+                // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
+                program = path.relative(cwd, programPath);
+            }
+            else { // should not happen
+                // if no working dir given, we use the direct folder of the executable
+                cwd = path.dirname(programPath);
+                program = path.basename(programPath);
             }
 
-            if (!fs.existsSync(cwd)) {
-                return this.getNotExistErrorResponse('cwd', cwd);
+            const runtimeArgs = args.runtimeArgs || [];
+            const programArgs = args.args || [];
+
+            let launchArgs = [runtimeExecutable, '--nolazy'];
+            if (!args.noDebug) {
+                launchArgs.push(`--inspect=${port}`);
             }
 
-            // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
-            program = path.relative(cwd, programPath);
-        }
-        else { // should not happen
-            // if no working dir given, we use the direct folder of the executable
-            cwd = path.dirname(programPath);
-            program = path.basename(programPath);
-        }
+            // Always stop on entry to set breakpoints
+            launchArgs.push('--debug-brk');
+            this._continueAfterConfigDone = !args.stopOnEntry;
 
-        const runtimeArgs = args.runtimeArgs || [];
-        const programArgs = args.args || [];
+            launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
+            this.logLaunchCommand(launchArgs);
 
-        let launchArgs = [runtimeExecutable, '--nolazy'];
-        if (!args.noDebug) {
-            launchArgs.push(`--inspect=${port}`);
-        }
+            let launchP: Promise<void>;
+            if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
+                const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
+                    kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
+                    title: localize('node.console.title', "Node Debug Console"),
+                    cwd,
+                    args: launchArgs,
+                    env: args.env
+                };
+                launchP = this.launchInTerminal(termArgs);
+            } else if (!args.console || args.console === 'internalConsole') {
+                // merge environment variables into a copy of the process.env
+                const env = Object.assign({}, process.env, args.env);
+                launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
+            } else {
+                return Promise.reject(errors.unknownConsoleType(args.console));
+            }
 
-        // Always stop on entry to set breakpoints
-        launchArgs.push('--debug-brk');
-        this._continueAfterConfigDone = !args.stopOnEntry;
-
-        launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
-        this.logLaunchCommand(launchArgs);
-
-        let launchP: Promise<void>;
-        if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
-            const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
-                kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
-                title: localize('node.console.title', "Node Debug Console"),
-                cwd,
-                args: launchArgs,
-                env: args.env
-            };
-            launchP = this.launchInTerminal(termArgs);
-        } else if (!args.console || args.console === 'internalConsole') {
-            // merge environment variables into a copy of the process.env
-            const env = Object.assign({}, process.env, args.env);
-            launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
-        } else {
-            return Promise.reject(errors.unknownConsoleType(args.console));
-        }
-
-        return launchP
-            .then(() => {
-                return args.noDebug ?
-                    Promise.resolve<void>() :
-                    this.doAttach(port, undefined, args.address, args.timeout)
-                        .then(() => this.getNodeProcessIdIfNeeded());
-            });
+            return launchP
+                .then(() => {
+                    return args.noDebug ?
+                        Promise.resolve<void>() :
+                        this.doAttach(port, undefined, args.address, args.timeout)
+                            .then(() => this.getNodeProcessIdIfNeeded());
+                });
+        });
     }
 
     public attach(args: AttachRequestArguments): Promise<void> {
@@ -263,6 +261,50 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
+    private resolveProgramPath(programPath: string, sourceMaps: boolean): Promise<string> {
+        return Promise.resolve().then(() => {
+            if (!programPath) {
+                return programPath;
+            }
+
+            if (utils.isJavaScript(programPath)) {
+                if (!sourceMaps) {
+                    return programPath;
+                }
+
+                // if programPath is a JavaScript file and sourceMaps are enabled, we don't know whether
+                // programPath is the generated file or whether it is the source (and we need source mapping).
+                // Typically this happens if a tool like 'babel' or 'uglify' is used (because they both transpile js to js).
+                // We use the source maps to find a 'source' file for the given js file.
+                return this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath).then(generatedPath => {
+                    if (generatedPath && generatedPath !== programPath) {
+                        // programPath must be source because there seems to be a generated file for it
+                        logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
+                        programPath = generatedPath;
+                    } else {
+                        logger.log(`Launch: program '${programPath}' seems to be the generated file`);
+                    }
+
+                    return programPath;
+                });
+            } else {
+                // node cannot execute the program directly
+                if (!sourceMaps) {
+                    return Promise.reject(errors.cannotLaunchBecauseSourceMaps(programPath));
+                }
+
+                return this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath).then(generatedPath => {
+                    if (!generatedPath) { // cannot find generated file
+                        return Promise.reject(errors.cannotLaunchBecauseOutdir(programPath));
+                    }
+
+                    logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
+                    return generatedPath;
+                });
+            }
+        });
+    }
+
     /**
      * Wait 500ms for the entry pause event, and if it doesn't come, move on with life.
      * During attach, we don't know whether it's paused when attaching.
@@ -289,8 +331,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
-    protected addBreakpoints(url: string, lines: number[], cols?: number[]): Promise<Chrome.Debugger.SetBreakpointResponse[]> {
-        return super.addBreakpoints(url, lines, cols).then(responses => {
+    protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<Chrome.Debugger.SetBreakpointResponse[]> {
+        return super.addBreakpoints(url, breakpoints).then(responses => {
             if (this._entryPauseEvent) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;
                 if (this._continueAfterConfigDone) {

@@ -38,3 +38,19 @@ export function unknownConsoleType(consoleType: string): DebugProtocol.Message {
         format: localize('VSND2028', "Unknown console type '{0}'.", consoleType)
     };
 }
+
+export function cannotLaunchBecauseSourceMaps(programPath: string): DebugProtocol.Message {
+    return {
+        id: 2002,
+        format: localize('VSND2002', "Cannot launch program '{0}'; configuring source maps might help.", '{path}'),
+        variables: { path: programPath }
+    };
+}
+
+export function cannotLaunchBecauseOutdir(programPath: string): DebugProtocol.Message {
+    return {
+        id: 2003,
+        format: localize('VSND2003', "Cannot launch program '{0}'; setting the '{1}' attribute might help.", '{path}', 'outDir'),
+        variables: { path: programPath }
+    };
+}

@@ -21,7 +21,8 @@ suite('Node Debug Adapter', () => {
 
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node');
-        return dc.start(); // add port to run as server
+        // return dc.start(4712);
+        return dc.start();
     });
 
     teardown( () => dc.stop() );
@@ -205,8 +206,7 @@ suite('Node Debug Adapter', () => {
             });
         });
 
-        // Sourcemap on launch
-        test.skip('should stop on a breakpoint in source (outDir)', () => {
+        test('should stop on a breakpoint in source (outDir)', () => {
 
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-inline/src/classes.ts');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-inline/dist');
@@ -223,8 +223,7 @@ suite('Node Debug Adapter', () => {
             });
         });
 
-        // Sourcemap on launch
-        test.skip('should stop on a breakpoint in source (outFiles)', () => {
+        test('should stop on a breakpoint in source (outFiles)', () => {
 
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-inline/src/classes.ts');
             const OUT_FILES = Path.join(DATA_ROOT, 'sourcemaps-inline/dist/**/*.js');
@@ -241,8 +240,7 @@ suite('Node Debug Adapter', () => {
             });
         });
 
-        // Sourcemap on launch
-        test.skip('should stop on a breakpoint in source with spaces in paths (outDir)', () => {
+        test('should stop on a breakpoint in source with spaces in paths (outDir)', () => {
 
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps with spaces', 'the source/classes.ts');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps with spaces/the distribution');
@@ -259,8 +257,7 @@ suite('Node Debug Adapter', () => {
             });
         });
 
-        // Sourcemap on launch
-        test.skip('should stop on a breakpoint in source with spaces in paths (outFiles)', () => {
+        test('should stop on a breakpoint in source with spaces in paths (outFiles)', () => {
 
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps with spaces', 'the source/classes.ts');
             const OUT_FILES = Path.join(DATA_ROOT, 'sourcemaps with spaces/the distribution/**/*.js');
@@ -475,7 +472,7 @@ suite('Node Debug Adapter', () => {
                 dc.configurationSequence(),
                 dc.launch({ program: PROGRAM }),
                 dc.assertOutput('stdout', 'Hello stdout 0\nHello stdout 1\nHello stdout 2\n'),
-                //dc.assertOutput('stderr', 'Hello stderr 0\nHello stderr 1\nHello stderr 2\n')
+                // dc.assertOutput('stderr', 'Hello stderr 0\nHello stderr 1\nHello stderr 2\n') // "debugger listening on port # ..." message
             ]);
         });
     });

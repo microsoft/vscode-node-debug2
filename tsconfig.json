@@ -12,6 +12,8 @@
         "noImplicitReturns": true
     },
     "exclude": [
+        "node_modules",
+        "!node_modules/@types",
         "testapp/",
         "typings/browser"
     ]
