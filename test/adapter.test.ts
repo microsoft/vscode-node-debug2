@@ -76,7 +76,6 @@ suite('Node Debug Adapter', () => {
 
         test('should stop on entry', () => {
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
-			console.log(PROGRAM);
             const ENTRY_LINE = 1;
 
             return Promise.all([
