@@ -24,7 +24,6 @@ function test() {
     if (doEverything) {
         app2.consoleAPIs();
         app2.throwCaught();
-        app2.throwUncaught();
     }
 }
 

@@ -9,14 +9,14 @@
             "program": "${workspaceRoot}/out/app.js",
             // "stopOnEntry": true,
             "cwd": "${workspaceRoot}",
-            "runtimeExecutable": "/Users/roblou/Downloads/node-v7.0.0-nightly20160905a290ddfdc9-darwin-x64/bin/node",
+            // "runtimeExecutable": "C:\\Users\\roblou\\Downloads\\node-v7.0.0-nightly201609202b5acda7a2-win-x86\\node-v7.0.0-nightly201609202b5acda7a2-win-x86\\node.exe",
             // "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v6.4.0/bin/node",
             "sourceMaps": true,
             "verboseDiagnosticLogging": true,
             "outDir": "${workspaceRoot}/out",
             // "webRoot": "${workspaceRoot}/out",
             // "trace": "all"
-            "console": "integratedTerminal"
+            "console": "internalConsole"
         },
         {
             "name": "Attach",
@@ -33,13 +33,18 @@
             // "restart": true
         },
         {
-            "name": "Attach to Process",
+            "name": "Attach remote",
             "type": "node",
             "request": "attach",
-            "processId": "${command.PickProcess}",
+            "address": "10.85.172.55",
             "port": 5858,
-            "sourceMaps": false,
-            "outDir": null
+            "sourceMaps": true,
+            "outDir": "${workspaceRoot}/out",
+            "verboseDiagnosticLogging": true,
+            "trace": "all",
+            "console": "integratedTerminal",
+            "localRoot": "${workspaceRoot}/out",
+            "remoteRoot": "/Users/roblou/code/vscode-node-cdp-debug/testapp/out"
         }
     ]
 }
