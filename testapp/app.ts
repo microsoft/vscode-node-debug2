@@ -76,9 +76,6 @@ newlines`;
     };
 
     debugger;
-    eval('var evalVar3 = [1,2,3]');
-    eval('var evalVar1 = 16');
-    eval('var evalVar2 = "sdlfk"');
 
     const bool = true;
     const fn = () => {
@@ -95,5 +92,4 @@ newlines`;
     fn();
 
     app2.throwCaught();
-    app2.throwUncaught();
 }

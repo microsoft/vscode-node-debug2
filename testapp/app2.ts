@@ -1,17 +1,16 @@
 console.log('app2.ts loaded');
 
 export function throwCaught(): void {
+    try {
+        throw new Error('error!');
+    } catch (e) {
 
-}
-
-export function throwUncaught(): void {
-
+    }
 }
 
 export function evalDebugger() {
     eval('var x = 1; debugger;');
     eval('throwCaught()');
-    eval('throwUncaught()');
 }
 
 export function consoleAPIs() {
