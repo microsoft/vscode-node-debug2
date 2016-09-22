@@ -13,7 +13,6 @@ const tslint = require('gulp-tslint');
 const sources = [
     'src',
     'test',
-    'typings/main',
     'node_modules/@types'
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
