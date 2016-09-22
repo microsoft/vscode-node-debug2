@@ -24,6 +24,8 @@
     "@types/es6-promise": "0.0.32",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.39",
+    "@types/source-map": "^0.1.27",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-tslint": "^3.3.1",
@@ -33,7 +35,9 @@
     "run-sequence": "^1.2.2",
     "tslint": "^2.5.1",
     "typescript": "^2.0.2",
-    "vscode-debugadapter-testsupport": "^1.12.0"
+    "vsce": "^1.14.0",
+    "vscode-debugadapter-testsupport": "^1.12.0",
+    "vscode-nls-dev": "^2.0.0-beta.1"
   },
   "scripts": {
     "test": "mocha --timeout 10000 -u tdd ./out/test/"
@@ -166,10 +170,13 @@
                 "default": true
               },
               "outDir": {
-								"type": ["string", "null"],
-								"description": "%node.outDir.description%",
-								"default": null
-							},
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "%node.outDir.description%",
+                "default": null
+              },
               "outFiles": {
                 "type": "array",
                 "description": "%node.outFiles.description%",
@@ -243,10 +250,13 @@
                 "default": true
               },
               "outDir": {
-								"type": ["string", "null"],
-								"description": "%node.outDir.description%",
-								"default": null
-							},
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "%node.outDir.description%",
+                "default": null
+              },
               "outFiles": {
                 "type": "array",
                 "description": "%node.outFiles.description%",

@@ -8,3 +8,4 @@ vscode-node-cdp-debug.txt
 typings/
 .browse.VC.db
 npm-debug.log
+package.nls.*.json

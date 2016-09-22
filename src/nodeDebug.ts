@@ -9,10 +9,10 @@ import {NodeDebugAdapter} from './nodeDebugAdapter';
 
 ChromeDebugSession.run(ChromeDebugSession.getSession(
     {
-        logFilePath: path.resolve(__dirname, '../../vscode-node-cdp-debug.txt'), // non-.txt file types can't be uploaded to github
+        logFilePath: path.resolve(__dirname, '../../vscode-node-debug2.txt'), // non-.txt file types can't be uploaded to github
         adapter: NodeDebugAdapter,
-        extensionName: 'node-debug'
+        extensionName: 'node-debug2'
     }));
 
 /* tslint:disable:no-var-requires */
-logger.log('node-debug: ' + require('../../package.json').version);
+logger.log('node-debug2: ' + require('../../package.json').version);

@@ -9,6 +9,10 @@ const log = require('gulp-util').log;
 const typescript = require('typescript');
 const sourcemaps = require('gulp-sourcemaps');
 const tslint = require('gulp-tslint');
+const runSequence = require('run-sequence');
+const nls = require('vscode-nls-dev');
+const cp = require('child_process');
+const del = require('del');
 
 const sources = [
     'src',
@@ -53,4 +57,35 @@ gulp.task('tslint', function() {
       return gulp.src(lintSources, { base: '.' })
         .pipe(tslint())
         .pipe(tslint.report('verbose'));
+});
+
+gulp.task('clean', function() {
+	return del(['out/**', 'package.nls.*.json', 'vscode-node-debug2-*.vsix']);
+});
+
+gulp.task('add-i18n', function() {
+	return gulp.src(['package.nls.json'])
+		.pipe(nls.createAdditionalLanguageFiles(nls.coreLanguages, 'i18n'))
+		.pipe(gulp.dest('.'));
+});
+
+function vsceTask(task) {
+    return cb => {
+        var cmd = cp.spawn('./node_modules/.bin/vsce', [ task ], { stdio: 'inherit' });
+        cmd.on('close', code => {
+            log(`vsce exited with ${code}`);
+            cb(code);
+        });
+    }
+}
+
+gulp.task('vsce-publish', vsceTask('publish'));
+gulp.task('vsce-package', vsceTask('package'));
+
+gulp.task('publish', function(callback) {
+	runSequence('build', 'add-i18n', 'vsce-publish', callback);
+});
+
+gulp.task('package', function(callback) {
+	runSequence('build', 'add-i18n', 'vsce-package', callback);
 });
