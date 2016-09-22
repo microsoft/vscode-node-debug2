@@ -1,6 +1,6 @@
 {
   "name": "vscode-node-debug2",
-  "displayName": "Node Debug 2",
+  "displayName": "Node Debug 2 - Experimental",
   "version": "0.0.1",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
@@ -165,6 +165,11 @@
                 "description": "%node.sourceMaps.description%",
                 "default": true
               },
+              "outDir": {
+								"type": ["string", "null"],
+								"description": "%node.outDir.description%",
+								"default": null
+							},
               "outFiles": {
                 "type": "array",
                 "description": "%node.outFiles.description%",
@@ -237,6 +242,11 @@
                 "description": "%node.sourceMaps.description%",
                 "default": true
               },
+              "outDir": {
+								"type": ["string", "null"],
+								"description": "%node.outDir.description%",
+								"default": null
+							},
               "outFiles": {
                 "type": "array",
                 "description": "%node.outFiles.description%",
