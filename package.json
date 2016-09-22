@@ -3,7 +3,7 @@
   "displayName": "Node Debug 2",
   "version": "0.0.1",
   "publisher": "ms-vscode",
-  "description": "Visual Studio Code debugger extension for Node.js, using the new Inspector Protocol",
+  "description": "%extension.description%",
   "icon": "images/node-debug-icon.svg",
   "categories": [
     "Debuggers"
@@ -61,7 +61,7 @@
     "debuggers": [
       {
         "type": "node2",
-        "label": "Node.js via Inspector Protocol",
+        "label": "%node2.label%",
         "program": "./out/src/nodeDebug.js",
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",

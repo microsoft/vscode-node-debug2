@@ -1,4 +1,8 @@
 {
+	"extension.description": "Visual Studio Code debugger extension for Node.js, using the new Inspector Protocol",
+
+	"node.label": "Node.js via Inspector Protocol",
+
 	"node.sourceMaps.description": "Use JavaScript source maps (if they exist).",
 	"node.outFiles.description": "If source maps are enabled, these glob patterns specify the generated JavaScript files. If a pattern starts with '!' the files are excluded. If not specified, the generated code is expected in the same directory as its source.",
 	"node.stopOnEntry.description": "Automatically stop program after launch.",
@@ -26,7 +30,7 @@
 
 	"node.processattach.config.name": "Attach to Process",
 
-	"extensionHost.label": "VSCode Extension Development",
+	"extensionHost.label": "VS Code Extension Development",
 
 	"extensionHost.launch.runtimeExecutable.description": "Absolute path to VS Code.",
 	"extensionHost.launch.args.description": "Command line arguments passed to the program.",
