@@ -1,27 +1,10 @@
-# vscode-node-cdp-debug
-This is a prototype of a debug adapter for VS Code that can target Node, using the Chrome Debugging Protocol. At the moment, this is only supported in Node v7. It's based on the vscode-debug-chrome-core library.
+# VS Code Node Debug 2
+This repository contains an experimental debug extension for [node.js](https://nodejs.org) that ships with [VS Code](https://code.visualstudio.com) and uses the [Chrome Debugging Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/), which Node now exposes via the `--inspect` flag, only in Node versions 6.3+. It's built on the [vscode-chrome-debug-core](https://github.com/Microsoft/vscode-chrome-debug-core) library.
 
-## How to run
-Clone this repo, run npm install. Open the directory in Code and press ctrl+shift+b to build and F5 to run as a debug server.
+## Contributing
+Contributions are welcome, please see [CONTRIBUTING.txt](CONTRIBUTING.txt).
 
-Open your app's directory in Code and set up a launch config. It should look something like this:
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-```
-{
-    "version": "0.2.0",
-    "debugServer": "4712", // To use the vscode-node-cdp-debug server, instead of vscode's built in Node debugger
-    "configurations": [
-        {
-            "name": "Node",
-            "type": "chrome",
-            "request": "attach",
-            "port": 9229, // Default port, check the message printed - "Debugger listening on port X"
-            "sourceMaps": true,
-            "webRoot": "${workspaceRoot}"
-            // "diagnosticLogging": true // May be useful for debugging
-        }
-    ]
-}
-```
-
-Start your app using "node --inspect". Press F5 in Code to attach.
+## License
+[MIT](LICENSE.txt)
