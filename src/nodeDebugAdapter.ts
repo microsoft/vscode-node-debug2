@@ -33,7 +33,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _restartMode: boolean;
     private _isTerminated: boolean;
 
-    public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilites {
+    public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
 
         return super.initialize(args);
