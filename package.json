@@ -3,7 +3,8 @@
   "displayName": "Node Debug 2",
   "version": "0.0.1",
   "publisher": "ms-vscode",
-  "description": "Visual Studio Code debug adapter for Node.js, using the new Inspector Protocol",
+  "description": "Visual Studio Code debugger extension for Node.js, using the new Inspector Protocol",
+	"icon": "images/node-debug-icon.svg",
   "categories": [
 		"Debuggers"
 	],
@@ -13,7 +14,7 @@
 	"license": "MIT",
 	"private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "0.1.19",
+    "vscode-chrome-debug-core": "1.0.0",
     "vscode-debugadapter": "^1.12.0",
     "vscode-debugprotocol": "^1.12.0",
     "vscode-nls": "^1.0.4"
@@ -23,7 +24,6 @@
     "@types/es6-promise": "0.0.32",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.39",
-    "@types/source-map": "^0.1.27",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-tslint": "^3.3.1",
