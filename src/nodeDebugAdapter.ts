@@ -28,6 +28,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _continueAfterConfigDone = true;
     private _entryPauseEvent: Chrome.Debugger.PausedParams;
     private _waitingForEntryPauseEvent = true;
+    private _finishedConfig = false;
 
     private _supportsRunInTerminalRequest: boolean;
     private _restartMode: boolean;
@@ -216,6 +217,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public configurationDone(): Promise<void> {
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
         // So tell the target to continue, or tell the client that we paused, as needed
+        this._finishedConfig = true;
         if (this._continueAfterConfigDone) {
             this._expectingStopReason = undefined;
             this.continue();
@@ -333,12 +335,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      */
     protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<Chrome.Debugger.SetBreakpointResponse[]> {
         return super.addBreakpoints(url, breakpoints).then(responses => {
-            if (this._entryPauseEvent) {
+            if (this._entryPauseEvent && !this._finishedConfig) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;
                 if (this._continueAfterConfigDone) {
                     const bpAtEntryLocation = responses.some(response => {
                         // Don't compare column location, because you can have a bp at col 0, then break at some other column
-                        return response.result.actualLocation.lineNumber === entryLocation.lineNumber &&
+                        return response.result.actualLocation && response.result.actualLocation.lineNumber === entryLocation.lineNumber &&
                             response.result.actualLocation.scriptId === entryLocation.scriptId;
                     });
 
