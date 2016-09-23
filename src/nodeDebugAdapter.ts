@@ -106,7 +106,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             const runtimeArgs = args.runtimeArgs || [];
             const programArgs = args.args || [];
 
-            let launchArgs = [runtimeExecutable, '--nolazy'];
+            let launchArgs = [runtimeExecutable];
             if (!args.noDebug) {
                 launchArgs.push(`--inspect=${port}`);
             }
