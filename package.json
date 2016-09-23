@@ -48,10 +48,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-node-cdp-debug.git"
+    "url": "https://github.com/Microsoft/vscode-node-debug2.git"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode-node-cdp-debug/issues"
+    "url": "https://github.com/Microsoft/vscode-node-debug2/issues"
   },
   "contributes": {
     "breakpoints": [

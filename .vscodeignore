@@ -5,7 +5,6 @@
 gulpfile.js
 tsconfig.json
 tslint.json
-vscode-node-cdp-debug.txt
 testapp/**
 testdata/**
 out/test/**
