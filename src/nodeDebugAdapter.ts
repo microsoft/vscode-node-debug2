@@ -21,6 +21,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
 
+    private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
 
@@ -141,8 +142,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 .then(() => {
                     return args.noDebug ?
                         Promise.resolve<void>() :
-                        this.doAttach(port, undefined, args.address, args.timeout)
-                            .then(() => this.getNodeProcessIdIfNeeded());
+                        this.doAttach(port, undefined, args.address, args.timeout);
                 });
         });
     }
@@ -156,6 +156,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.doAttach(port, targetUrl, address, timeout)
             .then(() => {
                 this.beginWaitingForDebuggerPaused();
+                this.getNodeProcessDetailsIfNeeded();
             });
     }
 
@@ -256,7 +257,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this._continueAfterConfigDone = false;
             }
 
-            this.getNodeProcessIdIfNeeded()
+            this.getNodeProcessDetailsIfNeeded()
                 .then(() => this.sendInitializedEvent());
         } else {
             super.onDebuggerPaused(notification);
@@ -324,7 +325,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this._continueAfterConfigDone = false;
                 this._waitingForEntryPauseEvent = false;
 
-                this.getNodeProcessIdIfNeeded()
+                this.getNodeProcessDetailsIfNeeded()
                     .then(() => this.sendInitializedEvent());
             }
         }, 50);
@@ -358,27 +359,32 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private getNodeProcessIdIfNeeded(): Promise<void> {
-        if (this._nodeProcessId || !this._pollForNodeProcess) {
+    private getNodeProcessDetailsIfNeeded(): Promise<void> {
+        if (this._loggedTargetVersion) {
             return Promise.resolve<void>();
         }
 
-        return this._chromeConnection.runtime_evaluate('process.pid')
-            .then(result => {
-                if (result.error) {
-                    logger.error('Error evaluating `process.pid`: ' + result.error);
-                } else if (result.result.exceptionDetails) {
-                    const details = result.result.exceptionDetails;
-                    if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
-                        logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
-                    } else {
-                        logger.error('Exception evaluating `process.pid`: ' + details.exception.description + '. Will try again later.');
-                    }
+        return this._chromeConnection.runtime_evaluate('[process.pid, process.version]', undefined, undefined, /*returnByValue=*/true).then(response => {
+            if (response.error) {
+                logger.error('Error evaluating `process.pid`: ' + response.error);
+            } else if (response.result.exceptionDetails) {
+                const details = response.result.exceptionDetails;
+                if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
+                    logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
                 } else {
-                    this._nodeProcessId = result.result.result.value;
+                    logger.error('Exception evaluating `process.pid`: ' + details.exception.description + '. Will try again later.');
+                }
+            } else {
+                const value = response.result.result.value;
+                if (!this._pollForNodeProcess) {
+                    this._nodeProcessId = value[0];
                     this.startPollingForNodeTermination();
                 }
-            });
+
+                this._loggedTargetVersion = true;
+                logger.log('Target node version: ' + value[1]);
+            }
+        });
     }
 
     private startPollingForNodeTermination(): void {
