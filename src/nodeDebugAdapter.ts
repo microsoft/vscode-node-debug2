@@ -116,7 +116,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._continueAfterConfigDone = !args.stopOnEntry;
 
             launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
-            this.logLaunchCommand(launchArgs);
 
             let launchP: Promise<void>;
             if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
@@ -175,6 +174,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: cp.SpawnOptions): Promise<void> {
+        this.logLaunchCommand(runtimeExecutable, launchArgs);
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
          return new Promise<void>((resolve, reject) => {
             this._nodeProcessId = nodeProcess.pid;
@@ -189,6 +189,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this.terminateSession('target closed');
             });
 
+            nodeProcess.stdout.on('data', (data: string) => {
+                let msg = data.toString();
+                msg = utils.trimLastNewline(msg);
+                logger.log(msg, /*forceLog=*/true);
+            });
+
             nodeProcess.stderr.on('data', (data: string) => {
                 // Print stderr, but chop off the Chrome-specific message
                 let msg = data.toString();
@@ -197,6 +203,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     msg = msg.substr(0, chromeMsgIndex).trim();
                 }
 
+                msg = utils.trimLastNewline(msg);
                 logger.error(msg);
             });
 
@@ -401,9 +408,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }, NodeDebugAdapter.NODE_TERMINATION_POLL_INTERVAL);
     }
 
-    private logLaunchCommand(args: string[]) {
+    private logLaunchCommand(executable: string, args: string[]) {
         // print the command to launch the target to the debug console
-        let cli = '';
+        let cli = executable + ' ';
         for (let a of args) {
             if (a.indexOf(' ') >= 0) {
                 cli += '\'' + a + '\'';

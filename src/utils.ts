@@ -95,3 +95,7 @@ export function isOnPath(program: string): boolean {
 	}
 	return false;
 }
+
+export function trimLastNewline(msg: string): string {
+    return msg.replace(/(\n|\r\n)$/, '');
+}
