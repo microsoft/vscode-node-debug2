@@ -5,6 +5,7 @@
 import {ChromeDebugAdapter, logger} from 'vscode-chrome-debug-core';
 import * as Chrome from 'vscode-chrome-debug-core/lib/src/chrome/chromeDebugProtocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
+import {OutputEvent} from 'vscode-debugadapter';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -420,7 +421,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             cli += ' ';
         }
 
-        logger.log(cli, /*forceLog=*/true);
+        this.sendEvent(new OutputEvent(cli + '\n', 'console'));
     }
 
     /**
