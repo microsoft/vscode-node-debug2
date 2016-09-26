@@ -194,7 +194,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 let msg = data.toString();
                 const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
                 if (chromeMsgIndex >= 0) {
-                    msg = msg.substr(0, chromeMsgIndex);
+                    msg = msg.substr(0, chromeMsgIndex).trim();
                 }
 
                 logger.error(msg);
