@@ -382,7 +382,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
             } else {
                 const value = response.result.result.value;
-                if (!this._pollForNodeProcess) {
+                if (this._pollForNodeProcess) {
                     this._nodeProcessId = value[0];
                     this.startPollingForNodeTermination();
                 }
