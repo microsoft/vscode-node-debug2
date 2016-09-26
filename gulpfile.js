@@ -37,7 +37,7 @@ gulp.task('build', ['copy-scripts'], function () {
 	return gulp.src(sources, { base: '.' })
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject)).js
-        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: computeSourceRoot }))
+        .pipe(sourcemaps.write('.', { includeContent: true, sourceRoot: computeSourceRoot }))
         .pipe(gulp.dest('out'));
 });
 
