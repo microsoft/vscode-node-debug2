@@ -21,8 +21,8 @@ suite('Node Debug Adapter', () => {
 
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node');
-        // return dc.start(4712);
-        return dc.start();
+        return dc.start(4711);
+        // return dc.start();
     });
 
     teardown( () => dc.stop() );
@@ -333,6 +333,29 @@ suite('Node Debug Adapter', () => {
                 path: TS_SOURCE,
                 line: TS_LINE
             });
+        });
+
+        test('should stop on a breakpoint when the sourcemap is loaded after the bp is set', () => {
+            const BP_PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-setinterval', 'src/file2.ts');
+            const LAUNCH_PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-setinterval', 'dist/program.js');
+            const BP_LINE = 10;
+
+            return Promise.all<DebugProtocol.ProtocolMessage>([
+                dc.waitForEvent('initialized').then(event => {
+                    return dc.setBreakpointsRequest({ source: { path: BP_PROGRAM }, breakpoints: [{ line: BP_LINE }]}).then(response => {
+                        assert.equal(response.body.breakpoints.length, 1);
+                        assert(!response.body.breakpoints[0].verified, 'Expected bp to not be verified yet');
+                        return dc.configurationDoneRequest();
+                    });
+                }),
+                dc.launch({ program: LAUNCH_PROGRAM, sourceMaps: true }),
+                dc.waitForEvent('breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
+                    assert(event.body.breakpoint.verified);
+                    return null;
+                }),
+
+                dc.assertStoppedLocation('breakpoint', { path: BP_PROGRAM, line: BP_LINE } )
+            ]);
         });
 
         // Microsoft/vscode-chrome-debug-core#38

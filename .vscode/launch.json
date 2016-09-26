@@ -3,12 +3,12 @@
     "configurations": [
         {
             "name": "launch as server",
-            "type": "node",
+            "type": "node2",
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/out/src/nodeDebug.js",
             "stopOnEntry": false,
-            "args": [ "--server=4712" ],
+            "args": [ "--server=4711" ],
             "sourceMaps": true,
             "outDir": "${workspaceRoot}/out"
         },
@@ -24,7 +24,7 @@
 				"--colors",
 				"./out/test"
 			],
-			"sourceMaps": true,
+			// "sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ]
 		}
     ]

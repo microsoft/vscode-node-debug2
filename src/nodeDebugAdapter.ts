@@ -82,9 +82,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return this.getAttributeMissingErrorResponse('program');
         }
 
-        return Promise.resolve().then(() => {
-            return this.resolveProgramPath(programPath, args.sourceMaps);
-        }).then(programPath => {
+        return this.resolveProgramPath(programPath, args.sourceMaps).then(programPath => {
             let program: string;
             let cwd = args.cwd;
             if (cwd) {
