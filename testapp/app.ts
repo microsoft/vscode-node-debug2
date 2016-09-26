@@ -56,7 +56,6 @@ newlines`;
     m.set('a', 1);
     m.set('bcd', [1, 2, 3]);
     m.set('def', m);
-    veryLargeArray.forEach(x => m.set('k' + x, x));
     m['blah'] = 3;
     m[5] = 1;
 
@@ -71,7 +70,8 @@ newlines`;
     const obj = {
         '[test]': 1,
         '.test2': 2,
-        ' ': 3
+        ' ': 3,
+        5: 1
     };
 
     debugger;
@@ -83,9 +83,9 @@ newlines`;
         app2.anotherFn();
         return 5;
     };
-    const fn2 = function() {
-        const zzz = 333;
-    };
+
+    function fn2() { };
+    fn2.prototype.aPrototypeFn = () => { return 3; };
 
     app2.anotherFn();
     fn();
