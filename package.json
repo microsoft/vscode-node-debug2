@@ -220,11 +220,6 @@
           },
           "attach": {
             "properties": {
-              "processId": {
-                "type": "string",
-                "description": "%node.attach.processId.description%",
-                "default": "${command.PickProcess}"
-              },
               "port": {
                 "type": "number",
                 "description": "%node.port.description%",
