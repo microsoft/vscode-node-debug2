@@ -94,7 +94,7 @@
             "name": "%node.attach.config.name%",
             "type": "node",
             "request": "attach",
-            "port": 5858,
+            "port": 9229,
             "address": "localhost",
             "restart": false,
             "sourceMaps": false,
@@ -188,7 +188,7 @@
               "port": {
                 "type": "number",
                 "description": "%node.port.description%",
-                "default": 5858
+                "default": 9229
               },
               "address": {
                 "type": "string",
@@ -223,7 +223,7 @@
               "port": {
                 "type": "number",
                 "description": "%node.port.description%",
-                "default": 5858
+                "default": 9229
               },
               "address": {
                 "type": "string",

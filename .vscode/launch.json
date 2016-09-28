@@ -1,16 +1,17 @@
 {
     "version": "0.1.0",
+    // "debugServer": "4711",
     "configurations": [
         {
             "name": "launch as server",
-            "type": "node2",
+            "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/out/src/nodeDebug.js",
             "stopOnEntry": false,
-            "args": [ "--server=4711" ],
+            "args": [ "--server=4712" ],
             "sourceMaps": true,
-            "outDir": "${workspaceRoot}/out"
+            // "outDir": "${workspaceRoot}/out"
         },
         {
 			"name": "Run Tests",
