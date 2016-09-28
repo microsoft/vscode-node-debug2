@@ -92,7 +92,7 @@
           },
           {
             "name": "%node.attach.config.name%",
-            "type": "node",
+            "type": "node2",
             "request": "attach",
             "port": 9229,
             "address": "localhost",
