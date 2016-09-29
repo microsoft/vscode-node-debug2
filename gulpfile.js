@@ -13,6 +13,7 @@ const runSequence = require('run-sequence');
 const nls = require('vscode-nls-dev');
 const cp = require('child_process');
 const del = require('del');
+const fs = require('fs');
 
 const sources = [
     'src',
@@ -69,13 +70,41 @@ gulp.task('add-i18n', function() {
 		.pipe(gulp.dest('.'));
 });
 
+function verifyNotALinkedModule(modulePath) {
+    return new Promise((resolve, reject) => {
+        fs.lstat(modulePath, (err, stat) => {
+            if (stat.isSymbolicLink()) {
+                reject(new Error('Symbolic link found: ' + modulePath));
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+function verifyNoLinkedModules() {
+    return new Promise((resolve, reject) => {
+        fs.readdir('./node_modules', (err, files) => {
+            Promise.all(files.map(file => {
+                const modulePath = path.join('.', 'node_modules', file);
+                return verifyNotALinkedModule(modulePath);
+            })).then(resolve, reject);
+        });
+    });
+}
+
+gulp.task('verify-no-linked-modules', cb => verifyNoLinkedModules().then(() => cb, cb));
+
 function vsceTask(task) {
     return cb => {
-        var cmd = cp.spawn('./node_modules/.bin/vsce', [ task ], { stdio: 'inherit' });
-        cmd.on('close', code => {
-            log(`vsce exited with ${code}`);
-            cb(code);
-        });
+        verifyNoLinkedModules().then(() => {
+            const cmd = cp.spawn('./node_modules/.bin/vsce', [ task ], { stdio: 'inherit' });
+            cmd.on('close', code => {
+                log(`vsce exited with ${code}`);
+                cb(code);
+            });
+        },
+        cb);
     }
 }
 
