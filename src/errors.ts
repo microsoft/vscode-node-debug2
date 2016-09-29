@@ -47,10 +47,10 @@ export function cannotLaunchBecauseSourceMaps(programPath: string): DebugProtoco
     };
 }
 
-export function cannotLaunchBecauseOutdir(programPath: string): DebugProtocol.Message {
+export function cannotLaunchBecauseOutFiles(programPath: string): DebugProtocol.Message {
     return {
         id: 2003,
-        format: localize('VSND2003', "Cannot launch program '{0}'; setting the '{1}' attribute might help.", '{path}', 'outDir'),
+        format: localize('VSND2003', "Cannot launch program '{0}'; setting the '{1}' attribute might help.", '{path}', 'outDir or outFiles'),
         variables: { path: programPath }
     };
 }
