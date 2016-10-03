@@ -160,7 +160,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.sendRequest('runInTerminal', termArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
+            this._session.sendRequest('runInTerminal', termArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
                 if (response.success) {
                     // since node starts in a terminal, we cannot track it with an 'exit' handler
                     // plan for polling after we have gotten the process pid.
@@ -393,6 +393,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
+    protected onConsoleMessage(params: Chrome.Console.MessageAddedParams): void {
+        // Messages come from stdout
+    }
+
     private startPollingForNodeTermination(): void {
         const intervalId = setInterval(() => {
             try {
@@ -421,7 +425,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             cli += ' ';
         }
 
-        this.sendEvent(new OutputEvent(cli + '\n', 'console'));
+        this._session.sendEvent(new OutputEvent(cli + '\n', 'console'));
     }
 
     /**
