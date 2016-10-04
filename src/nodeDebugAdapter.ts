@@ -139,7 +139,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return launchP
                 .then(() => {
                     return args.noDebug ?
-                        Promise.resolve<void>() :
+                        Promise.resolve() :
                         this.doAttach(port, undefined, args.address, args.timeout);
                 });
         });
@@ -299,12 +299,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             } else {
                 // node cannot execute the program directly
                 if (!sourceMaps) {
-                    return Promise.reject(errors.cannotLaunchBecauseSourceMaps(programPath));
+                    return Promise.reject<string>(errors.cannotLaunchBecauseSourceMaps(programPath));
                 }
 
                 return this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath).then(generatedPath => {
                     if (!generatedPath) { // cannot find generated file
-                        return Promise.reject(errors.cannotLaunchBecauseOutFiles(programPath));
+                        return Promise.reject<string>(errors.cannotLaunchBecauseOutFiles(programPath));
                     }
 
                     logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
@@ -367,7 +367,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private getNodeProcessDetailsIfNeeded(): Promise<void> {
         if (this._loggedTargetVersion) {
-            return Promise.resolve<void>();
+            return Promise.resolve();
         }
 
         return this._chromeConnection.runtime_evaluate('[process.pid, process.version]', undefined, undefined, /*returnByValue=*/true).then(response => {
