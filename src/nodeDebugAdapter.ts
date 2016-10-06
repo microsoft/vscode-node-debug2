@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import {ChromeDebugAdapter, logger} from 'vscode-chrome-debug-core';
-import * as Chrome from 'vscode-chrome-debug-core/lib/src/chrome/chromeDebugProtocol';
+import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
 
@@ -28,7 +28,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     // Flags relevant during init
     private _continueAfterConfigDone = true;
-    private _entryPauseEvent: Chrome.Debugger.PausedParams;
+    private _entryPauseEvent: Crdp.Debugger.PausedEvent;
     private _waitingForEntryPauseEvent = true;
     private _finishedConfig = false;
 
@@ -245,11 +245,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public terminateSession(reason: string): void {
         const requestRestart = this._restartMode && !this._inShutdown;
-        super.terminateSession(reason, requestRestart);
         this.killNodeProcess();
+        super.terminateSession(reason, requestRestart);
     }
 
-    protected onDebuggerPaused(notification: Chrome.Debugger.PausedParams): void {
+    protected onDebuggerPaused(notification: Crdp.Debugger.PausedEvent): void {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log('Paused on entry');
@@ -340,15 +340,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
-    protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<Chrome.Debugger.SetBreakpointResponse[]> {
+    protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<Crdp.Debugger.SetBreakpointResponse[]> {
         return super.addBreakpoints(url, breakpoints).then(responses => {
             if (this._entryPauseEvent && !this._finishedConfig) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;
                 if (this._continueAfterConfigDone) {
                     const bpAtEntryLocation = responses.some(response => {
                         // Don't compare column location, because you can have a bp at col 0, then break at some other column
-                        return response.result.actualLocation && response.result.actualLocation.lineNumber === entryLocation.lineNumber &&
-                            response.result.actualLocation.scriptId === entryLocation.scriptId;
+                        return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
+                            response.actualLocation.scriptId === entryLocation.scriptId;
                     });
 
                     if (bpAtEntryLocation) {
@@ -370,18 +370,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return Promise.resolve();
         }
 
-        return this._chromeConnection.runtime_evaluate('[process.pid, process.version]', undefined, undefined, /*returnByValue=*/true).then(response => {
-            if (response.error) {
-                logger.error('Error evaluating `process.pid`: ' + response.error);
-            } else if (response.result.exceptionDetails) {
-                const details = response.result.exceptionDetails;
+        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version]', returnByValue: true }).then(response => {
+            if (response.exceptionDetails) {
+                const details = response.exceptionDetails;
                 if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
                     logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
                 } else {
                     logger.error('Exception evaluating `process.pid`: ' + details.exception.description + '. Will try again later.');
                 }
             } else {
-                const value = response.result.result.value;
+                const value = response.result.value;
                 if (this._pollForNodeProcess) {
                     this._nodeProcessId = value[0];
                     this.startPollingForNodeTermination();
@@ -390,10 +388,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this._loggedTargetVersion = true;
                 logger.log('Target node version: ' + value[1]);
             }
-        });
+        },
+        error => logger.error('Error evaluating `process.pid`: ' + error));
     }
 
-    protected onConsoleMessage(params: Chrome.Console.MessageAddedParams): void {
+    protected onConsoleMessage(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
         // Messages come from stdout
     }
 
@@ -408,7 +407,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
             } catch (e) {
                 clearInterval(intervalId);
-                this.terminateSession('Target process is dead');
+                logger.log('Target process died');
+                this.terminateSession('Target process died');
             }
         }, NodeDebugAdapter.NODE_TERMINATION_POLL_INTERVAL);
     }
