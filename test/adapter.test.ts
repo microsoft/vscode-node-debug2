@@ -3,14 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-
 import assert = require('assert');
 import * as Path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 
 suite('Node Debug Adapter', () => {
-
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
     const PROJECT_ROOT = Path.join(__dirname, '../../');
@@ -21,14 +19,13 @@ suite('Node Debug Adapter', () => {
 
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node');
-        return dc.start(4711);
-        // return dc.start();
+        // return dc.start(4711);
+        return dc.start();
     });
 
     teardown( () => dc.stop() );
 
     suite('basic', () => {
-
         test('unknown request should produce error', done => {
             dc.send('illegal_request').then(() => {
                 done(new Error('does not report error on unknown request'));
@@ -39,7 +36,6 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('initialize', () => {
-
         test('should return supported features', () => {
             return dc.initializeRequest().then(response => {
                 assert.equal(response.body.supportsConfigurationDoneRequest, true);
@@ -62,7 +58,6 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('launch', () => {
-
 		// #11
         test.skip('should run program to the end', () => {
 
@@ -87,7 +82,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on debugger statement', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'programWithDebugger.js');
             const DEBUGGER_LINE = 6;
 
@@ -101,7 +95,6 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('setBreakpoints', () => {
-
         test('should stop on a breakpoint', () => {
 
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
@@ -111,7 +104,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint in file with spaces in its name', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'folder with spaces', 'file with spaces.js');
             const BREAKPOINT_LINE = 2;
 
@@ -119,7 +111,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint identical to the entrypoint', () => {        // verifies the 'hide break on entry point' logic
-
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const ENTRY_LINE = 1;
 
@@ -128,7 +119,6 @@ suite('Node Debug Adapter', () => {
 
         // Microsoft/vscode-chrome-debug-core#73
         test.skip('should break on a specific column in a single line program', () => {
-
             const SINGLE_LINE_PROGRAM = Path.join(DATA_ROOT, 'programSingleLine.js');
             const LINE = 1;
             const COLUMN = 55;
@@ -138,13 +128,11 @@ suite('Node Debug Adapter', () => {
 
 		// Microsoft/vscode-chrome-debug-core#10
         test.skip('should stop on a conditional breakpoint', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const COND_BREAKPOINT_LINE = 13;
             const COND_BREAKPOINT_COLUMN = 2;
 
             return Promise.all([
-
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setBreakpointsRequest({
                         breakpoints: [ { line: COND_BREAKPOINT_LINE, condition: 'i === 3' } ],
@@ -172,9 +160,7 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('setBreakpoints in TypeScript', () => {
-
         test('should stop on a breakpoint in source (all files top level)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-simple/classes.js');
             const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-simple/classes.ts');
             const TS_LINE = 17;
@@ -191,7 +177,6 @@ suite('Node Debug Adapter', () => {
 
         // Find map beside generated
         test.skip('should stop on a breakpoint in source (all files top level, missing sourceMappingURL)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-simple-no-sourceMappingURL/classes.js');
             const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-simple-no-sourceMappingURL/classes.ts');
             const TS_LINE = 17;
@@ -207,7 +192,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint in source (outDir)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-inline/src/classes.ts');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-inline/dist');
             const BREAKPOINT_LINE = 17;
@@ -224,7 +208,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint in source (outFiles)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-inline/src/classes.ts');
             const OUT_FILES = Path.join(DATA_ROOT, 'sourcemaps-inline/dist/**/*.js');
             const BREAKPOINT_LINE = 17;
@@ -241,7 +224,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint in source with spaces in paths (outDir)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps with spaces', 'the source/classes.ts');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps with spaces/the distribution');
             const BREAKPOINT_LINE = 17;
@@ -258,7 +240,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint in source with spaces in paths (outFiles)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps with spaces', 'the source/classes.ts');
             const OUT_FILES = Path.join(DATA_ROOT, 'sourcemaps with spaces/the distribution/**/*.js');
             const BREAKPOINT_LINE = 17;
@@ -276,7 +257,6 @@ suite('Node Debug Adapter', () => {
 
 
         test('should stop on a breakpoint in source - Microsoft/vscode#2574', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-2574/out/classes.js');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-2574/out');
             const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-2574/src/classes.ts');
@@ -295,7 +275,6 @@ suite('Node Debug Adapter', () => {
 
         // Find map next to js
         test.skip('should stop on a breakpoint in source (sourceMappingURL missing)', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemap-no-sourceMappingURL/out/classes.js');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemap-no-sourceMappingURL/out');
             const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemap-no-sourceMappingURL/src/classes.ts');
@@ -313,7 +292,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a breakpoint in source even if breakpoint was set in JavaScript - Microsoft/vscode-node-debug#43', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-2574/out/classes.js');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-2574/out');
             const JS_SOURCE = PROGRAM;
@@ -360,7 +338,6 @@ suite('Node Debug Adapter', () => {
 
         // Microsoft/vscode-chrome-debug-core#38
         test.skip('should stop on a breakpoint in source even if program\'s entry point is in JavaScript', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/out/entry.js');
             const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/out');
             const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/src/classes.ts');
@@ -376,7 +353,6 @@ suite('Node Debug Adapter', () => {
     });
 
     suite.skip('function setBreakpoints', () => {
-
         const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
         const FUNCTION_NAME_1 = 'foo';
         const FUNCTION_LINE_1 = 4;
@@ -385,9 +361,7 @@ suite('Node Debug Adapter', () => {
         const FUNCTION_NAME_3 = 'xyz';
 
         test('should stop on a function breakpoint', () => {
-
             return Promise.all<DebugProtocol.ProtocolMessage>([
-
                 dc.launch({ program: PROGRAM }),
 
                 dc.configurationSequence(),
@@ -423,12 +397,10 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('setExceptionBreakpoints', () => {
-
         const PROGRAM = Path.join(DATA_ROOT, 'programWithException.js');
 
         // Terminate at end
         test.skip('should not stop on an exception', () => {
-
             return Promise.all<DebugProtocol.ProtocolMessage>([
 
                 dc.waitForEvent('initialized').then(event => {
@@ -446,7 +418,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on a caught exception', () => {
-
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
@@ -466,7 +437,6 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on uncaught exception', () => {
-
             const UNCAUGHT_EXCEPTION_LINE = 12;
 
             return Promise.all([
@@ -487,7 +457,6 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('output events', () => {
-
         const PROGRAM = Path.join(DATA_ROOT, 'programWithOutput.js');
 
         test('stdout and stderr events should be complete and in correct order', () => {
