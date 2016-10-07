@@ -18,12 +18,12 @@ suite('Node Debug Adapter', () => {
     let dc: DebugClient;
 
     setup(() => {
-        dc = new DebugClient('node', DEBUG_ADAPTER, 'node');
-        // return dc.start(4711);
+        dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
+        // return dc.start(4712);
         return dc.start();
     });
 
-    teardown( () => dc.stop() );
+    teardown(() => dc.stop());
 
     suite('basic', () => {
         test('unknown request should produce error', done => {
@@ -402,7 +402,6 @@ suite('Node Debug Adapter', () => {
         // Terminate at end
         test.skip('should not stop on an exception', () => {
             return Promise.all<DebugProtocol.ProtocolMessage>([
-
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ ]
@@ -421,7 +420,6 @@ suite('Node Debug Adapter', () => {
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
-
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'all' ]
@@ -440,7 +438,6 @@ suite('Node Debug Adapter', () => {
             const UNCAUGHT_EXCEPTION_LINE = 12;
 
             return Promise.all([
-
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'uncaught' ]
@@ -466,6 +463,53 @@ suite('Node Debug Adapter', () => {
                 dc.assertOutput('stdout', 'Hello stdout 0\nHello stdout 1\nHello stdout 2\n'),
                 // dc.assertOutput('stderr', 'Hello stderr 0\nHello stderr 1\nHello stderr 2\n') // "debugger listening on port # ..." message
             ]);
+        });
+    });
+
+    suite('eval', () => {
+        const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
+        function start(): Promise<void> {
+            return Promise.all([
+                dc.configurationSequence(),
+                dc.launch({ program:  PROGRAM }),
+                dc.waitForEvent('initialized')
+            ]);
+        }
+
+        test('works for a simple case', () => {
+            return start()
+                .then(() => dc.evaluateRequest({ expression: '1 + 1' }))
+                .then(response => {
+                        assert(response.success);
+                        assert.equal(response.body.result, '2');
+                        assert.equal(response.body.variablesReference, 0);
+                });
+        });
+
+        test('evaluates a global node thing', () => {
+            return start()
+                .then(() => dc.evaluateRequest({ expression: 'process.versions' }))
+                .then(response => {
+                    assert(response.success);
+                    assert.equal(response.body.result, 'Object');
+                    assert(response.body.variablesReference > 0);
+                });
+        });
+
+        test('returns "not available" for a reference error', () => {
+            return start()
+                .then(() => dc.evaluateRequest({ expression: 'notDefinedThing' }))
+                .catch(response => {
+                    assert.equal(response.message, 'not available');
+                });
+        });
+
+        test('returns the error message for another error', () => {
+            return start()
+                .then(() => dc.evaluateRequest({ expression: 'throw new Error("fail")' }))
+                .catch(response => {
+                    assert.equal(response.message, 'Error: fail');
+                });
         });
     });
 });
