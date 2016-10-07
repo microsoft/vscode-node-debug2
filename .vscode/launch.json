@@ -1,6 +1,6 @@
 {
     "version": "0.1.0",
-    // "debugServer": "4713",
+    // "debugServer": "4712",
     "configurations": [
         {
             "name": "launch as server",
@@ -18,8 +18,8 @@
 			"type": "node2",
 			"request": "launch",
 			"cwd": "${workspaceRoot}",
-			"program": "${workspaceRoot}/node_modules/.bin/mocha",
-			"args": [
+			"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/mocha",
+			"runtimeArgs": [
 				"-u", "tdd",
 				"--timeout", "3000",
 				"--colors",

@@ -79,8 +79,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             if (pathUtils.normalizeDriveLetter(programPath) !== pathUtils.realPath(programPath)) {
                 logger.log(localize('program.path.case.mismatch.warning', "Program path uses differently cased character as file on disk; this might result in breakpoints not being hit."), /*forceLog=*/true);
             }
-        } else {
-            return this.getAttributeMissingErrorResponse('program');
         }
 
         return this.resolveProgramPath(programPath, args.sourceMaps).then(programPath => {
@@ -96,9 +94,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
 
                 // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
-                program = path.relative(cwd, programPath);
-            }
-            else { // should not happen
+                if (programPath) {
+                    program = path.relative(cwd, programPath);
+                }
+            } else if (programPath) {
                 // if no working dir given, we use the direct folder of the executable
                 cwd = path.dirname(programPath);
                 program = path.basename(programPath);
@@ -116,7 +115,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             launchArgs.push('--debug-brk');
             this._continueAfterConfigDone = !args.stopOnEntry;
 
-            launchArgs = launchArgs.concat(runtimeArgs, [program], programArgs);
+            launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
 
             let launchP: Promise<void>;
             if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
@@ -426,16 +425,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         this._session.sendEvent(new OutputEvent(cli + '\n', 'console'));
-    }
-
-    /**
-     * 'Attribute missing' error
-     */
-    private getAttributeMissingErrorResponse(attribute: string): Promise<void> {
-        return Promise.reject(<DebugProtocol.Message>{
-            id: 2005,
-            format: localize('attribute.missing', "Attribute '{0}' is missing or empty.", attribute)
-        });
     }
 
     /**
