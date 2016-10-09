@@ -56,8 +56,10 @@ gulp.task('default', ['build']);
 
 gulp.task('tslint', function() {
       return gulp.src(lintSources, { base: '.' })
-        .pipe(tslint())
-        .pipe(tslint.report('verbose'));
+        .pipe(tslint({
+            formatter: "verbose"
+        }))
+        .pipe(tslint.report({ emitError: false }));
 });
 
 gulp.task('clean', function() {

@@ -49,7 +49,6 @@
     "no-eval": true,
     "no-inferrable-types": false,
     "no-internal-module": true,
-    "no-keyword-named-variables": true,
     "no-require-imports": false,
     "no-shadowed-variable": true,
     "no-string-literal": true,
@@ -61,7 +60,6 @@
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "no-var-requires": true,
-    "object-literal-sort-keys": true,
     "one-line": [
       true,
       "check-open-brace",
@@ -69,20 +67,9 @@
       "check-else",
       "check-whitespace"
     ],
-    "quotemark": [
-      true,
-      "single"
-    ],
     "radix": true,
-    "semicolon": true,
+    "semicolon": ["always"],
     "switch-default": true,
-    "trailing-comma": [
-      true,
-      {
-        "multiline": "always",
-        "singleline": "never"
-      }
-    ],
     "triple-equals": [
       true,
       "allow-null-check"

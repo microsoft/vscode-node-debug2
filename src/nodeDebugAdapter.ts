@@ -81,7 +81,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         }
 
-        return this.resolveProgramPath(programPath, args.sourceMaps).then(programPath => {
+        return this.resolveProgramPath(programPath, args.sourceMaps).then(resolvedProgramPath => {
             let program: string;
             let cwd = args.cwd;
             if (cwd) {
@@ -94,13 +94,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
 
                 // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
-                if (programPath) {
-                    program = path.relative(cwd, programPath);
+                if (resolvedProgramPath) {
+                    program = path.relative(cwd, resolvedProgramPath);
                 }
-            } else if (programPath) {
+            } else if (resolvedProgramPath) {
                 // if no working dir given, we use the direct folder of the executable
-                cwd = path.dirname(programPath);
-                program = path.basename(programPath);
+                cwd = path.dirname(resolvedProgramPath);
+                program = path.basename(resolvedProgramPath);
             }
 
             const runtimeArgs = args.runtimeArgs || [];
@@ -176,7 +176,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: cp.SpawnOptions): Promise<void> {
         this.logLaunchCommand(runtimeExecutable, launchArgs);
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
-         return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             this._nodeProcessId = nodeProcess.pid;
             nodeProcess.on('error', (error) => {
                 reject(errors.cannotLaunchDebugTarget(error));
@@ -238,7 +238,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         if (this._nodeProcessId && !this._attachMode) {
             logger.log('Killing process with id: ' + this._nodeProcessId);
             utils.killTree(this._nodeProcessId);
-           this._nodeProcessId = 0;
+            this._nodeProcessId = 0;
         }
     }
 

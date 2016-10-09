@@ -19,7 +19,7 @@ export function cannotLaunchInTerminal(_error: string): DebugProtocol.Message {
         id: 2011,
         format: localize('VSND2011', "Cannot launch debug target in terminal ({0}).", '{_error}'),
         variables: { _error }
-    }
+    };
 }
 
 export function cannotLaunchDebugTarget(_error: string): DebugProtocol.Message {
@@ -29,7 +29,7 @@ export function cannotLaunchDebugTarget(_error: string): DebugProtocol.Message {
         variables: { _error },
         showUser: true,
         sendTelemetry: true
-    }
+    };
 }
 
 export function unknownConsoleType(consoleType: string): DebugProtocol.Message {
