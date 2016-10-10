@@ -18,7 +18,7 @@ suite('Node Debug Adapter', () => {
     let dc: DebugClient;
 
     function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
-        return dc.waitForEvent(eventType, 2e4);
+        return dc.waitForEvent(eventType, 3e4);
     }
 
     setup(() => {
