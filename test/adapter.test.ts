@@ -50,7 +50,6 @@ suite('Node Debug Adapter', () => {
     });
 
     teardown(() => {
-        dc.removeListener('output', log);
         return dc.stop();
     });
 
