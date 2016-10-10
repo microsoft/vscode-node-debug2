@@ -47,7 +47,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const port = args.port || utils.random(3000, 50000);
 
-        let runtimeExecutable = args.runtimeExecutable;
+        let runtimeExecutable = "/Users/roblou/Downloads/node-v7.0.0-nightly20161004e10516d5a4-darwin-x64/bin/node";
         if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
                 return this.getRelativePathErrorResponse('runtimeExecutable', runtimeExecutable);
@@ -369,7 +369,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return Promise.resolve();
         }
 
-        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version]', returnByValue: true }).then(response => {
+        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version]', returnByValue: true, contextId: 1 }).then(response => {
             if (response.exceptionDetails) {
                 const details = response.exceptionDetails;
                 if (details.exception.description.startsWith('ReferenceError: process is not defined')) {

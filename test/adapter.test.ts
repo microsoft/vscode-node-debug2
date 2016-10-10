@@ -223,7 +223,8 @@ suite('Node Debug Adapter', () => {
                 program: PROGRAM,
                 sourceMaps: true,
                 outFiles: [ OUT_FILES ],
-                runtimeArgs: [ '--nolazy' ]
+                runtimeArgs: [ '--nolazy' ],
+                verboseDiagnosticLogging: true
             }, {
                 path: PROGRAM,
                 line: BREAKPOINT_LINE
@@ -239,7 +240,8 @@ suite('Node Debug Adapter', () => {
                 program: PROGRAM,
                 sourceMaps: true,
                 outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ]
+                runtimeArgs: [ '--nolazy' ],
+                verboseDiagnosticLogging: true
             }, {
                 path: PROGRAM,
                 line: BREAKPOINT_LINE
@@ -255,7 +257,8 @@ suite('Node Debug Adapter', () => {
                 program: PROGRAM,
                 sourceMaps: true,
                 outFiles: [ OUT_FILES ],
-                runtimeArgs: [ '--nolazy' ]
+                runtimeArgs: [ '--nolazy' ],
+                verboseDiagnosticLogging: true
             }, {
                 path: PROGRAM,
                 line: BREAKPOINT_LINE
