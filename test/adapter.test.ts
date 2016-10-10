@@ -50,6 +50,8 @@ suite('Node Debug Adapter', () => {
     });
 
     teardown(() => {
+        dc.removeListener('output', log);
+
         return dc.stop();
     });
 
@@ -481,7 +483,8 @@ suite('Node Debug Adapter', () => {
         });
     });
 
-    suite('output events', () => {
+    // verbose logging...
+    suite.skip('output events', () => {
         const PROGRAM = Path.join(DATA_ROOT, 'programWithOutput.js');
 
         test('stdout and stderr events should be complete and in correct order', () => {
