@@ -47,7 +47,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const port = args.port || utils.random(3000, 50000);
 
-        let runtimeExecutable = "/Users/roblou/Downloads/node-v7.0.0-nightly20161004e10516d5a4-darwin-x64/bin/node";
+        let runtimeExecutable = args.runtimeExecutable;
         if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
                 return this.getRelativePathErrorResponse('runtimeExecutable', runtimeExecutable);
