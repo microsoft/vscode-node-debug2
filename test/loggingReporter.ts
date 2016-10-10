@@ -21,7 +21,7 @@ class LoggingReporter extends mocha.reporters.Spec {
             }
         });
 
-        runner.on('start', test => {
+        runner.on('test', test => {
             this.inTest = true;
             this.testLogs = [];
         });
