@@ -8,6 +8,7 @@ import * as Path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 
+// ES6 default export...
 const LoggingReporter = require('./loggingReporter');
 
 suite('Node Debug Adapter', () => {
@@ -28,10 +29,7 @@ suite('Node Debug Adapter', () => {
         LoggingReporter.logEE.emit('log', msg);
     };
 
-    setup(() => {
-        dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
-        dc.addListener('output', log);
-
+    function applyLoggingPatch(): void {
         const origLaunch = dc.launch;
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
@@ -44,6 +42,12 @@ suite('Node Debug Adapter', () => {
             launchArgs.verboseDiagnosticLogging = true;
             return origHitBreakpoint.apply(dc, args);
         };
+    }
+
+    setup(() => {
+        dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
+        applyLoggingPatch();
+        dc.addListener('output', log);
 
         // return dc.start(4712);
         return dc.start();
