@@ -17,6 +17,10 @@ suite('Node Debug Adapter', () => {
 
     let dc: DebugClient;
 
+    function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
+        return dc.waitForEvent(eventType, 2e4);
+    }
+
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
         // return dc.start(4712);
@@ -60,13 +64,12 @@ suite('Node Debug Adapter', () => {
     suite('launch', () => {
 		// #11
         test.skip('should run program to the end', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
 
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program: PROGRAM }),
-                dc.waitForEvent('terminated')
+                waitForEvent('terminated')
             ]);
         });
 
@@ -96,7 +99,6 @@ suite('Node Debug Adapter', () => {
 
     suite('setBreakpoints', () => {
         test('should stop on a breakpoint', () => {
-
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const BREAKPOINT_LINE = 2;
 
@@ -133,7 +135,7 @@ suite('Node Debug Adapter', () => {
             const COND_BREAKPOINT_COLUMN = 2;
 
             return Promise.all([
-                dc.waitForEvent('initialized').then(event => {
+                waitForEvent('initialized').then(event => {
                     return dc.setBreakpointsRequest({
                         breakpoints: [ { line: COND_BREAKPOINT_LINE, condition: 'i === 3' } ],
                         source: { path: PROGRAM }
@@ -319,7 +321,7 @@ suite('Node Debug Adapter', () => {
             const BP_LINE = 10;
 
             return Promise.all<DebugProtocol.ProtocolMessage>([
-                dc.waitForEvent('initialized').then(event => {
+                waitForEvent('initialized').then(event => {
                     return dc.setBreakpointsRequest({ source: { path: BP_PROGRAM }, breakpoints: [{ line: BP_LINE }]}).then(response => {
                         assert.equal(response.body.breakpoints.length, 1);
                         assert(!response.body.breakpoints[0].verified, 'Expected bp to not be verified yet');
@@ -327,7 +329,7 @@ suite('Node Debug Adapter', () => {
                     });
                 }),
                 dc.launch({ program: LAUNCH_PROGRAM, sourceMaps: true }),
-                dc.waitForEvent('breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
+                waitForEvent('breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
                     assert(event.body.breakpoint.verified);
                     return null;
                 }),
@@ -402,7 +404,7 @@ suite('Node Debug Adapter', () => {
         // Terminate at end
         test.skip('should not stop on an exception', () => {
             return Promise.all<DebugProtocol.ProtocolMessage>([
-                dc.waitForEvent('initialized').then(event => {
+                waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ ]
                     });
@@ -412,7 +414,7 @@ suite('Node Debug Adapter', () => {
 
                 dc.launch({ program: PROGRAM }),
 
-                dc.waitForEvent('terminated')
+                waitForEvent('terminated')
             ]);
         });
 
@@ -420,7 +422,7 @@ suite('Node Debug Adapter', () => {
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
-                dc.waitForEvent('initialized').then(event => {
+                waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'all' ]
                     });
@@ -438,7 +440,7 @@ suite('Node Debug Adapter', () => {
             const UNCAUGHT_EXCEPTION_LINE = 12;
 
             return Promise.all([
-                dc.waitForEvent('initialized').then(event => {
+                waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'uncaught' ]
                     });
@@ -472,7 +474,7 @@ suite('Node Debug Adapter', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program:  PROGRAM }),
-                dc.waitForEvent('initialized')
+                waitForEvent('initialized')
             ]);
         }
 

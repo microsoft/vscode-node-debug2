@@ -40,7 +40,7 @@
   },
   "scripts": {
     "postinstall": "gulp build",
-    "test": "mocha --timeout 10000 -u tdd ./out/test/"
+    "test": "mocha --timeout 20000 -u tdd ./out/test/"
   },
   "engines": {
     "vscode": "^1.6.0",
