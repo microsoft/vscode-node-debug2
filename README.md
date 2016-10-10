@@ -1,4 +1,5 @@
 # VS Code Node Debug 2 (Experimental)
+[![build status](https://travis-ci.org/Microsoft/vscode-node-debug2.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-node-debug2)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/microsoft/vscode)
 
 This repository contains an experimental debug extension for [node.js](https://nodejs.org) that ships with [VS Code](https://code.visualstudio.com) and uses the [Chrome Debugging Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/), which Node now exposes via the `--inspect` flag, only in Node versions 6.3+. It's built on the [vscode-chrome-debug-core](https://github.com/Microsoft/vscode-chrome-debug-core) library.
