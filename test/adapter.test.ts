@@ -22,13 +22,15 @@ suite('Node Debug Adapter', () => {
         return dc.waitForEvent(eventType, 3e4);
     }
 
+    function log(e) {
+        const timestamp = new Date().toISOString().split(/[TZ]/)[1];
+        const msg = ' ' + timestamp + ' ' + e.body.output.trim();
+        LoggingReporter.logEE.emit('log', msg);
+    };
+
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
-        dc.on('output', e => {
-            const timestamp = new Date().toISOString().split(/[TZ]/)[1];
-            const msg = timestamp + ' ' + e.body.output.trim();
-            LoggingReporter.logEE.emit('log', msg);
-        });
+        dc.addListener('output', log);
 
         const origLaunch = dc.launch;
         dc.launch = (launchArgs: any) => {
@@ -47,7 +49,10 @@ suite('Node Debug Adapter', () => {
         return dc.start();
     });
 
-    teardown(() => dc.stop());
+    teardown(() => {
+        dc.removeListener('output', log);
+        return dc.stop();
+    });
 
     suite('basic', () => {
         test('unknown request should produce error', done => {
