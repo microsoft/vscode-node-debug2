@@ -23,6 +23,11 @@ suite('Node Debug Adapter', () => {
 
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
+        dc.on('output', e => {
+            const channel = e.body.category === 'stderr' ? console.error : console.log;
+            channel(e.body.output.trim());
+        });
+
         // return dc.start(4712);
         return dc.start();
     });
@@ -109,14 +114,14 @@ suite('Node Debug Adapter', () => {
             const PROGRAM = Path.join(DATA_ROOT, 'folder with spaces', 'file with spaces.js');
             const BREAKPOINT_LINE = 2;
 
-            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE} );
+            return dc.hitBreakpoint({ program: PROGRAM, verboseDiagnosticLogging: true }, { path: PROGRAM, line: BREAKPOINT_LINE} );
         });
 
         test('should stop on a breakpoint identical to the entrypoint', () => {        // verifies the 'hide break on entry point' logic
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const ENTRY_LINE = 1;
 
-            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: ENTRY_LINE } );
+            return dc.hitBreakpoint({ program: PROGRAM, verboseDiagnosticLogging: true }, { path: PROGRAM, line: ENTRY_LINE } );
         });
 
         // Microsoft/vscode-chrome-debug-core#73
@@ -473,7 +478,7 @@ suite('Node Debug Adapter', () => {
         function start(): Promise<void> {
             return Promise.all([
                 dc.configurationSequence(),
-                dc.launch({ program:  PROGRAM }),
+                dc.launch({ program:  PROGRAM, verboseDiagnosticLogging: true }),
                 waitForEvent('initialized')
             ]);
         }

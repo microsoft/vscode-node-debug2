@@ -388,7 +388,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 logger.log('Target node version: ' + value[1]);
             }
         },
-        error => logger.error('Error evaluating `process.pid`: ' + error));
+        error => logger.error('Error evaluating `process.pid`: ' + error.message));
     }
 
     protected onConsoleMessage(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
