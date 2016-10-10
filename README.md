@@ -1,4 +1,6 @@
 # VS Code Node Debug 2 (Experimental)
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/microsoft/vscode)
+
 This repository contains an experimental debug extension for [node.js](https://nodejs.org) that ships with [VS Code](https://code.visualstudio.com) and uses the [Chrome Debugging Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/), which Node now exposes via the `--inspect` flag, only in Node versions 6.3+. It's built on the [vscode-chrome-debug-core](https://github.com/Microsoft/vscode-chrome-debug-core) library.
 
 This extension will eventually have feature-parity with vscode-node-debug, but isn't there yet. An overview is recorded [here](https://github.com/Microsoft/vscode-node-debug/issues/7) and you can see issues in the [vscode-node-debug2](https://github.com/Microsoft/vscode-node-debug2/issues) repo and the [vscode-chrome-debug-core](https://github.com/microsoft/vscode-chrome-debug-core/issues) repo. For the most part, you should be able to set `"type": "node2"` in your existing Node launch config and have things work the same, as long as it's running in Node v6.3+.
