@@ -39,7 +39,7 @@
     "vscode-nls-dev": "^2.0.0-beta.1"
   },
   "scripts": {
-    "test": "mocha --timeout 3000 -u tdd ./out/test/"
+    "test": "mocha --timeout 10000 -u tdd ./out/test/"
   },
   "engines": {
     "vscode": "^1.6.0",
