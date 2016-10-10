@@ -8,12 +8,13 @@ import * as Path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 
+const LoggingReporter = require('./loggingReporter');
+
 suite('Node Debug Adapter', () => {
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
     const PROJECT_ROOT = Path.join(__dirname, '../../');
     const DATA_ROOT = Path.join(PROJECT_ROOT, 'testdata/');
-
 
     let dc: DebugClient;
 
@@ -24,9 +25,23 @@ suite('Node Debug Adapter', () => {
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
         dc.on('output', e => {
-            const channel = e.body.category === 'stderr' ? console.error : console.log;
-            channel(e.body.output.trim());
+            const timestamp = new Date().toISOString().split(/[TZ]/)[1];
+            const msg = timestamp + ' ' + e.body.output.trim();
+            LoggingReporter.logEE.emit('log', msg);
         });
+
+        const origLaunch = dc.launch;
+        dc.launch = (launchArgs: any) => {
+            launchArgs.verboseDiagnosticLogging = true;
+            return origLaunch.call(dc, launchArgs);
+        };
+
+        const origHitBreakpoint = dc.hitBreakpoint;
+        dc.hitBreakpoint = (...args) => {
+            const launchArgs = args[0];
+            launchArgs.verboseDiagnosticLogging = true;
+            return origHitBreakpoint.apply(dc, args);
+        };
 
         // return dc.start(4712);
         return dc.start();
@@ -51,17 +66,16 @@ suite('Node Debug Adapter', () => {
             });
         });
 
-        test('should produce error for invalid \'pathFormat\'', done => {
-            dc.initializeRequest({
+        test('should produce error for invalid \'pathFormat\'', () => {
+            return dc.initializeRequest({
                 adapterID: 'mock',
                 linesStartAt1: true,
                 columnsStartAt1: true,
                 pathFormat: 'url'
             }).then(response => {
-                done(new Error('does not report error on invalid \'pathFormat\' attribute'));
+                throw new Error('does not report error on invalid \'pathFormat\' attribute');
             }).catch(err => {
                 // error expected
-                done();
             });
         });
     });
@@ -114,14 +128,14 @@ suite('Node Debug Adapter', () => {
             const PROGRAM = Path.join(DATA_ROOT, 'folder with spaces', 'file with spaces.js');
             const BREAKPOINT_LINE = 2;
 
-            return dc.hitBreakpoint({ program: PROGRAM, verboseDiagnosticLogging: true }, { path: PROGRAM, line: BREAKPOINT_LINE} );
+            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE} );
         });
 
         test('should stop on a breakpoint identical to the entrypoint', () => {        // verifies the 'hide break on entry point' logic
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const ENTRY_LINE = 1;
 
-            return dc.hitBreakpoint({ program: PROGRAM, verboseDiagnosticLogging: true }, { path: PROGRAM, line: ENTRY_LINE } );
+            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: ENTRY_LINE } );
         });
 
         // Microsoft/vscode-chrome-debug-core#73
@@ -481,7 +495,7 @@ suite('Node Debug Adapter', () => {
         function start(): Promise<void> {
             return Promise.all([
                 dc.configurationSequence(),
-                dc.launch({ program:  PROGRAM, verboseDiagnosticLogging: true }),
+                dc.launch({ program:  PROGRAM }),
                 waitForEvent('initialized')
             ]);
         }
