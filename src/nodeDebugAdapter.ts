@@ -50,10 +50,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         let runtimeExecutable = args.runtimeExecutable;
         if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
-                return this.getRelativePathErrorResponse('runtimeExecutable', runtimeExecutable);
-            }
-
-            if (!fs.existsSync(runtimeExecutable)) {
+				if (!pathUtils.isOnPath(runtimeExecutable)) {
+                    return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
+				}
+			} else if (!fs.existsSync(runtimeExecutable)) {
                 return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
             }
         } else {
@@ -444,6 +444,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private getRelativePathErrorResponse(attribute: string, path: string): Promise<void> {
         const format = localize('attribute.path.not.absolute', "Attribute '{0}' is not absolute ('{1}'); consider adding '{2}' as a prefix to make it absolute.", attribute, '{path}', '${workspaceRoot}/');
         return this.getErrorResponseWithInfoLink(2008, format, { path }, 20003);
+    }
+
+    private getRuntimeNotOnPathErrorResponse(runtime: string): Promise<void> {
+        return Promise.reject(<DebugProtocol.Message>{
+            id: 2001,
+            format: localize('VSND2001', "Cannot find runtime '{0}' on PATH.", '{_runtime}'),
+            variables: { _runtime: runtime }
+        });
     }
 
     /**

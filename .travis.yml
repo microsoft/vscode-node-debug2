@@ -15,7 +15,7 @@ node_js:
 before_script:
   - npm i -g gulp
   - npm i -g node-nightly
-  - node-nightly --upgrade
+  - node-nightly
 
 script:
     - gulp build
