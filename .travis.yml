@@ -1,16 +1,22 @@
-os: osx
+os:
+  - osx
+  - linux
 
 language: node_js
 
-node_js:
-  - "6.3"
-  - "6.4"
-  - "6.5"
-  - "6.6"
-  - "6.7"
+matrix:
+  include:
+    - node_js: "6.3"
+    - node_js: "6.4"
+    - node_js: "6.5"
+    - node_js: "6.6"
+    - node_js: "6.7"
+    - env: USE_NODE_NIGHTLY=1
 
 before_script:
-  - npm install -g gulp
+  - npm i -g gulp
+  - npm i -g node-nightly
+  - node-nightly --upgrade
 
 script:
     - gulp build

@@ -29,10 +29,14 @@ suite('Node Debug Adapter', () => {
         LoggingReporter.logEE.emit('log', msg);
     };
 
-    function applyLoggingPatch(): void {
+    function patchLaunchArgs(): void {
         const origLaunch = dc.launch;
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
+            if (process.env['USE_NODE_NIGHTLY'] === 1) {
+                launchArgs.runtimeExecutable = 'node-hightly';
+            }
+
             return origLaunch.call(dc, launchArgs);
         };
 
@@ -40,13 +44,17 @@ suite('Node Debug Adapter', () => {
         dc.hitBreakpoint = (...args) => {
             const launchArgs = args[0];
             launchArgs.verboseDiagnosticLogging = true;
+            if (process.env['USE_NODE_NIGHTLY'] === 1) {
+                launchArgs.runtimeExecutable = 'node-hightly';
+            }
+
             return origHitBreakpoint.apply(dc, args);
         };
     }
 
     setup(() => {
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
-        applyLoggingPatch();
+        patchLaunchArgs();
         dc.addListener('output', log);
 
         // return dc.start(4712);
