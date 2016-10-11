@@ -35,7 +35,8 @@ class LoggingReporter extends mocha.reporters.Spec {
             this.testLogs.forEach(msg => {
                 console.log(msg);
             });
-            console.log('finished - ' + new Date().toISOString().split(/[TZ]/)[1]);
+
+            console.log(new Date().toISOString().split(/[TZ]/)[1] + ' Finished');
         });
     }
 }

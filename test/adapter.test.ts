@@ -33,8 +33,8 @@ suite('Node Debug Adapter', () => {
         const origLaunch = dc.launch;
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
-            if (process.env['USE_NODE_NIGHTLY'] === 1) {
-                launchArgs.runtimeExecutable = 'node-hightly';
+            if (process.version.startsWith('v6.2')) {
+                launchArgs.runtimeExecutable = 'node-nightly';
             }
 
             return origLaunch.call(dc, launchArgs);
@@ -44,8 +44,8 @@ suite('Node Debug Adapter', () => {
         dc.hitBreakpoint = (...args) => {
             const launchArgs = args[0];
             launchArgs.verboseDiagnosticLogging = true;
-            if (process.env['USE_NODE_NIGHTLY'] === 1) {
-                launchArgs.runtimeExecutable = 'node-hightly';
+            if (process.version.startsWith('v6.2')) {
+                launchArgs.runtimeExecutable = 'node-nightly';
             }
 
             return origHitBreakpoint.apply(dc, args);
