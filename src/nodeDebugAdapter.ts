@@ -50,10 +50,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         let runtimeExecutable = args.runtimeExecutable;
         if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
-				if (!pathUtils.isOnPath(runtimeExecutable)) {
+                if (!pathUtils.isOnPath(runtimeExecutable)) {
                     return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
-				}
-			} else if (!fs.existsSync(runtimeExecutable)) {
+                }
+            } else if (!fs.existsSync(runtimeExecutable)) {
                 return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
             }
         } else {

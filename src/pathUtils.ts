@@ -205,31 +205,29 @@ export function makeRelative2(from: string, to: string): string {
  * Is the given runtime executable on the PATH.
  */
 export function isOnPath(program: string): boolean {
-	if (process.platform === 'win32') {
-		const WHERE = 'C:\\Windows\\System32\\where.exe';
-		try {
-			if (FS.existsSync(WHERE)) {
-				CP.execSync(`${WHERE} ${program}`);
-			} else {
-				// do not report error if 'where' doesn't exist
-			}
-			return true;
-		}
-		catch (Exception) {
-			// ignore
-		}
-	} else {
-		const WHICH = '/usr/bin/which';
-		try {
-			if (FS.existsSync(WHICH)) {
-				CP.execSync(`${WHICH} '${program}'`);
-			} else {
-				// do not report error if 'which' doesn't exist
-			}
-			return true;
-		}
-		catch (Exception) {
-		}
-	}
-	return false;
+    if (process.platform === 'win32') {
+        const WHERE = 'C:\\Windows\\System32\\where.exe';
+        try {
+            if (FS.existsSync(WHERE)) {
+                CP.execSync(`${WHERE} ${program}`);
+            } else {
+                // do not report error if 'where' doesn't exist
+            }
+            return true;
+        } catch (e) {
+            // ignore
+        }
+    } else {
+        const WHICH = '/usr/bin/which';
+        try {
+            if (FS.existsSync(WHICH)) {
+                CP.execSync(`${WHICH} '${program}'`);
+            } else {
+                // do not report error if 'which' doesn't exist
+            }
+            return true;
+        } catch (e) {
+        }
+    }
+    return false;
 }
