@@ -1,6 +1,11 @@
+os:
+  - osx
+  - linux
+
 language: node_js
 
 node_js:
+  - "6.2" # will actually use nightly here
   - "6.3"
   - "6.4"
   - "6.5"
@@ -8,7 +13,9 @@ node_js:
   - "6.7"
 
 before_script:
-  - npm install -g gulp
+  - npm i -g gulp
+  - npm i -g node-nightly
+  - node-nightly
 
 script:
     - gulp build

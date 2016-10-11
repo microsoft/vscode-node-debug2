@@ -1,5 +1,13 @@
+environment:
+  matrix:
+    - nodejs_version: 6.3
+    - nodejs_version: 6.4
+    - nodejs_version: 6.5
+    - nodejs_version: 6.6
+    - nodejs_version: 6.7
+
 install:
-  - ps: Install-Product node 6.3 x86
+  - ps: Install-Product node $env:nodejs_version x86
 
 build_script:
   - npm install

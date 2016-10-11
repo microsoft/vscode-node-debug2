@@ -50,10 +50,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         let runtimeExecutable = args.runtimeExecutable;
         if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
-                return this.getRelativePathErrorResponse('runtimeExecutable', runtimeExecutable);
-            }
-
-            if (!fs.existsSync(runtimeExecutable)) {
+                if (!pathUtils.isOnPath(runtimeExecutable)) {
+                    return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
+                }
+            } else if (!fs.existsSync(runtimeExecutable)) {
                 return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
             }
         } else {
@@ -369,7 +369,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return Promise.resolve();
         }
 
-        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version]', returnByValue: true }).then(response => {
+        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 }).then(response => {
             if (response.exceptionDetails) {
                 const details = response.exceptionDetails;
                 if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
@@ -385,10 +385,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
 
                 this._loggedTargetVersion = true;
-                logger.log('Target node version: ' + value[1]);
+                logger.log(`Target node version: ${value[1]} ${value[2]}`);
             }
         },
-        error => logger.error('Error evaluating `process.pid`: ' + error));
+        error => logger.error('Error evaluating `process.pid`: ' + error.message));
     }
 
     protected onConsoleMessage(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
@@ -444,6 +444,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private getRelativePathErrorResponse(attribute: string, path: string): Promise<void> {
         const format = localize('attribute.path.not.absolute', "Attribute '{0}' is not absolute ('{1}'); consider adding '{2}' as a prefix to make it absolute.", attribute, '{path}', '${workspaceRoot}/');
         return this.getErrorResponseWithInfoLink(2008, format, { path }, 20003);
+    }
+
+    private getRuntimeNotOnPathErrorResponse(runtime: string): Promise<void> {
+        return Promise.reject(<DebugProtocol.Message>{
+            id: 2001,
+            format: localize('VSND2001', "Cannot find runtime '{0}' on PATH.", '{_runtime}'),
+            variables: { _runtime: runtime }
+        });
     }
 
     /**
