@@ -34,7 +34,7 @@ suite('Node Debug Adapter', () => {
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly';
+                launchArgs.runtimeExecutable = 'node-nightly.cmd';
             }
 
             return origLaunch.call(dc, launchArgs);
@@ -45,7 +45,7 @@ suite('Node Debug Adapter', () => {
             const launchArgs = args[0];
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly';
+                launchArgs.runtimeExecutable = 'node-nightly.cmd';
             }
 
             return origHitBreakpoint.apply(dc, args);

@@ -21,4 +21,6 @@ build_script:
   - npm install
 
 test_script:
-  - cmd /c "cd c:/projects/vscode-node-debug2 && npm test"
+  - cmd
+  - cd c:/projects/vscode-node-debug2
+  - npm test
