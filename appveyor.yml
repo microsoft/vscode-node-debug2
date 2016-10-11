@@ -8,11 +8,17 @@ environment:
     - nodejs_version: 6.7
 
 install:
-  - ps: if ($env:nodejs_version -eq 6.2) { Install-Product node $env:nodejs_version x64 } else { Install-Product node $env:nodejs_version x86 }
-  - npm i -g node-nightly
-  - node-nightly
+  - ps: >
+      if ($env:nodejs_version -eq 6.2) {
+        Install-Product node $env:nodejs_version x64
+        npm i -g node-nightly
+        node-nightly
+      } else {
+        Install-Product node $env:nodejs_version x86
+      }
 
 build_script:
+  - pwd
   - npm install
 
 test_script:
