@@ -4,15 +4,30 @@ os:
 
 language: node_js
 
+node_js:
+  - "6.3"
+  - "6.4"
+  - "6.5"
+  - "6.6"
+  - "6.7"
+  - "6.2" # placeholder for nightly
+
+env:
+  - USE_NODE_NIGHTLY=0
+  - USE_NODE_NIGHTLY=1
+
 matrix:
-  include:
-    - node_js: "6.3"
-    - node_js: "6.4"
-    - node_js: "6.5"
-    - node_js: "6.6"
-    - node_js: "6.7"
+  exclude:
     - env: USE_NODE_NIGHTLY=1
-      node_js: "node"
+      node_js: "6.3"
+    - env: USE_NODE_NIGHTLY=1
+      node_js: "6.4"
+    - env: USE_NODE_NIGHTLY=1
+      node_js: "6.5"
+    - env: USE_NODE_NIGHTLY=1
+      node_js: "6.6"
+    - env: USE_NODE_NIGHTLY=1
+      node_js: "6.7"
 
 before_script:
   - npm i -g gulp
