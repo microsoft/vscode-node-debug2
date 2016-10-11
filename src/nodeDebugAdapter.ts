@@ -369,7 +369,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return Promise.resolve();
         }
 
-        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version]', returnByValue: true, contextId: 1 }).then(response => {
+        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 }).then(response => {
             if (response.exceptionDetails) {
                 const details = response.exceptionDetails;
                 if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
@@ -385,7 +385,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
 
                 this._loggedTargetVersion = true;
-                logger.log('Target node version: ' + value[1]);
+                logger.log(`Target node version: ${value[1]} ${value[2]}`);
             }
         },
         error => logger.error('Error evaluating `process.pid`: ' + error.message));
