@@ -30,7 +30,8 @@ const lintSources = [
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
 function computeSourceRoot(file) {
-    return path.relative(path.dirname(file.path), __dirname);
+    const absPath = path.join(__dirname, file.path);
+    return path.relative(path.dirname(absPath), __dirname);
 }
 
 const tsProject = ts.createProject('tsconfig.json', { typescript });
