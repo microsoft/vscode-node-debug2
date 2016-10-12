@@ -14,6 +14,7 @@ const LoggingReporter = require('./loggingReporter');
 suite('Node Debug Adapter', () => {
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
+    console.log('dirname: ' + __dirname);
     const PROJECT_ROOT = Path.join(__dirname, '../../');
     const DATA_ROOT = Path.join(PROJECT_ROOT, 'testdata/');
 
