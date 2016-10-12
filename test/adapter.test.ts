@@ -5,6 +5,7 @@
 
 import assert = require('assert');
 import * as Path from 'path';
+import * as os from 'os';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 
@@ -12,6 +13,7 @@ import {DebugClient} from 'vscode-debugadapter-testsupport';
 const LoggingReporter = require('./loggingReporter');
 
 suite('Node Debug Adapter', () => {
+    const NIGHTLY_NAME = os.platform() === 'win32' ? 'node-nightly.cmd' : 'node-nightly';
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
     const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + __dirname.substr(1);
@@ -35,7 +37,7 @@ suite('Node Debug Adapter', () => {
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly.cmd';
+                launchArgs.runtimeExecutable = NIGHTLY_NAME;
             }
 
             return origLaunch.call(dc, launchArgs);
@@ -46,7 +48,7 @@ suite('Node Debug Adapter', () => {
             const launchArgs = args[0];
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly.cmd';
+                launchArgs.runtimeExecutable = NIGHTLY_NAME;
             }
 
             return origHitBreakpoint.apply(dc, args);

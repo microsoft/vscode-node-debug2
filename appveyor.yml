@@ -2,8 +2,9 @@ environment:
   matrix:
     - nodejs_version: 6.2
     - nodejs_version: 6.3
-    - nodejs_version: 6.4
-    - nodejs_version: 6.5
+    # --inspect crashes in .4 and .5. https://github.com/nodejs/node/issues/8155
+    #- nodejs_version: 6.4
+    #- nodejs_version: 6.5
     - nodejs_version: 6.6
     - nodejs_version: 6.7
 
@@ -14,6 +15,7 @@ install:
         npm i -g node-nightly
         node-nightly
       } else {
+        # --inspect crashes in x64 https://github.com/nodejs/node/issues/8155
         Install-Product node $env:nodejs_version x86
       }
 
