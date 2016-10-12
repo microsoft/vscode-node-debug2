@@ -6,7 +6,7 @@
 import assert = require('assert');
 import * as Path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {DebugClient} from 'vscode-debugadapter-testSupport';
+import {DebugClient} from 'vscode-debugadapter-testsupport';
 
 // ES6 default export...
 const LoggingReporter = require('./loggingReporter');
