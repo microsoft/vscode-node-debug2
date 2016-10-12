@@ -14,6 +14,7 @@ const LoggingReporter = require('./loggingReporter');
 suite('Node Debug Adapter', () => {
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
+    console.log('dirname: ' + __dirname);
     const PROJECT_ROOT = Path.join(__dirname, '../../');
     const DATA_ROOT = Path.join(PROJECT_ROOT, 'testdata/');
 
@@ -34,7 +35,7 @@ suite('Node Debug Adapter', () => {
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly';
+                launchArgs.runtimeExecutable = 'node-nightly.cmd';
             }
 
             return origLaunch.call(dc, launchArgs);
@@ -45,7 +46,7 @@ suite('Node Debug Adapter', () => {
             const launchArgs = args[0];
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly';
+                launchArgs.runtimeExecutable = 'node-nightly.cmd';
             }
 
             return origHitBreakpoint.apply(dc, args);

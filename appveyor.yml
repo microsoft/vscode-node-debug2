@@ -1,5 +1,6 @@
 environment:
   matrix:
+    - nodejs_version: 6.2
     - nodejs_version: 6.3
     - nodejs_version: 6.4
     - nodejs_version: 6.5
@@ -7,10 +8,20 @@ environment:
     - nodejs_version: 6.7
 
 install:
-  - ps: Install-Product node $env:nodejs_version x86
+  - ps: >
+      if ($env:nodejs_version -eq 6.2) {
+        Install-Product node $env:nodejs_version x64
+        npm i -g node-nightly
+        node-nightly
+      } else {
+        Install-Product node $env:nodejs_version x86
+      }
 
 build_script:
   - npm install
 
 test_script:
+  - cd c:\projects\vscode-node-debug2\test
+  - cd ..
+  - echo %cd%
   - npm test
