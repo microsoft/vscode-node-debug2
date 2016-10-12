@@ -6,7 +6,7 @@
 import assert = require('assert');
 import * as Path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {DebugClient} from 'vscode-debugadapter-testsupport';
+import {DebugClient} from 'vscode-debugadapter-testSupport';
 
 // ES6 default export...
 const LoggingReporter = require('./loggingReporter');
@@ -14,14 +14,14 @@ const LoggingReporter = require('./loggingReporter');
 suite('Node Debug Adapter', () => {
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
-    console.log('dirname: ' + __dirname);
-    const PROJECT_ROOT = Path.join(__dirname, '../../');
+    const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + __dirname.substr(1);
+    const PROJECT_ROOT = Path.join(lowercaseDriveLetterDirname, '../../');
     const DATA_ROOT = Path.join(PROJECT_ROOT, 'testdata/');
 
     let dc: DebugClient;
 
     function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
-        return dc.waitForEvent(eventType, 3e4);
+        return dc.waitForEvent(eventType, 2e4);
     }
 
     function log(e) {
