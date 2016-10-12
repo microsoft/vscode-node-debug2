@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "3.0.1",
+    "vscode-chrome-debug-core": "3.0.2",
     "vscode-debugadapter": "^1.13.0",
     "vscode-debugprotocol": "^1.13.0",
     "vscode-nls": "^1.0.4"
@@ -40,7 +40,7 @@
   },
   "scripts": {
     "postinstall": "gulp build",
-    "test": "mocha --timeout 30000 -s 2000 -u tdd --reporter out/test/loggingReporter ./out/test/"
+    "test": "mocha --timeout 20000 -s 2000 -u tdd --reporter out/test/loggingReporter ./out/test/"
   },
   "engines": {
     "vscode": "^1.6.0",

@@ -5,6 +5,7 @@
 
 import assert = require('assert');
 import * as Path from 'path';
+import * as os from 'os';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 
@@ -12,15 +13,17 @@ import {DebugClient} from 'vscode-debugadapter-testsupport';
 const LoggingReporter = require('./loggingReporter');
 
 suite('Node Debug Adapter', () => {
+    const NIGHTLY_NAME = os.platform() === 'win32' ? 'node-nightly.cmd' : 'node-nightly';
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
-    const PROJECT_ROOT = Path.join(__dirname, '../../');
+    const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + __dirname.substr(1);
+    const PROJECT_ROOT = Path.join(lowercaseDriveLetterDirname, '../../');
     const DATA_ROOT = Path.join(PROJECT_ROOT, 'testdata/');
 
     let dc: DebugClient;
 
     function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
-        return dc.waitForEvent(eventType, 3e4);
+        return dc.waitForEvent(eventType, 2e4);
     }
 
     function log(e) {
@@ -34,7 +37,7 @@ suite('Node Debug Adapter', () => {
         dc.launch = (launchArgs: any) => {
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly';
+                launchArgs.runtimeExecutable = NIGHTLY_NAME;
             }
 
             return origLaunch.call(dc, launchArgs);
@@ -45,7 +48,7 @@ suite('Node Debug Adapter', () => {
             const launchArgs = args[0];
             launchArgs.verboseDiagnosticLogging = true;
             if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = 'node-nightly';
+                launchArgs.runtimeExecutable = NIGHTLY_NAME;
             }
 
             return origHitBreakpoint.apply(dc, args);
