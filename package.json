@@ -26,7 +26,7 @@
     "chrome-remote-debug-protocol": "^1.1.20160822",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
-    "gulp-sourcemaps": "^1.5.2",
+    "gulp-sourcemaps": "1.7.3",
     "gulp-tslint": "^6.1.2",
     "gulp-typescript": "^2.12.1",
     "gulp-util": "^3.0.5",
