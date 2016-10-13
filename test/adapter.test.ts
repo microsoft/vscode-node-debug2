@@ -23,7 +23,7 @@ suite('Node Debug Adapter', () => {
     let dc: DebugClient;
 
     function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
-        return dc.waitForEvent(eventType, 2e4);
+        return dc.waitForEvent(eventType, 1e4);
     }
 
     function log(e) {
@@ -555,6 +555,85 @@ suite('Node Debug Adapter', () => {
                 .then(() => dc.evaluateRequest({ expression: 'throw new Error("fail")' }))
                 .catch(response => {
                     assert.equal(response.message, 'Error: fail');
+                });
+        });
+    });
+
+    suite('completions', () => {
+        const PROGRAM = Path.join(DATA_ROOT, 'programWithVariables.js');
+
+        function start(): Promise<void> {
+            return Promise.all([
+                dc.configurationSequence(),
+                dc.launch({ program:  PROGRAM }),
+                waitForEvent('initialized'),
+                waitForEvent('stopped')
+            ]);
+        }
+
+        function testCompletions(text: string, column = text.length + 1, frameId = 0): Promise<DebugProtocol.CompletionItem[]> {
+            return start()
+                .then(() => dc.send('completions', <DebugProtocol.CompletionsArguments>{ text, column, frameId }))
+                .then((response: DebugProtocol.CompletionsResponse) => response.body.targets);
+        }
+
+        function inCompletionsList(completions: DebugProtocol.CompletionItem[], ...labels: string[]): boolean {
+            return labels.every(label => completions.filter(target => target.label === label).length === 1);
+        }
+
+        test('returns global vars', () => {
+            return testCompletions('')
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'global'));
+                });
+        });
+
+        test('returns local vars', () => {
+            return testCompletions('')
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'num', 'str', 'arr', 'obj'));
+                });
+        });
+
+        test('returns methods', () => {
+            return testCompletions('arr.')
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'push', 'indexOf'));
+                });
+        });
+
+        test('returns object properties', () => {
+            return testCompletions('obj.')
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'a', 'b'));
+                });
+        });
+
+        test('multiple dots', () => {
+            return testCompletions('obj.b.')
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'startsWith', 'endsWith'));
+                });
+        });
+
+        test('returns from the correct column', () => {
+            return testCompletions('obj.b.', /*column=*/6)
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'a', 'b'));
+                });
+        });
+
+        test('returns from the correct frameId', () => {
+            return testCompletions('obj', undefined, /*frameId=*/1)
+                .then(completions => {
+                    assert(!inCompletionsList(completions, 'obj'));
+                });
+        });
+
+        test('returns properties of string literals', () => {
+            return testCompletions('"".')
+                .then(completions => {
+                    assert(inCompletionsList(completions, 'startsWith'));
                 });
         });
     });
