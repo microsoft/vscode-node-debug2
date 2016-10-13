@@ -38,6 +38,7 @@ function locals() {
     };
     const gen = generator();
     const genNext = gen.next();
+    const promise = Promise.resolve("sdfkj");
 
     const manyPropsObj: any = { prop2: 'abc', prop1: 'def' };
     for (let i=0; i<=5; i++) manyPropsObj['prop' + i] = Math.random();
@@ -51,6 +52,19 @@ newlines`;
     buffView[0] = 234;
     const s = Symbol('hi');
     const e = new Error('hi');
+
+    const handler = {
+        get: function(target, name){
+            return name in target?
+                target[name] :
+                37;
+        }
+    };
+
+    const num = 5.1;
+    const p = { proxy: new Proxy({b: 4}, handler) };
+
+    const p2 = new Proxy({a: 1} ,handler);
 
     const m = new Map();
     m.set('a', 1);
