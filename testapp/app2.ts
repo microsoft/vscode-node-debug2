@@ -36,12 +36,12 @@ export function consoleAPIs() {
     } catch (e) { }
 }
 
-export function anotherFn(): void {
+export function anotherFn(cb?): void {
     let qqq;
     const str = 'hello';
     let xyz = 1;
     const obj = { a: 2, get thing() { throw new Error('xyz'); }, set thing(x) { } };
     const obj2 = { b: 3, get getter() { return 5; }};
     const obj3 = { b: 3, get getter() { return { a: 4, b: [1, 2, 3] } } };
-    xyz++;                     xyz++;
+    xyz++;                     xyz++;   cb && cb();
 }

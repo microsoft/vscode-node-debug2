@@ -101,7 +101,7 @@ newlines`;
     function fn2() { };
     fn2.prototype.aPrototypeFn = () => { return 3; };
 
-    app2.anotherFn();
+    app2.anotherFn(fn);
     fn();
 
     app2.throwCaught();
