@@ -13,6 +13,7 @@ import {DebugClient} from 'vscode-debugadapter-testsupport';
 const LoggingReporter = require('./loggingReporter');
 
 suite('Node Debug Adapter', () => {
+    const THREAD_ID = 1;
     const NIGHTLY_NAME = os.platform() === 'win32' ? 'node-nightly.cmd' : 'node-nightly';
     const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
@@ -583,57 +584,72 @@ suite('Node Debug Adapter', () => {
 
         test('returns global vars', () => {
             return testCompletions('')
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'global'));
-                });
+                .then(completions => assert(inCompletionsList(completions, 'global')));
         });
 
         test('returns local vars', () => {
             return testCompletions('')
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'num', 'str', 'arr', 'obj'));
-                });
+                .then(completions => assert(inCompletionsList(completions, 'num', 'str', 'arr', 'obj')));
         });
 
         test('returns methods', () => {
             return testCompletions('arr.')
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'push', 'indexOf'));
-                });
+                .then(completions => assert(inCompletionsList(completions, 'push', 'indexOf')));
         });
 
         test('returns object properties', () => {
             return testCompletions('obj.')
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'a', 'b'));
-                });
+                .then(completions => assert(inCompletionsList(completions, 'a', 'b')));
         });
 
         test('multiple dots', () => {
             return testCompletions('obj.b.')
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'startsWith', 'endsWith'));
-                });
+                .then(completions => assert(inCompletionsList(completions, 'startsWith', 'endsWith')));
         });
 
         test('returns from the correct column', () => {
             return testCompletions('obj.b.', /*column=*/6)
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'a', 'b'));
-                });
+                .then(completions => assert(inCompletionsList(completions, 'a', 'b')));
         });
 
         test('returns from the correct frameId', () => {
             return testCompletions('obj', undefined, /*frameId=*/1)
-                .then(completions => {
-                    assert(!inCompletionsList(completions, 'obj'));
-                });
+                .then(completions => assert(!inCompletionsList(completions, 'obj')));
         });
 
         test('returns properties of string literals', () => {
             return testCompletions('"".')
-                .then(completions => {
-                    assert(inCompletionsList(completions, 'startsWith'));
+                .then(completions => assert(inCompletionsList(completions, 'startsWith')));
+        });
+    });
+
+    suite('stepping', () => {
+        const PROGRAM = Path.join(DATA_ROOT, 'program.js');
+
+        function start(): Promise<void> {
+            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 1 });
+        }
+
+        test.only('returns the same frameIDs between steps', () => {
+            let firstFrameIDs: number[];
+            return start()
+                .then(() => {
+                    return Promise.all([
+                        dc.nextRequest({threadId: THREAD_ID }),
+                        dc.waitForEvent('stopped')]);
+                })
+                .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
+                .then(frameResponse => {
+                    firstFrameIDs = frameResponse.body.stackFrames.map(frame => frame.id);
+
+                    return Promise.all([
+                        dc.nextRequest({threadId: THREAD_ID }),
+                        dc.waitForEvent('stopped')]);
+                })
+                .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
+                .then(frameResponse => {
+                    const secondFrameIDs = frameResponse.body.stackFrames.map(frame => frame.id);
+                    assert.deepEqual(firstFrameIDs, secondFrameIDs);
                 });
         });
     });
