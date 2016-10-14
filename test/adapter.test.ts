@@ -169,8 +169,7 @@ suite('Node Debug Adapter', () => {
             return dc.hitBreakpoint({ program: SINGLE_LINE_PROGRAM }, { path: SINGLE_LINE_PROGRAM, line: LINE, column: COLUMN } );
         });
 
-		// Microsoft/vscode-chrome-debug-core#10
-        test.skip('should stop on a conditional breakpoint', () => {
+        test('should stop on a conditional breakpoint', () => {
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const COND_BREAKPOINT_LINE = 13;
             const COND_BREAKPOINT_COLUMN = 2;
@@ -630,7 +629,7 @@ suite('Node Debug Adapter', () => {
             return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 1 });
         }
 
-        test.only('returns the same frameIDs between steps', () => {
+        test('returns the same frameIDs between steps', () => {
             let firstFrameIDs: number[];
             return start()
                 .then(() => {
