@@ -1,308 +1,308 @@
 {
-  "name": "node-debug2",
-  "displayName": "Node Debug 2 - Experimental",
-  "version": "0.0.8",
-  "publisher": "ms-vscode",
-  "description": "%extension.description%",
-  "icon": "images/node-debug-icon.svg",
-  "categories": [
-    "Debuggers"
-  ],
-  "author": {
-    "name": "Microsoft Corporation"
-  },
-  "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "vscode-chrome-debug-core": "3.1.0",
-    "vscode-debugadapter": "^1.13.0",
-    "vscode-debugprotocol": "^1.13.0",
-    "vscode-nls": "^1.0.4"
-  },
-  "devDependencies": {
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.39",
-    "@types/source-map": "^0.1.27",
-    "chrome-remote-debug-protocol": "^1.1.20160822",
-    "del": "^2.2.2",
-    "gulp": "^3.9.1",
-    "gulp-sourcemaps": "1.7.3",
-    "gulp-tslint": "^6.1.2",
-    "gulp-typescript": "^2.12.1",
-    "gulp-util": "^3.0.5",
-    "mocha": "^3.1.1",
-    "run-sequence": "^1.2.2",
-    "tslint": "^3.15.1",
-    "typescript": "^2.0.2",
-    "vsce": "^1.14.0",
-    "vscode-debugadapter-testsupport": "^1.13.0",
-    "vscode-nls-dev": "^2.0.0-beta.1"
-  },
-  "scripts": {
-    "postinstall": "gulp build",
-    "test": "mocha --timeout 20000 -s 2000 -u tdd --reporter out/test/loggingReporter ./out/test/",
-    "vscode:prepublish": "gulp verify-no-linked-modules"
-  },
-  "engines": {
-    "vscode": "^1.6.0",
-    "node": "^6.3.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Microsoft/vscode-node-debug2.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Microsoft/vscode-node-debug2/issues"
-  },
-  "contributes": {
-    "breakpoints": [
-      {
-        "language": "javascript"
-      },
-      {
-        "language": "javascriptreact"
-      }
+    "name": "node-debug2",
+    "displayName": "Node Debug 2 - Experimental",
+    "version": "0.0.8",
+    "publisher": "ms-vscode",
+    "description": "%extension.description%",
+    "icon": "images/node-debug-icon.svg",
+    "categories": [
+        "Debuggers"
     ],
-    "debuggers": [
-      {
-        "type": "node2",
-        "label": "Node.js v6.3+ (Experimental)",
-        "program": "./out/src/nodeDebug.js",
-        "runtime": "node",
-        "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
-        "initialConfigurations": [
-          {
-            "name": "%node.launch.config.name%",
-            "type": "node2",
-            "request": "launch",
-            "program": "${workspaceRoot}/app.js",
-            "stopOnEntry": false,
-            "args": [],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": null,
-            "runtimeExecutable": null,
-            "runtimeArgs": [
-              "--nolazy"
-            ],
-            "env": {
-              "NODE_ENV": "development"
+    "author": {
+        "name": "Microsoft Corporation"
+    },
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "vscode-chrome-debug-core": "3.1.0",
+        "vscode-debugadapter": "^1.13.0",
+        "vscode-debugprotocol": "^1.13.0",
+        "vscode-nls": "^1.0.4"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.32",
+        "@types/node": "^6.0.39",
+        "@types/source-map": "^0.1.27",
+        "chrome-remote-debug-protocol": "^1.1.20160822",
+        "del": "^2.2.2",
+        "gulp": "^3.9.1",
+        "gulp-sourcemaps": "1.7.3",
+        "gulp-tslint": "^6.1.2",
+        "gulp-typescript": "^2.12.1",
+        "gulp-util": "^3.0.5",
+        "mocha": "^3.1.1",
+        "run-sequence": "^1.2.2",
+        "tslint": "^3.15.1",
+        "typescript": "^2.0.2",
+        "vsce": "^1.14.0",
+        "vscode-debugadapter-testsupport": "^1.13.0",
+        "vscode-nls-dev": "^2.0.0-beta.1"
+    },
+    "scripts": {
+        "postinstall": "gulp build",
+        "test": "mocha --timeout 20000 -s 2000 -u tdd --reporter out/test/loggingReporter ./out/test/",
+        "vscode:prepublish": "gulp verify-no-linked-modules"
+    },
+    "engines": {
+        "vscode": "^1.6.0",
+        "node": "^6.3.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Microsoft/vscode-node-debug2.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Microsoft/vscode-node-debug2/issues"
+    },
+    "contributes": {
+        "breakpoints": [
+            {
+                "language": "javascript"
             },
-            "console": "internalConsole",
-            "sourceMaps": false,
-            "outFiles": []
-          },
-          {
-            "name": "%node.attach.config.name%",
-            "type": "node2",
-            "request": "attach",
-            "port": 9229,
-            "address": "localhost",
-            "restart": false,
-            "sourceMaps": false,
-            "outFiles": [],
-            "localRoot": "${workspaceRoot}",
-            "remoteRoot": null
-          }
+            {
+                "language": "javascriptreact"
+            }
         ],
-        "configurationAttributes": {
-          "launch": {
-            "required": [
-              "cwd"
-            ],
-            "properties": {
-              "program": {
-                "type": "string",
-                "description": "%node.launch.program.description%"
-              },
-              "stopOnEntry": {
-                "type": "boolean",
-                "description": "%node.stopOnEntry.description%",
-                "default": true
-              },
-              "console": {
-                "enum": [
-                  "internalConsole",
-                  "integratedTerminal",
-                  "externalTerminal"
+        "debuggers": [
+            {
+                "type": "node2",
+                "label": "Node.js v6.3+ (Experimental)",
+                "program": "./out/src/nodeDebug.js",
+                "runtime": "node",
+                "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
+                "initialConfigurations": [
+                    {
+                        "name": "%node.launch.config.name%",
+                        "type": "node2",
+                        "request": "launch",
+                        "program": "${workspaceRoot}/app.js",
+                        "stopOnEntry": false,
+                        "args": [],
+                        "cwd": "${workspaceRoot}",
+                        "preLaunchTask": null,
+                        "runtimeExecutable": null,
+                        "runtimeArgs": [
+                            "--nolazy"
+                        ],
+                        "env": {
+                            "NODE_ENV": "development"
+                        },
+                        "console": "internalConsole",
+                        "sourceMaps": false,
+                        "outFiles": []
+                    },
+                    {
+                        "name": "%node.attach.config.name%",
+                        "type": "node2",
+                        "request": "attach",
+                        "port": 9229,
+                        "address": "localhost",
+                        "restart": false,
+                        "sourceMaps": false,
+                        "outFiles": [],
+                        "localRoot": "${workspaceRoot}",
+                        "remoteRoot": null
+                    }
                 ],
-                "description": "%node.launch.console.description%",
-                "default": "internalConsole"
-              },
-              "args": {
-                "type": "array",
-                "description": "%node.launch.args.description%",
-                "items": {
-                  "type": "string"
-                },
-                "default": []
-              },
-              "cwd": {
-                "type": "string",
-                "description": "%node.launch.cwd.description%",
-                "default": "${workspaceRoot}"
-              },
-              "runtimeExecutable": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "%node.launch.runtimeExecutable.description%",
-                "default": null
-              },
-              "runtimeArgs": {
-                "type": "array",
-                "description": "%node.launch.runtimeArgs.description%",
-                "items": {
-                  "type": "string"
-                },
-                "default": []
-              },
-              "env": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "description": "%node.launch.env.description%",
-                "default": {}
-              },
-              "sourceMaps": {
-                "type": "boolean",
-                "description": "%node.sourceMaps.description%",
-                "default": true
-              },
-              "outDir": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "%node.outDir.description%",
-                "default": null
-              },
-              "outFiles": {
-                "type": "array",
-                "description": "%node.outFiles.description%",
-                "items": {
-                  "type": "string"
-                },
-                "default": []
-              },
-              "port": {
-                "type": "number",
-                "description": "%node.port.description%",
-                "default": 9229
-              },
-              "address": {
-                "type": "string",
-                "description": "%node.address.description%",
-                "default": "localhost"
-              },
-              "timeout": {
-                "type": "number",
-                "description": "%node.timeout.description%",
-                "default": 10000
-              },
-              "smartStep": {
-                "type": "boolean",
-                "description": "%node.smartStep.description%",
-                "default": true,
-                "errorMessage": "Not supported yet"
-              },
-              "diagnosticLogging": {
-                "type": "boolean",
-                "description": "When true, the adapter logs its own diagnostic info to the console",
-                "default": true
-              },
-              "verboseDiagnosticLogging": {
-                "type": "boolean",
-                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
-                "default": true
-              }
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "cwd"
+                        ],
+                        "properties": {
+                            "program": {
+                                "type": "string",
+                                "description": "%node.launch.program.description%"
+                            },
+                            "stopOnEntry": {
+                                "type": "boolean",
+                                "description": "%node.stopOnEntry.description%",
+                                "default": true
+                            },
+                            "console": {
+                                "enum": [
+                                    "internalConsole",
+                                    "integratedTerminal",
+                                    "externalTerminal"
+                                ],
+                                "description": "%node.launch.console.description%",
+                                "default": "internalConsole"
+                            },
+                            "args": {
+                                "type": "array",
+                                "description": "%node.launch.args.description%",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "cwd": {
+                                "type": "string",
+                                "description": "%node.launch.cwd.description%",
+                                "default": "${workspaceRoot}"
+                            },
+                            "runtimeExecutable": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "%node.launch.runtimeExecutable.description%",
+                                "default": null
+                            },
+                            "runtimeArgs": {
+                                "type": "array",
+                                "description": "%node.launch.runtimeArgs.description%",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "env": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                },
+                                "description": "%node.launch.env.description%",
+                                "default": {}
+                            },
+                            "sourceMaps": {
+                                "type": "boolean",
+                                "description": "%node.sourceMaps.description%",
+                                "default": true
+                            },
+                            "outDir": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "%node.outDir.description%",
+                                "default": null
+                            },
+                            "outFiles": {
+                                "type": "array",
+                                "description": "%node.outFiles.description%",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "port": {
+                                "type": "number",
+                                "description": "%node.port.description%",
+                                "default": 9229
+                            },
+                            "address": {
+                                "type": "string",
+                                "description": "%node.address.description%",
+                                "default": "localhost"
+                            },
+                            "timeout": {
+                                "type": "number",
+                                "description": "%node.timeout.description%",
+                                "default": 10000
+                            },
+                            "smartStep": {
+                                "type": "boolean",
+                                "description": "%node.smartStep.description%",
+                                "default": true,
+                                "errorMessage": "Not supported yet"
+                            },
+                            "diagnosticLogging": {
+                                "type": "boolean",
+                                "description": "When true, the adapter logs its own diagnostic info to the console",
+                                "default": true
+                            },
+                            "verboseDiagnosticLogging": {
+                                "type": "boolean",
+                                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+                                "default": true
+                            }
+                        }
+                    },
+                    "attach": {
+                        "properties": {
+                            "port": {
+                                "type": "number",
+                                "description": "%node.port.description%",
+                                "default": 9229
+                            },
+                            "address": {
+                                "type": "string",
+                                "description": "%node.address.description%",
+                                "default": "localhost"
+                            },
+                            "timeout": {
+                                "type": "number",
+                                "description": "%node.timeout.description%",
+                                "default": 10000
+                            },
+                            "restart": {
+                                "type": "boolean",
+                                "description": "%node.attach.restart.description%",
+                                "default": true
+                            },
+                            "sourceMaps": {
+                                "type": "boolean",
+                                "description": "%node.sourceMaps.description%",
+                                "default": true
+                            },
+                            "outDir": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "%node.outDir.description%",
+                                "default": null
+                            },
+                            "outFiles": {
+                                "type": "array",
+                                "description": "%node.outFiles.description%",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "stopOnEntry": {
+                                "type": "boolean",
+                                "description": "%node.stopOnEntry.description%",
+                                "default": true
+                            },
+                            "localRoot": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "%node.attach.localRoot.description%",
+                                "default": null
+                            },
+                            "remoteRoot": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "%node.attach.remoteRoot.description%",
+                                "default": null
+                            },
+                            "smartStep": {
+                                "type": "boolean",
+                                "description": "%node.smartStep.description%",
+                                "default": true,
+                                "errorMessage": "Not supported yet"
+                            },
+                            "diagnosticLogging": {
+                                "type": "boolean",
+                                "description": "When true, the adapter logs its own diagnostic info to the console",
+                                "default": true
+                            },
+                            "verboseDiagnosticLogging": {
+                                "type": "boolean",
+                                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+                                "default": true
+                            }
+                        }
+                    }
+                }
             }
-          },
-          "attach": {
-            "properties": {
-              "port": {
-                "type": "number",
-                "description": "%node.port.description%",
-                "default": 9229
-              },
-              "address": {
-                "type": "string",
-                "description": "%node.address.description%",
-                "default": "localhost"
-              },
-              "timeout": {
-                "type": "number",
-                "description": "%node.timeout.description%",
-                "default": 10000
-              },
-              "restart": {
-                "type": "boolean",
-                "description": "%node.attach.restart.description%",
-                "default": true
-              },
-              "sourceMaps": {
-                "type": "boolean",
-                "description": "%node.sourceMaps.description%",
-                "default": true
-              },
-              "outDir": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "%node.outDir.description%",
-                "default": null
-              },
-              "outFiles": {
-                "type": "array",
-                "description": "%node.outFiles.description%",
-                "items": {
-                  "type": "string"
-                },
-                "default": []
-              },
-              "stopOnEntry": {
-                "type": "boolean",
-                "description": "%node.stopOnEntry.description%",
-                "default": true
-              },
-              "localRoot": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "%node.attach.localRoot.description%",
-                "default": null
-              },
-              "remoteRoot": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "%node.attach.remoteRoot.description%",
-                "default": null
-              },
-              "smartStep": {
-                "type": "boolean",
-                "description": "%node.smartStep.description%",
-                "default": true,
-                "errorMessage": "Not supported yet"
-              },
-              "diagnosticLogging": {
-                "type": "boolean",
-                "description": "When true, the adapter logs its own diagnostic info to the console",
-                "default": true
-              },
-              "verboseDiagnosticLogging": {
-                "type": "boolean",
-                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
-                "default": true
-              }
-            }
-          }
-        }
-      }
-    ]
-  }
+        ]
+    }
 }
