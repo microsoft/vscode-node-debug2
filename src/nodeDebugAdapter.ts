@@ -196,13 +196,19 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._nodeProcessId = nodeProcess.pid;
             nodeProcess.on('error', (error) => {
                 reject(errors.cannotLaunchDebugTarget(error));
-                this.terminateSession(`failed to launch target (${error})`);
+                const msg = `Node process error: ${error}`;
+                logger.error(msg);
+                this.terminateSession(msg);
             });
             nodeProcess.on('exit', () => {
-                this.terminateSession('target exited');
+                const msg = 'Target exited';
+                logger.log(msg)
+                this.terminateSession(msg);
             });
             nodeProcess.on('close', (code) => {
-                this.terminateSession('target closed');
+                const msg = 'Target closed';
+                logger.log(msg);
+                this.terminateSession(msg);
             });
 
             nodeProcess.stdout.on('data', (data: string) => {
