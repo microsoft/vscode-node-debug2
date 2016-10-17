@@ -68,18 +68,18 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         if (this._adapterID === 'extensionHost') {
-			// we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
-			let launchArgs = []; // integrated terminal?
-			if (!args.noDebug) {
-				launchArgs.push(`--debugBrkPluginHost=${port}`, '--inspect');
-			}
+            // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
+            let launchArgs = []; // integrated terminal?
+            if (!args.noDebug) {
+                launchArgs.push(`--debugBrkPluginHost=${port}`, '--inspect');
+            }
 
             const runtimeArgs = args.runtimeArgs || [];
             const programArgs = args.args || [];
-			launchArgs = launchArgs.concat(runtimeArgs, programArgs);
+            launchArgs = launchArgs.concat(runtimeArgs, programArgs);
 
             return this.launchInInternalConsole(runtimeExecutable, launchArgs);
-		}
+        }
 
         let programPath = args.program;
         if (programPath) {
