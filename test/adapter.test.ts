@@ -571,9 +571,11 @@ suite('Node Debug Adapter', () => {
             ]);
         }
 
-        function testCompletions(text: string, column = text.length + 1, frameId = 0): Promise<DebugProtocol.CompletionItem[]> {
+        function testCompletions(text: string, column = text.length + 1, frameIdx = 0): Promise<DebugProtocol.CompletionItem[]> {
             return start()
-                .then(() => dc.send('completions', <DebugProtocol.CompletionsArguments>{ text, column, frameId }))
+                .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
+                .then(stackTraceResponse => stackTraceResponse.body.stackFrames.map(frame => frame.id))
+                .then(frameIds => dc.send('completions', <DebugProtocol.CompletionsArguments>{ text, column, frameId: frameIds[frameIdx] }))
                 .then((response: DebugProtocol.CompletionsResponse) => response.body.targets);
         }
 
