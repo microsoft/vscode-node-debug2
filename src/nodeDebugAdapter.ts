@@ -35,9 +35,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _supportsRunInTerminalRequest: boolean;
     private _restartMode: boolean;
     private _isTerminated: boolean;
+    private _adapterID: string;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
+        this._adapterID = args.adapterID;
 
         return super.initialize(args);
     }
@@ -64,6 +66,20 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             // use node from PATH
             runtimeExecutable = NodeDebugAdapter.NODE;
         }
+
+        if (this._adapterID === 'extensionHost') {
+			// we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
+			let launchArgs = []; // integrated terminal?
+			if (!args.noDebug) {
+				launchArgs.push(`--debugBrkPluginHost=${port}`, '--inspect');
+			}
+
+            const runtimeArgs = args.runtimeArgs || [];
+            const programArgs = args.args || [];
+			launchArgs = launchArgs.concat(runtimeArgs, programArgs);
+
+            return this.launchInInternalConsole(runtimeExecutable, launchArgs);
+		}
 
         let programPath = args.program;
         if (programPath) {
@@ -173,7 +189,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts: cp.SpawnOptions): Promise<void> {
+    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts?: cp.SpawnOptions): Promise<void> {
         this.logLaunchCommand(runtimeExecutable, launchArgs);
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
         return new Promise<void>((resolve, reject) => {
@@ -228,7 +244,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._expectingStopReason = undefined;
             this.continue();
         } else if (this._entryPauseEvent) {
-            this.onDebuggerPaused(this._entryPauseEvent);
+            this.onPaused(this._entryPauseEvent);
         }
 
         return super.configurationDone();
@@ -248,7 +264,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.terminateSession(reason, requestRestart);
     }
 
-    protected onDebuggerPaused(notification: Crdp.Debugger.PausedEvent): void {
+    protected onPaused(notification: Crdp.Debugger.PausedEvent): void {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log('Paused on entry');
@@ -265,7 +281,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this.getNodeProcessDetailsIfNeeded()
                 .then(() => this.sendInitializedEvent());
         } else {
-            super.onDebuggerPaused(notification);
+            super.onPaused(notification);
         }
     }
 
