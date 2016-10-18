@@ -8,6 +8,7 @@ environment:
     - nodejs_version: 6.6
     - nodejs_version: 6.7
     - nodejs_version: 6.8
+    - nodejs_version: 6.9
 
 install:
   - ps: >
