@@ -15,11 +15,10 @@ const cp = require('child_process');
 const del = require('del');
 const fs = require('fs');
 
-const sources = [
-    'src',
-    'test',
-    'node_modules/@types'
-].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
+const watchedSources = [
+	'src/**/*',
+    'test/**/*'
+];
 
 const scripts = [
     'src/terminateProcess.sh'
@@ -36,7 +35,7 @@ function computeSourceRoot(file) {
 
 const tsProject = ts.createProject('tsconfig.json', { typescript });
 gulp.task('build', ['copy-scripts'], function () {
-	return gulp.src(sources, { base: '.' })
+    return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject)).js
         .pipe(sourcemaps.write('.', { includeContent: true, sourceRoot: computeSourceRoot }))
@@ -50,7 +49,7 @@ gulp.task('copy-scripts', () => {
 
 gulp.task('watch', ['build'], function(cb) {
     log('Watching build sources...');
-    return gulp.watch(sources, ['build']);
+    return gulp.watch(watchedSources, ['build']);
 });
 
 gulp.task('default', ['build']);

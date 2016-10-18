@@ -1,19 +1,19 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "noImplicitAny": false,
-        "removeComments": false,
         "target": "ES6",
         "sourceMap": true,
         "outDir": "out",
+
+        "noImplicitAny": false,
+        "removeComments": false,
         "noUnusedLocals": true,
         "noImplicitThis": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true
     },
     "exclude": [
-        "node_modules",
-        "!node_modules/@types",
+        "node_modules/",
         "testapp/",
         "testdata/"
     ]
