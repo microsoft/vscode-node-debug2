@@ -46,6 +46,7 @@
   ],
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
+    "build": "gulp build",
     "test": "mocha --timeout 20000 -s 2000 -u tdd --reporter out/test/loggingReporter.js ./out/test/",
     "vscode:prepublish": "gulp verify-no-linked-modules"
   },
