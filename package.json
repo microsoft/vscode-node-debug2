@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2 - Experimental",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.svg",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "3.1.0",
+    "vscode-chrome-debug-core": "3.1.1",
     "vscode-debugadapter": "^1.13.0",
     "vscode-debugprotocol": "^1.13.0",
     "vscode-nls": "^1.0.4"
@@ -46,7 +46,7 @@
   ],
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "mocha --timeout 20000 -s 2000 -u tdd --reporter ./out/test/loggingReporter ./out/test/",
+    "test": "mocha --timeout 20000 -s 2000 -u tdd --reporter out/test/loggingReporter.js ./out/test/",
     "vscode:prepublish": "gulp verify-no-linked-modules"
   },
   "engines": {
