@@ -69,7 +69,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         if (this._adapterID === 'extensionHost') {
             // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
-            let launchArgs = []; // integrated terminal?
+            let launchArgs = [];
             if (!args.noDebug) {
                 launchArgs.push(`--debugBrkPluginHost=${port}`, '--inspect');
             }
@@ -202,7 +202,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             });
             nodeProcess.on('exit', () => {
                 const msg = 'Target exited';
-                logger.log(msg)
+                logger.log(msg);
                 this.terminateSession(msg);
             });
             nodeProcess.on('close', (code) => {
@@ -387,7 +387,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private getNodeProcessDetailsIfNeeded(): Promise<void> {
-        if (this._loggedTargetVersion) {
+        if (this._loggedTargetVersion || !this.chrome) {
             return Promise.resolve();
         }
 
