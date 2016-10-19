@@ -248,7 +248,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         this._finishedConfig = true;
         if (this._continueAfterConfigDone) {
             this._expectingStopReason = undefined;
-            this.continue();
+            this.continue(/*internal=*/true);
         } else if (this._entryPauseEvent) {
             this.onPaused(this._entryPauseEvent);
         }
