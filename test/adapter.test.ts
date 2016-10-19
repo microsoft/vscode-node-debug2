@@ -23,6 +23,41 @@ suite('Node Debug Adapter', () => {
 
     let dc: DebugClient;
 
+    let unhandledAdapterErrors: string[];
+    const origTest = test;
+    const checkLogTest = (expectation: string, assertion?: ActionFunction, testFn: Function = origTest): Mocha.ITest => {
+        // Hack to always check logs after a test runs, can simplify after this issue:
+        // https://github.com/mochajs/mocha/issues/1635
+        if (!assertion) {
+            return origTest(expectation, assertion);
+        }
+
+        function runTest(): Promise<any> {
+            return new Promise((resolve, reject) => {
+                const maybeP = assertion(resolve);
+                if (maybeP && maybeP.then) {
+                    maybeP.then(resolve, reject);
+                }
+            });
+        }
+
+        return testFn(expectation, done => {
+            runTest()
+                .then(() => {
+                    // If any unhandled errors were logged, then ensure the test fails
+                    if (unhandledAdapterErrors.length) {
+                        const errStr = unhandledAdapterErrors.length === 1 ? unhandledAdapterErrors[0] :
+                            JSON.stringify(unhandledAdapterErrors);
+                        throw new Error(errStr);
+                    }
+                })
+                .then(done, done)
+        });
+    };
+    (<Mocha.ITestDefinition>checkLogTest).only = (expectation, assertion) => checkLogTest(expectation, assertion, origTest.only);
+    (<Mocha.ITestDefinition>checkLogTest).skip = test.skip;
+    test = (<any>checkLogTest);
+
     function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
         return dc.waitForEvent(eventType, 1e4);
     }
@@ -31,6 +66,8 @@ suite('Node Debug Adapter', () => {
         const timestamp = new Date().toISOString().split(/[TZ]/)[1];
         const msg = ' ' + timestamp + ' ' + e.body.output.trim();
         LoggingReporter.logEE.emit('log', msg);
+
+        if (msg.indexOf('********') >= 0) unhandledAdapterErrors.push(msg);
     };
 
     function patchLaunchArgs(): void {
@@ -57,6 +94,7 @@ suite('Node Debug Adapter', () => {
     }
 
     setup(() => {
+        unhandledAdapterErrors = [];
         dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
         patchLaunchArgs();
         dc.addListener('output', log);
@@ -67,7 +105,6 @@ suite('Node Debug Adapter', () => {
 
     teardown(() => {
         dc.removeListener('output', log);
-
         return dc.stop();
     });
 

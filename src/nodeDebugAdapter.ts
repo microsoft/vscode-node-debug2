@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, logger, chromeUtils} from 'vscode-chrome-debug-core';
 import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
@@ -393,11 +393,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 }).then(response => {
             if (response.exceptionDetails) {
-                const details = response.exceptionDetails;
-                if (details.exception.description.startsWith('ReferenceError: process is not defined')) {
+                const description = chromeUtils.errorMessageFromExceptionDetails(response.exceptionDetails);
+                if (description.startsWith('ReferenceError: process is not defined')) {
                     logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
                 } else {
-                    logger.error('Exception evaluating `process.pid`: ' + details.exception.description + '. Will try again later.');
+                    logger.error('Exception evaluating `process.pid`: ' + description + '. Will try again later.');
                 }
             } else {
                 const value = response.result.value;

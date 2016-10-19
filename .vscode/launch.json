@@ -1,10 +1,10 @@
 {
     "version": "0.1.0",
-    "debugServer": "4712",
+    // "debugServer": "4712",
     "configurations": [
         {
             "name": "launch as server",
-            "type": "node2",
+            "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/out/src/nodeDebug.js",
@@ -27,7 +27,19 @@
                 "-R", "out/test/loggingReporter"
 			],
 			"sourceMaps": true,
-			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ]
+			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ],
+			"verboseDiagnosticLogging": true
+		},
+        {
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}"
+			],
+			"sourceMaps": true,
+			"outFiles": [ "${workspaceRoot}/out/**/*.js" ]
 		}
     ]
 }
