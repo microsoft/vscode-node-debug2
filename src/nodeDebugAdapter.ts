@@ -413,7 +413,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         error => logger.error('Error evaluating `process.pid`: ' + error.message));
     }
 
-    protected onConsoleMessage(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
+    protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
         // Messages come from stdout
     }
 
