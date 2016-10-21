@@ -14,6 +14,14 @@ node_js:
   - "6.8"
   - "6.9"
 
+matrix:
+  allow_failures:
+    - node_js: "6.3"
+    - node_js: "6.4"
+    - node_js: "6.5"
+    - node_js: "6.6"
+    - node_js: "6.7"
+
 before_script:
   - npm i -g gulp
   - npm i -g node-nightly

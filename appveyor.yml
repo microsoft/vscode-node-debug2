@@ -3,12 +3,16 @@ environment:
     - nodejs_version: 6.2
     - nodejs_version: 6.3
     # --inspect crashes in .4 and .5. https://github.com/nodejs/node/issues/8155
-    #- nodejs_version: 6.4
-    #- nodejs_version: 6.5
     - nodejs_version: 6.6
     - nodejs_version: 6.7
     - nodejs_version: 6.8
     - nodejs_version: 6.9
+
+matrix:
+  allow_failures:
+    - nodejs_version: 6.3
+    - nodejs_version: 6.6
+    - nodejs_version: 6.7
 
 install:
   - ps: >
