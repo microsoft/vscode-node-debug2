@@ -62,7 +62,10 @@ suite('Node Debug Adapter', () => {
         return dc.waitForEvent(eventType, 1e4);
     }
 
-    function log(e) {
+    function log(e: DebugProtocol.OutputEvent) {
+        // Skip telemetry events
+        if (e.body.category === 'telemetry') return;
+
         const timestamp = new Date().toISOString().split(/[TZ]/)[1];
         const msg = ' ' + timestamp + ' ' + e.body.output.trim();
         LoggingReporter.logEE.emit('log', msg);
