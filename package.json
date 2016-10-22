@@ -178,8 +178,7 @@
               "smartStep": {
                 "type": "boolean",
                 "description": "%node.smartStep.description%",
-                "default": true,
-                "errorMessage": "Not supported yet"
+                "default": true
               },
               "diagnosticLogging": {
                 "type": "boolean",
@@ -260,8 +259,7 @@
               "smartStep": {
                 "type": "boolean",
                 "description": "%node.smartStep.description%",
-                "default": true,
-                "errorMessage": "Not supported yet"
+                "default": true
               },
               "diagnosticLogging": {
                 "type": "boolean",
