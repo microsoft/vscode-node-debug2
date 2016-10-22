@@ -449,6 +449,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         this._session.sendEvent(new OutputEvent(cli + '\n', 'console'));
     }
 
+    protected globalEvaluate(args: Crdp.Runtime.EvaluateRequest): Promise<Crdp.Runtime.EvaluateResponse> {
+        // contextId: 1 - see https://github.com/nodejs/node/issues/8426
+        if (!args.contextId) args.contextId = 1;
+
+        return super.globalEvaluate(args);
+    }
+
     /**
      * 'Path does not exist' error
      */
