@@ -574,10 +574,10 @@ suite('Node Debug Adapter', () => {
 
         test('evaluates a global node thing', () => {
             return start()
-                .then(() => dc.evaluateRequest({ expression: 'process.versions' }))
+                .then(() => dc.evaluateRequest({ expression: 'Object' }))
                 .then(response => {
                     assert(response.success);
-                    assert.equal(response.body.result, 'Object');
+                    assert.equal(response.body.result, 'function Object() { … }');
                     assert(response.body.variablesReference > 0);
                 });
         });
@@ -595,6 +595,26 @@ suite('Node Debug Adapter', () => {
                 .then(() => dc.evaluateRequest({ expression: 'throw new Error("fail")' }))
                 .catch(response => {
                     assert.equal(response.message, 'Error: fail');
+                });
+        });
+
+        test('Shows object previews', () => {
+            return start()
+                .then(() => dc.evaluateRequest({ expression: 'x = {a: 1, b: [1], c: {a: 1}}' }))
+                .then(response => {
+                    assert(response.success);
+                    assert.equal(response.body.result, 'Object {a: 1, b: Array[1], c: Object}');
+                    assert(response.body.variablesReference > 0);
+                });
+        });
+
+        test('Shows array previews', () => {
+            return start()
+                .then(() => dc.evaluateRequest({ expression: '[1, [1], {a: 3}]' }))
+                .then(response => {
+                    assert(response.success);
+                    assert.equal(response.body.result, 'Array[3] [1, Array[1], Object]');
+                    assert(response.body.variablesReference > 0);
                 });
         });
     });
