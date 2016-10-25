@@ -397,7 +397,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 if (description.startsWith('ReferenceError: process is not defined')) {
                     logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
                 } else {
-                    logger.error('Exception evaluating `process.pid`: ' + description + '. Will try again later.');
+                    logger.log('Exception evaluating `process.pid`: ' + description + '. Will try again later.');
                 }
             } else {
                 const value = response.result.value;
