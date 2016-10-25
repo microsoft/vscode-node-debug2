@@ -29,7 +29,8 @@ function test() {
 
 function locals() {
     const veryLargeArray = [];
-    for (let i = 0; i <= 5; i++) veryLargeArray[i] = Math.random();
+    veryLargeArray['blah'] = 5;
+    for (let i = 0; i <= 1000; i++) veryLargeArray[i] = Math.random();
     veryLargeArray[0] = veryLargeArray;
 
     let generator = function*() {
@@ -100,6 +101,7 @@ newlines`;
 
     function fn2() { };
     fn2.prototype.aPrototypeFn = () => { return 3; };
+    (<any>fn2).fnProp = 123;
 
     app2.anotherFn(fn);
     fn();
