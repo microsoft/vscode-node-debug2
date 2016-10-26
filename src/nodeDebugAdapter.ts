@@ -213,8 +213,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             nodeProcess.stdout.on('data', (data: string) => {
                 let msg = data.toString();
-                msg = utils.trimLastNewline(msg);
-                logger.log(msg, /*forceLog=*/true);
+                logger.write(msg, /*forceLog=*/true);
             });
 
             nodeProcess.stderr.on('data', (data: string) => {
@@ -225,8 +224,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     msg = msg.substr(0, chromeMsgIndex).trim();
                 }
 
-                msg = utils.trimLastNewline(msg);
-                logger.error(msg);
+                logger.write(msg, /*forceLog=*/true, logger.LogLevel.Error);
             });
 
             resolve();
