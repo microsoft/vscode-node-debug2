@@ -182,13 +182,18 @@
               },
               "diagnosticLogging": {
                 "type": "boolean",
-                "description": "When true, the adapter logs its own diagnostic info to the console",
+                "description": "%node.diagnosticLogging.description%",
                 "default": true
               },
               "verboseDiagnosticLogging": {
                 "type": "boolean",
-                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+                "description": "%node.verboseDiagnosticLogging.description%",
                 "default": true
+              },
+              "sourceMapPathOverrides": {
+                "type": "object",
+                "description": "%node.sourceMapPathOverrides.description%",
+                "default": {}
               }
             }
           },
@@ -263,13 +268,18 @@
               },
               "diagnosticLogging": {
                 "type": "boolean",
-                "description": "When true, the adapter logs its own diagnostic info to the console",
+                "description": "%node.diagnosticLogging.description%",
                 "default": true
               },
               "verboseDiagnosticLogging": {
                 "type": "boolean",
-                "description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+                "description": "%node.verboseDiagnosticLogging.description%",
                 "default": true
+              },
+              "sourceMapPathOverrides": {
+                "type": "object",
+                "description": "%node.sourceMapPathOverrides.description%",
+                "default": {}
               }
             }
           }

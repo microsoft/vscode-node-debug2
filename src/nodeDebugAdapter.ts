@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger, chromeUtils} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, logger, chromeUtils, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
 import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
@@ -16,6 +16,12 @@ import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import {localize} from './utils';
 import * as errors from './errors';
+
+const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
+    'webpack:///./*': '${cwd}/*',
+    'webpack:///*': '*',
+    'meteor://💻app/*': '${cwd}/*',
+};
 
 export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
@@ -45,6 +51,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public launch(args: LaunchRequestArguments): Promise<void> {
+        args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         super.launch(args);
 
         const port = args.port || utils.random(3000, 50000);
@@ -161,6 +168,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public attach(args: AttachRequestArguments): Promise<void> {
+        args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         this._restartMode = args.restart;
         return super.attach(args);
     }
@@ -494,4 +502,33 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             urlLabel: localize('more.information', "More Information")
         });
     }
+}
+
+function getSourceMapPathOverrides(cwd: string, sourceMapPathOverrides?: ISourceMapPathOverrides): ISourceMapPathOverrides {
+    return sourceMapPathOverrides ? resolveCwdPattern(cwd, sourceMapPathOverrides, /*warnOnMissing=*/true) :
+            resolveCwdPattern(cwd, DefaultSourceMapPathOverrides, /*warnOnMissing=*/false);
+}
+
+/**
+ * Returns a copy of sourceMapPathOverrides with the ${cwd} pattern resolved in all entries.
+ */
+function resolveCwdPattern(cwd: string, sourceMapPathOverrides: ISourceMapPathOverrides, warnOnMissing: boolean): ISourceMapPathOverrides {
+    const resolvedOverrides: ISourceMapPathOverrides = {};
+    for (let pattern in sourceMapPathOverrides) {
+        const replacePattern = sourceMapPathOverrides[pattern];
+        resolvedOverrides[pattern] = replacePattern;
+
+        const cwdIndex = replacePattern.indexOf('${cwd}');
+        if (cwdIndex === 0) {
+            if (cwd) {
+                resolvedOverrides[pattern] = replacePattern.replace('${cwd}', cwd);
+            } else if (warnOnMissing) {
+                logger.log('Warning: sourceMapPathOverrides entry contains ${cwd}, but cwd is not set');
+            }
+        } else if (cwdIndex > 0) {
+            logger.log('Warning: in a sourceMapPathOverrides entry, ${cwd} is only valid at the beginning of the path');
+        }
+    }
+
+    return resolvedOverrides;
 }
