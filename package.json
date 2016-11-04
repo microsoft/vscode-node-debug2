@@ -194,6 +194,11 @@
                 "type": "object",
                 "description": "%node.sourceMapPathOverrides.description%",
                 "default": {}
+              },
+              "experimentalLibraryCode": {
+                "type": "array",
+                "description": "%node.experimentalLibraryCode.description%",
+                "default": []
               }
             }
           },
@@ -280,6 +285,11 @@
                 "type": "object",
                 "description": "%node.sourceMapPathOverrides.description%",
                 "default": {}
+              },
+              "experimentalLibraryCode": {
+                "type": "array",
+                "description": "%node.experimentalLibraryCode.description%",
+                "default": []
               }
             }
           }
