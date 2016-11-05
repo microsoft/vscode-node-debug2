@@ -9,7 +9,7 @@ import {DebugClient} from 'vscode-debugadapter-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 export function waitForEvent(dc: DebugClient, eventType: string): Promise<DebugProtocol.Event> {
-    return dc.waitForEvent(eventType, 1e4);
+    return dc.waitForEvent(eventType, 2e3);
 }
 
 export function setBreakpointOnStart(dc: DebugClient, bps: DebugProtocol.SourceBreakpoint[], program: string, expLine?: number, expCol?: number, expVerified = true): Promise<void> {

@@ -176,7 +176,7 @@ suite('Node Debug Adapter', () => {
 
     });
 
-    suite.only('setBreakpoints', () => {
+    suite('setBreakpoints', () => {
         test('should stop on a breakpoint', () => {
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const BREAKPOINT_LINE = 2;
@@ -422,50 +422,6 @@ suite('Node Debug Adapter', () => {
                 outDir: OUT_DIR,
                 runtimeArgs: [ '--nolazy' ]
             }, { path: TS_SOURCE, line: TS_LINE } );
-        });
-    });
-
-    suite.skip('function setBreakpoints', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
-        const FUNCTION_NAME_1 = 'foo';
-        const FUNCTION_LINE_1 = 4;
-        const FUNCTION_NAME_2 = 'bar';
-        const FUNCTION_LINE_2 = 8;
-        const FUNCTION_NAME_3 = 'xyz';
-
-        test('should stop on a function breakpoint', () => {
-            return Promise.all<DebugProtocol.ProtocolMessage>([
-                dc.launch({ program: PROGRAM }),
-
-                dc.configurationSequence(),
-
-                // since we can only set a function breakpoint for *known* functions,
-                // we use the program output as an indication that function 'foo' has been defined.
-                dc.assertOutput('stdout', 'foo defined').then(event => {
-
-                    return dc.setFunctionBreakpointsRequest({
-                            breakpoints: [ { name: FUNCTION_NAME_2 } ]
-                        }).then(() => {
-                            return dc.setFunctionBreakpointsRequest({
-                                    breakpoints: [ { name: FUNCTION_NAME_1 }, { name: FUNCTION_NAME_2 }, { name: FUNCTION_NAME_3 } ]
-                                }).then(response => {
-                                    const bp1 = response.body.breakpoints[0];
-                                    assert.equal(bp1.verified, true);
-                                    assert.equal(bp1.line, FUNCTION_LINE_1);
-
-                                    const bp2 = response.body.breakpoints[1];
-                                    assert.equal(bp2.verified, true);
-                                    assert.equal(bp2.line, FUNCTION_LINE_2);
-
-                                    const bp3 = response.body.breakpoints[2];
-                                    assert.equal(bp3.verified, false);
-                                    return response;
-                                });
-                        });
-                }),
-
-                dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: FUNCTION_LINE_1 } )
-            ]);
         });
     });
 
@@ -740,17 +696,62 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('hit condition bps', () => {
-        setup(() => {
-            return testUtils.waitForEvent(dc, 'initialized');
+        const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
+        test('Works for =', () => {
+            const noCondBpLine = 15;
+            const condBpLine = 14;
+            const bps: DebugProtocol.SourceBreakpoint[] = [
+                    { line: condBpLine, hitCondition: '=2' },
+                    { line: noCondBpLine }];
+
+            return Promise.all([
+                testUtils.setBreakpointOnStart(dc, bps, PROGRAM),
+
+                dc.launch({ program: PROGRAM }),
+
+                // Assert that it skips
+                dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine })
+                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
+                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: condBpLine }))
+                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
+                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
+                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
+                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
+            ]);
         });
 
-        // const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
-        // test('Works for =', () => {
-        //     return Promise.all([
-        //         dc.setBreakpointsRequest({
-        //             breakpoints: [ { line: 14, column: 0, hitCondition:  } ],
-        //             source: { path: PROGRAM })
-        //     ]);
-        // });
+        test('Works for %', () => {
+            const noCondBpLine = 15;
+            const condBpLine = 14;
+            const bps: DebugProtocol.SourceBreakpoint[] = [
+                    { line: condBpLine, hitCondition: '%3' },
+                    { line: noCondBpLine }];
+
+            return Promise.all([
+                testUtils.setBreakpointOnStart(dc, bps, PROGRAM),
+
+                dc.launch({ program: PROGRAM }),
+
+                // Assert that it skips
+                dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine })
+                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
+                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
+                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
+                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: condBpLine }))
+                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
+                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
+            ]);
+        });
+
+        test('Does not bind when invalid', () => {
+            const condBpLine = 14;
+            const bps: DebugProtocol.SourceBreakpoint[] = [
+                    { line: condBpLine, hitCondition: 'lsdf' }];
+
+            return Promise.all([
+                testUtils.setBreakpointOnStart(dc, bps, PROGRAM, undefined, undefined, /*expVerified=*/false),
+                dc.launch({ program: PROGRAM })
+            ]);
+        });
     });
 });

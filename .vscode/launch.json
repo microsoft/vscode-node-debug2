@@ -21,7 +21,7 @@
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
 			"args": [
 				"-u", "tdd",
-				"--timeout", "3000",
+				"--timeout", "15000",
 				"--colors",
 				"./out/test",
                 "-R", "out/test/loggingReporter"

@@ -11,6 +11,7 @@ bar = function(n) {
 console.log('foo defined');
 
 setInterval(function() {
+	foo(321);
 	foo(123);
 }, 300);
 
