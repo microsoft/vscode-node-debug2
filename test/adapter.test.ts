@@ -3,11 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import assert = require('assert');
+import * as assert from 'assert';
 import * as Path from 'path';
 import * as os from 'os';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
+
+import * as testUtils from './testUtils';
 
 // ES6 default export...
 const LoggingReporter = require('./loggingReporter');
@@ -57,10 +59,6 @@ suite('Node Debug Adapter', () => {
     (<Mocha.ITestDefinition>checkLogTest).only = (expectation, assertion) => checkLogTest(expectation, assertion, origTest.only);
     (<Mocha.ITestDefinition>checkLogTest).skip = test.skip;
     test = (<any>checkLogTest);
-
-    function waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
-        return dc.waitForEvent(eventType, 1e4);
-    }
 
     function log(e: DebugProtocol.OutputEvent) {
         // Skip telemetry events
@@ -150,7 +148,7 @@ suite('Node Debug Adapter', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program: PROGRAM }),
-                waitForEvent('terminated')
+                testUtils.waitForEvent(dc, 'terminated')
             ]);
         });
 
@@ -178,7 +176,7 @@ suite('Node Debug Adapter', () => {
 
     });
 
-    suite('setBreakpoints', () => {
+    suite.only('setBreakpoints', () => {
         test('should stop on a breakpoint', () => {
             const PROGRAM = Path.join(DATA_ROOT, 'program.js');
             const BREAKPOINT_LINE = 2;
@@ -214,19 +212,9 @@ suite('Node Debug Adapter', () => {
             const COND_BREAKPOINT_LINE = 13;
             const COND_BREAKPOINT_COLUMN = 2;
 
+            const bp: DebugProtocol.SourceBreakpoint = { line: COND_BREAKPOINT_LINE, column: COND_BREAKPOINT_COLUMN, condition: 'i === 3' };
             return Promise.all([
-                waitForEvent('initialized').then(event => {
-                    return dc.setBreakpointsRequest({
-                        breakpoints: [ { line: COND_BREAKPOINT_LINE, condition: 'i === 3' } ],
-                        source: { path: PROGRAM }
-                    });
-                }).then(response => {
-                    const bp = response.body.breakpoints[0];
-                    assert.equal(bp.verified, true, 'breakpoint verification mismatch: verified');
-                    assert.equal(bp.line, COND_BREAKPOINT_LINE, 'breakpoint verification mismatch: line');
-                    assert.equal(bp.column, COND_BREAKPOINT_COLUMN, 'breakpoint verification mismatch: column');
-                    return dc.configurationDoneRequest();
-                }),
+                testUtils.setBreakpointOnStart(dc, [bp], PROGRAM, COND_BREAKPOINT_LINE, COND_BREAKPOINT_COLUMN),
 
                 dc.launch({ program: PROGRAM }),
 
@@ -404,7 +392,7 @@ suite('Node Debug Adapter', () => {
             const BP_LINE = 10;
 
             return Promise.all<DebugProtocol.ProtocolMessage>([
-                waitForEvent('initialized').then(event => {
+                testUtils.waitForEvent(dc, 'initialized').then(event => {
                     return dc.setBreakpointsRequest({ source: { path: BP_PROGRAM }, breakpoints: [{ line: BP_LINE }]}).then(response => {
                         assert.equal(response.body.breakpoints.length, 1);
                         assert(!response.body.breakpoints[0].verified, 'Expected bp to not be verified yet');
@@ -412,7 +400,7 @@ suite('Node Debug Adapter', () => {
                     });
                 }),
                 dc.launch({ program: LAUNCH_PROGRAM, sourceMaps: true }),
-                waitForEvent('breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
+                testUtils.waitForEvent(dc, 'breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
                     assert(event.body.breakpoint.verified);
                     return null;
                 }),
@@ -487,7 +475,7 @@ suite('Node Debug Adapter', () => {
         // Terminate at end
         test.skip('should not stop on an exception', () => {
             return Promise.all<DebugProtocol.ProtocolMessage>([
-                waitForEvent('initialized').then(event => {
+                testUtils.waitForEvent(dc, 'initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ ]
                     });
@@ -497,7 +485,7 @@ suite('Node Debug Adapter', () => {
 
                 dc.launch({ program: PROGRAM }),
 
-                waitForEvent('terminated')
+                testUtils.waitForEvent(dc, 'terminated')
             ]);
         });
 
@@ -505,7 +493,7 @@ suite('Node Debug Adapter', () => {
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
-                waitForEvent('initialized').then(event => {
+                testUtils.waitForEvent(dc, 'initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'all' ]
                     });
@@ -523,7 +511,7 @@ suite('Node Debug Adapter', () => {
             const UNCAUGHT_EXCEPTION_LINE = 12;
 
             return Promise.all([
-                waitForEvent('initialized').then(event => {
+                testUtils.waitForEvent(dc, 'initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'uncaught' ]
                     });
@@ -558,7 +546,7 @@ suite('Node Debug Adapter', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program:  PROGRAM }),
-                waitForEvent('initialized')
+                testUtils.waitForEvent(dc, 'initialized')
             ]);
         }
 
@@ -626,8 +614,8 @@ suite('Node Debug Adapter', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program:  PROGRAM }),
-                waitForEvent('initialized'),
-                waitForEvent('stopped')
+                testUtils.waitForEvent(dc, 'initialized'),
+                testUtils.waitForEvent(dc, 'stopped')
             ]);
         }
 
@@ -697,7 +685,7 @@ suite('Node Debug Adapter', () => {
                 .then(() => {
                     return Promise.all([
                         dc.nextRequest({threadId: THREAD_ID }),
-                        dc.waitForEvent('stopped')]);
+                        testUtils.waitForEvent(dc, 'stopped')]);
                 })
                 .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
                 .then(stackTraceResponse => {
@@ -705,7 +693,7 @@ suite('Node Debug Adapter', () => {
 
                     return Promise.all([
                         dc.nextRequest({threadId: THREAD_ID }),
-                        dc.waitForEvent('stopped')]);
+                        testUtils.waitForEvent(dc, 'stopped')]);
                 })
                 .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
                 .then(frameResponse => {
@@ -721,7 +709,7 @@ suite('Node Debug Adapter', () => {
             return dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 })
                 .then(() => Promise.all([
                     dc.stepInRequest({ threadId: THREAD_ID }),
-                    waitForEvent('stopped')
+                    testUtils.waitForEvent(dc, 'stopped')
                 ]))
                 .then(() => dc.stackTraceRequest({threadId: THREAD_ID }))
                 .then(stackTraceResponse => {
@@ -736,7 +724,7 @@ suite('Node Debug Adapter', () => {
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
-                waitForEvent('initialized').then(event => {
+                testUtils.waitForEvent(dc, 'initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'all' ]
                     });
@@ -749,5 +737,20 @@ suite('Node Debug Adapter', () => {
                 dc.assertStoppedLocation('exception', { path: PROGRAM, line: EXCEPTION_LINE } )
             ]);
         });
+    });
+
+    suite('hit condition bps', () => {
+        setup(() => {
+            return testUtils.waitForEvent(dc, 'initialized');
+        });
+
+        // const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
+        // test('Works for =', () => {
+        //     return Promise.all([
+        //         dc.setBreakpointsRequest({
+        //             breakpoints: [ { line: 14, column: 0, hitCondition:  } ],
+        //             source: { path: PROGRAM })
+        //     ]);
+        // });
     });
 });
