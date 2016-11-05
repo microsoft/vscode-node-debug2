@@ -25,7 +25,7 @@ export function setBreakpoint(dc: DebugClient, bps: DebugProtocol.SourceBreakpoi
     }).then(response => {
         const bp = response.body.breakpoints[0];
 
-        if (typeof expVerified === 'boolean') assert.equal(bp.verified, true, 'breakpoint verification mismatch: verified');
+        if (typeof expVerified === 'boolean') assert.equal(bp.verified, expVerified, 'breakpoint verification mismatch: verified');
         if (typeof expLine === 'number') assert.equal(bp.line, expLine, 'breakpoint verification mismatch: line');
         if (typeof expCol === 'number') assert.equal(bp.column, expCol, 'breakpoint verification mismatch: column');
     })
