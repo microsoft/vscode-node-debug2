@@ -12,9 +12,10 @@ import {DebugProtocol} from 'vscode-debugprotocol';
 import * as testUtils from './testUtils';
 import * as testSetup from './testSetup';
 
+const DATA_ROOT = testSetup.DATA_ROOT;
+const THREAD_ID = testUtils.THREAD_ID;
+
 suite('Node Debug Adapter etc', () => {
-    const THREAD_ID = 1;
-    const DATA_ROOT = testSetup.DATA_ROOT;
 
     let dc: DebugClient;
     setup(() => {
