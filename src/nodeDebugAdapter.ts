@@ -203,7 +203,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return new Promise<void>((resolve, reject) => {
             this._nodeProcessId = nodeProcess.pid;
             nodeProcess.on('error', (error) => {
-                reject(errors.cannotLaunchDebugTarget(error));
+                reject(errors.cannotLaunchDebugTarget(errors.toString()));
                 const msg = `Node process error: ${error}`;
                 logger.error(msg);
                 this.terminateSession(msg);
