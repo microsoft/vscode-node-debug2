@@ -4,109 +4,26 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as assert from 'assert';
-import * as Path from 'path';
-import * as os from 'os';
-import {DebugProtocol} from 'vscode-debugprotocol';
+import * as path from 'path';
+
 import {DebugClient} from 'vscode-debugadapter-testsupport';
+import {DebugProtocol} from 'vscode-debugprotocol';
 
 import * as testUtils from './testUtils';
+import * as testSetup from './testSetup';
 
-// ES6 default export...
-const LoggingReporter = require('./loggingReporter');
-
-suite('Node Debug Adapter', () => {
+suite('Node Debug Adapter etc', () => {
     const THREAD_ID = 1;
-    const NIGHTLY_NAME = os.platform() === 'win32' ? 'node-nightly.cmd' : 'node-nightly';
-    const DEBUG_ADAPTER = './out/src/nodeDebug.js';
-
-    const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + __dirname.substr(1);
-    const PROJECT_ROOT = Path.join(lowercaseDriveLetterDirname, '../../');
-    const DATA_ROOT = Path.join(PROJECT_ROOT, 'testdata/');
+    const DATA_ROOT = testSetup.DATA_ROOT;
 
     let dc: DebugClient;
-
-    let unhandledAdapterErrors: string[];
-    const origTest = test;
-    const checkLogTest = (expectation: string, assertion?: ActionFunction, testFn: Function = origTest): Mocha.ITest => {
-        // Hack to always check logs after a test runs, can simplify after this issue:
-        // https://github.com/mochajs/mocha/issues/1635
-        if (!assertion) {
-            return origTest(expectation, assertion);
-        }
-
-        function runTest(): Promise<any> {
-            return new Promise((resolve, reject) => {
-                const maybeP = assertion(resolve);
-                if (maybeP && maybeP.then) {
-                    maybeP.then(resolve, reject);
-                }
-            });
-        }
-
-        return testFn(expectation, done => {
-            runTest()
-                .then(() => {
-                    // If any unhandled errors were logged, then ensure the test fails
-                    if (unhandledAdapterErrors.length) {
-                        const errStr = unhandledAdapterErrors.length === 1 ? unhandledAdapterErrors[0] :
-                            JSON.stringify(unhandledAdapterErrors);
-                        throw new Error(errStr);
-                    }
-                })
-                .then(done, done)
-        });
-    };
-    (<Mocha.ITestDefinition>checkLogTest).only = (expectation, assertion) => checkLogTest(expectation, assertion, origTest.only);
-    (<Mocha.ITestDefinition>checkLogTest).skip = test.skip;
-    test = (<any>checkLogTest);
-
-    function log(e: DebugProtocol.OutputEvent) {
-        // Skip telemetry events
-        if (e.body.category === 'telemetry') return;
-
-        const timestamp = new Date().toISOString().split(/[TZ]/)[1];
-        const msg = ' ' + timestamp + ' ' + e.body.output.trim();
-        LoggingReporter.logEE.emit('log', msg);
-
-        if (msg.indexOf('********') >= 0) unhandledAdapterErrors.push(msg);
-    };
-
-    function patchLaunchArgs(): void {
-        const origLaunch = dc.launch;
-        dc.launch = (launchArgs: any) => {
-            launchArgs.verboseDiagnosticLogging = true;
-            if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = NIGHTLY_NAME;
-            }
-
-            return origLaunch.call(dc, launchArgs);
-        };
-
-        const origHitBreakpoint = dc.hitBreakpoint;
-        dc.hitBreakpoint = (...args) => {
-            const launchArgs = args[0];
-            launchArgs.verboseDiagnosticLogging = true;
-            if (process.version.startsWith('v6.2')) {
-                launchArgs.runtimeExecutable = NIGHTLY_NAME;
-            }
-
-            return origHitBreakpoint.apply(dc, args);
-        };
-    }
-
     setup(() => {
-        unhandledAdapterErrors = [];
-        dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
-        patchLaunchArgs();
-        dc.addListener('output', log);
-
-        // return dc.start(4712);
-        return dc.start();
+        return testSetup.setup()
+            .then(_dc => dc = _dc);
     });
 
     teardown(() => {
-        dc.removeListener('output', log);
-        return dc.stop();
+        return testSetup.teardown();
     });
 
     suite('basic', () => {
@@ -143,7 +60,7 @@ suite('Node Debug Adapter', () => {
     suite('launch', () => {
 		// #11
         test.skip('should run program to the end', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'program.js');
+            const PROGRAM = path.join(DATA_ROOT, 'program.js');
 
             return Promise.all([
                 dc.configurationSequence(),
@@ -153,7 +70,7 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on entry', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'program.js');
+            const PROGRAM = path.join(DATA_ROOT, 'program.js');
             const ENTRY_LINE = 1;
 
             return Promise.all([
@@ -164,7 +81,7 @@ suite('Node Debug Adapter', () => {
         });
 
         test('should stop on debugger statement', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'programWithDebugger.js');
+            const PROGRAM = path.join(DATA_ROOT, 'programWithDebugger.js');
             const DEBUGGER_LINE = 6;
 
             return Promise.all([
@@ -176,315 +93,10 @@ suite('Node Debug Adapter', () => {
 
     });
 
-    suite('setBreakpoints', () => {
-        test('should stop on a breakpoint', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'program.js');
-            const BREAKPOINT_LINE = 2;
-
-            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE} );
-        });
-
-        test('should stop on a breakpoint in file with spaces in its name', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'folder with spaces', 'file with spaces.js');
-            const BREAKPOINT_LINE = 2;
-
-            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE} );
-        });
-
-        test('should stop on a breakpoint identical to the entrypoint', () => {        // verifies the 'hide break on entry point' logic
-            const PROGRAM = Path.join(DATA_ROOT, 'program.js');
-            const ENTRY_LINE = 1;
-
-            return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: ENTRY_LINE } );
-        });
-
-        // Microsoft/vscode-chrome-debug-core#73
-        test.skip('should break on a specific column in a single line program', () => {
-            const SINGLE_LINE_PROGRAM = Path.join(DATA_ROOT, 'programSingleLine.js');
-            const LINE = 1;
-            const COLUMN = 55;
-
-            return dc.hitBreakpoint({ program: SINGLE_LINE_PROGRAM }, { path: SINGLE_LINE_PROGRAM, line: LINE, column: COLUMN } );
-        });
-
-        test('should stop on a conditional breakpoint', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'program.js');
-            const COND_BREAKPOINT_LINE = 13;
-            const COND_BREAKPOINT_COLUMN = 2;
-
-            const bp: DebugProtocol.SourceBreakpoint = { line: COND_BREAKPOINT_LINE, column: COND_BREAKPOINT_COLUMN, condition: 'i === 3' };
-            return Promise.all([
-                testUtils.setBreakpointOnStart(dc, [bp], PROGRAM, COND_BREAKPOINT_LINE, COND_BREAKPOINT_COLUMN),
-
-                dc.launch({ program: PROGRAM }),
-
-                dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: COND_BREAKPOINT_LINE } ).then(response => {
-                    const frame = response.body.stackFrames[0];
-                    return dc.evaluateRequest({ context: 'watch', frameId: frame.id, expression: 'x' }).then(response => {
-                        assert.equal(response.body.result, 9, 'x !== 9');
-                        return response;
-                    });
-                })
-            ]);
-        });
-    });
-
-    suite('setBreakpoints in TypeScript', () => {
-        test('should stop on a breakpoint in source (all files top level)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-simple/classes.js');
-            const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-simple/classes.ts');
-            const TS_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                runtimeArgs: [ '--nolazy' ]
-            }, {
-                path: TS_SOURCE,
-                line: TS_LINE
-            });
-        });
-
-        // Find map beside generated
-        test.skip('should stop on a breakpoint in source (all files top level, missing sourceMappingURL)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-simple-no-sourceMappingURL/classes.js');
-            const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-simple-no-sourceMappingURL/classes.ts');
-            const TS_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                runtimeArgs: [ '--nolazy' ]
-            }, {
-                path: TS_SOURCE,
-                line: TS_LINE
-            });
-        });
-
-        test('should stop on a breakpoint in source (outDir)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-inline/src/classes.ts');
-            const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-inline/dist');
-            const BREAKPOINT_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ]
-            }, {
-                path: PROGRAM,
-                line: BREAKPOINT_LINE
-            });
-        });
-
-        test('should stop on a breakpoint in source (outFiles)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-inline/src/classes.ts');
-            const OUT_FILES = Path.join(DATA_ROOT, 'sourcemaps-inline/dist/**/*.js');
-            const BREAKPOINT_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outFiles: [ OUT_FILES ],
-                runtimeArgs: [ '--nolazy' ],
-                verboseDiagnosticLogging: true
-            }, {
-                path: PROGRAM,
-                line: BREAKPOINT_LINE
-            });
-        });
-
-        test('should stop on a breakpoint in source with spaces in paths (outDir)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps with spaces', 'the source/classes.ts');
-            const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps with spaces/the distribution');
-            const BREAKPOINT_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ],
-                verboseDiagnosticLogging: true
-            }, {
-                path: PROGRAM,
-                line: BREAKPOINT_LINE
-            });
-        });
-
-        test('should stop on a breakpoint in source with spaces in paths (outFiles)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps with spaces', 'the source/classes.ts');
-            const OUT_FILES = Path.join(DATA_ROOT, 'sourcemaps with spaces/the distribution/**/*.js');
-            const BREAKPOINT_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outFiles: [ OUT_FILES ],
-                runtimeArgs: [ '--nolazy' ],
-                verboseDiagnosticLogging: true
-            }, {
-                path: PROGRAM,
-                line: BREAKPOINT_LINE
-            });
-        });
-
-
-        test('should stop on a breakpoint in source - Microsoft/vscode#2574', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-2574/out/classes.js');
-            const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-2574/out');
-            const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-2574/src/classes.ts');
-            const TS_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ]
-            }, {
-                path: TS_SOURCE,
-                line: TS_LINE
-            });
-        });
-
-        // Find map next to js
-        test.skip('should stop on a breakpoint in source (sourceMappingURL missing)', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemap-no-sourceMappingURL/out/classes.js');
-            const OUT_DIR = Path.join(DATA_ROOT, 'sourcemap-no-sourceMappingURL/out');
-            const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemap-no-sourceMappingURL/src/classes.ts');
-            const TS_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ]
-            }, {
-                path: TS_SOURCE,
-                line: TS_LINE
-            });
-        });
-
-        test('should stop on a breakpoint in source even if breakpoint was set in JavaScript - Microsoft/vscode-node-debug#43', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-2574/out/classes.js');
-            const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-2574/out');
-            const JS_SOURCE = PROGRAM;
-            const JS_LINE = 21;
-            const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-2574/src/classes.ts');
-            const TS_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ]
-            }, {
-                path: JS_SOURCE,
-                line: JS_LINE
-            }, {
-                path: TS_SOURCE,
-                line: TS_LINE
-            });
-        });
-
-        test('should stop on a breakpoint when the sourcemap is loaded after the bp is set', () => {
-            const BP_PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-setinterval', 'src/file2.ts');
-            const LAUNCH_PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-setinterval', 'dist/program.js');
-            const BP_LINE = 10;
-
-            return Promise.all<DebugProtocol.ProtocolMessage>([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
-                    return dc.setBreakpointsRequest({ source: { path: BP_PROGRAM }, breakpoints: [{ line: BP_LINE }]}).then(response => {
-                        assert.equal(response.body.breakpoints.length, 1);
-                        assert(!response.body.breakpoints[0].verified, 'Expected bp to not be verified yet');
-                        return dc.configurationDoneRequest();
-                    });
-                }),
-                dc.launch({ program: LAUNCH_PROGRAM, sourceMaps: true }),
-                testUtils.waitForEvent(dc, 'breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
-                    assert(event.body.breakpoint.verified);
-                    return null;
-                }),
-
-                dc.assertStoppedLocation('breakpoint', { path: BP_PROGRAM, line: BP_LINE } )
-            ]);
-        });
-
-        // Microsoft/vscode-chrome-debug-core#38
-        test.skip('should stop on a breakpoint in source even if program\'s entry point is in JavaScript', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/out/entry.js');
-            const OUT_DIR = Path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/out');
-            const TS_SOURCE = Path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/src/classes.ts');
-            const TS_LINE = 17;
-
-            return dc.hitBreakpoint({
-                program: PROGRAM,
-                sourceMaps: true,
-                outDir: OUT_DIR,
-                runtimeArgs: [ '--nolazy' ]
-            }, { path: TS_SOURCE, line: TS_LINE } );
-        });
-    });
-
-    suite('setExceptionBreakpoints', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'programWithException.js');
-
-        // Terminate at end
-        test.skip('should not stop on an exception', () => {
-            return Promise.all<DebugProtocol.ProtocolMessage>([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
-                    return dc.setExceptionBreakpointsRequest({
-                        filters: [ ]
-                    });
-                }).then(response => {
-                    return dc.configurationDoneRequest();
-                }),
-
-                dc.launch({ program: PROGRAM }),
-
-                testUtils.waitForEvent(dc, 'terminated')
-            ]);
-        });
-
-        test('should stop on a caught exception', () => {
-            const EXCEPTION_LINE = 6;
-
-            return Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
-                    return dc.setExceptionBreakpointsRequest({
-                        filters: [ 'all' ]
-                    });
-                }).then(response => {
-                    return dc.configurationDoneRequest();
-                }),
-
-                dc.launch({ program: PROGRAM }),
-
-                dc.assertStoppedLocation('exception', { path: PROGRAM, line: EXCEPTION_LINE } )
-            ]);
-        });
-
-        test('should stop on uncaught exception', () => {
-            const UNCAUGHT_EXCEPTION_LINE = 12;
-
-            return Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
-                    return dc.setExceptionBreakpointsRequest({
-                        filters: [ 'uncaught' ]
-                    });
-                }).then(response => {
-                    return dc.configurationDoneRequest();
-                }),
-
-                dc.launch({ program: PROGRAM }),
-
-                dc.assertStoppedLocation('exception', { path: PROGRAM, line: UNCAUGHT_EXCEPTION_LINE } )
-            ]);
-        });
-    });
 
     // verbose logging...
     suite.skip('output events', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'programWithOutput.js');
+        const PROGRAM = path.join(DATA_ROOT, 'programWithOutput.js');
 
         test('stdout and stderr events should be complete and in correct order', () => {
             return Promise.all([
@@ -497,7 +109,7 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('eval', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
+        const PROGRAM = path.join(DATA_ROOT, 'programWithFunction.js');
         function start(): Promise<void> {
             return Promise.all([
                 dc.configurationSequence(),
@@ -564,7 +176,7 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('completions', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'programWithVariables.js');
+        const PROGRAM = path.join(DATA_ROOT, 'programWithVariables.js');
 
         function start(): Promise<void> {
             return Promise.all([
@@ -629,7 +241,7 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('stepping', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'program.js');
+        const PROGRAM = path.join(DATA_ROOT, 'program.js');
 
         function start(): Promise<void> {
             return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 1 });
@@ -659,8 +271,8 @@ suite('Node Debug Adapter', () => {
         });
 
         test('smart stepping steps over unmapped files', () => {
-            const program = Path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
-            const programSource = Path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
+            const program = path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
+            const programSource = path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
 
             return dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 })
                 .then(() => Promise.all([
@@ -676,7 +288,7 @@ suite('Node Debug Adapter', () => {
         });
 
         test('smart stepping stops on exceptions in unmapped files', () => {
-            const PROGRAM = Path.join(DATA_ROOT, 'programWithException.js');
+            const PROGRAM = path.join(DATA_ROOT, 'programWithException.js');
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
@@ -696,7 +308,7 @@ suite('Node Debug Adapter', () => {
     });
 
     suite('hit condition bps', () => {
-        const PROGRAM = Path.join(DATA_ROOT, 'programWithFunction.js');
+        const PROGRAM = path.join(DATA_ROOT, 'programWithFunction.js');
         test('Works for =', () => {
             const noCondBpLine = 15;
             const condBpLine = 14;
