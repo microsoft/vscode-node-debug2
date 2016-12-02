@@ -309,6 +309,13 @@ suite('Node Debug Adapter etc', () => {
     });
 
     suite('hit condition bps', () => {
+        function continueAndStop(line: number): Promise<any> {
+            return Promise.all([
+                dc.continueRequest({ threadId: THREAD_ID }),
+                dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line })
+            ]);
+        }
+
         const PROGRAM = path.join(DATA_ROOT, 'programWithFunction.js');
         test('Works for =', () => {
             const noCondBpLine = 15;
@@ -324,12 +331,9 @@ suite('Node Debug Adapter etc', () => {
 
                 // Assert that it skips
                 dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine })
-                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
-                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: condBpLine }))
-                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
-                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
-                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
-                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
+                    .then(() => continueAndStop(condBpLine))
+                    .then(() => continueAndStop(noCondBpLine))
+                    .then(() => continueAndStop(noCondBpLine))
             ]);
         });
 
@@ -347,12 +351,9 @@ suite('Node Debug Adapter etc', () => {
 
                 // Assert that it skips
                 dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine })
-                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
-                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
-                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
-                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: condBpLine }))
-                    .then(() => dc.continueRequest({ threadId: THREAD_ID }))
-                    .then(() => dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line: noCondBpLine }))
+                    .then(() => continueAndStop(noCondBpLine))
+                    .then(() => continueAndStop(condBpLine))
+                    .then(() => continueAndStop(noCondBpLine))
             ]);
         });
 

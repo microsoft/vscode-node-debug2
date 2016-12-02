@@ -25,7 +25,7 @@ suite('Stepping', () => {
         return testSetup.teardown();
     });
 
-    suite('stepping', () => {
+    suite('basic', () => {
         const PROGRAM = path.join(DATA_ROOT, 'program.js');
 
         function start(): Promise<void> {
