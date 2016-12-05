@@ -196,9 +196,9 @@
                 "description": "%node.sourceMapPathOverrides.description%",
                 "default": {}
               },
-              "experimentalSkipFiles": {
+              "skipFiles": {
                 "type": "array",
-                "description": "%node.experimentalSkipFiles.description%",
+                "description": "%node.skipFiles.description%",
                 "default": []
               }
             }
@@ -288,9 +288,9 @@
                 "description": "%node.sourceMapPathOverrides.description%",
                 "default": {}
               },
-              "experimentalSkipFiles": {
+              "skipFiles": {
                 "type": "array",
-                "description": "%node.experimentalSkipFiles.description%",
+                "description": "%node.skipFiles.description%",
                 "default": []
               }
             }

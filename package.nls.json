@@ -15,7 +15,7 @@
 	"node.diagnosticLogging.description": "When true, the adapter logs its own diagnostic info to the console",
 	"node.verboseDiagnosticLogging.description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
 	"node.sourceMapPathOverrides.description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk. See README for details.",
-	"node.experimentalSkipFiles.description": "An array of file or folder names, or glob patterns, to skip when debugging.",
+	"node.skipFiles.description": "An array of file or folder names, or glob patterns, to skip when debugging.",
 
 	"node.launch.program.description": "Absolute path to the program.",
 	"node.launch.console.description": "Where to launch the debug target: internal console, integrated terminal, or external terminal.",
