@@ -150,6 +150,7 @@
                   "null"
                 ],
                 "description": "%node.outDir.description%",
+                "deprecationMessage": "%outDir.deprecationMessage%",
                 "default": null
               },
               "outFiles": {
@@ -235,6 +236,7 @@
                   "null"
                 ],
                 "description": "%node.outDir.description%",
+                "deprecationMessage": "%outDir.deprecationMessage%",
                 "default": null
               },
               "outFiles": {
