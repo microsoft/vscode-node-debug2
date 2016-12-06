@@ -78,6 +78,29 @@
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
         "initialConfigurations": "extension.node-debug2.provideInitialConfigurations",
+        "configurationSnippets": [
+					{
+						"label": "%node.snippet.launch.label%",
+						"description": "%node.snippet.launch.description%",
+						"body": {
+							"type": "node2",
+							"request": "launch",
+							"name": "${2:Launch Program}",
+							"program": "^\"\\${workspaceRoot}/${1:Program}\"",
+							"cwd": "^\"\\${workspaceRoot}\""
+						}
+					},
+					{
+						"label": "%node.snippet.attach.label%",
+						"description": "%node.snippet.attach.description%",
+						"body": {
+							"type": "node",
+							"request": "attach",
+							"name": "${2:Attach to Port}",
+							"port": 9229
+						}
+					}
+				],
         "configurationAttributes": {
           "launch": {
             "required": [

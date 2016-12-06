@@ -36,6 +36,11 @@
 
 	"node.processattach.config.name": "Attach to Process",
 
+	"node.snippet.launch.label": "(Experimental) Node.js v6.3+: Launch Configuration",
+	"node.snippet.launch.description": "A new configuration for launching a node program, using the new Inspector Protocol",
+	"node.snippet.attach.label": "(Experimental) Node.js v6.3+: Attach Configuration",
+	"node.snippet.attach.description": "A new configuration for attaching to a running node program, using the new Inspector Protocol",
+
 	"extensionHost.label": "VS Code Extension Development",
 
 	"extensionHost.launch.runtimeExecutable.description": "Absolute path to VS Code.",
