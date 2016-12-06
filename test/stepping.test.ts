@@ -97,9 +97,9 @@ suite('Stepping', () => {
             const program = path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
             const programSource = path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
 
-            const experimentalSkipFiles = ['unmapped'];
+            const skipFiles = ['unmapped'];
 
-            return dc.hitBreakpoint({ program, sourceMaps: true, experimentalSkipFiles }, { path: programSource, line: 7 })
+            return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
                 .then(() => Promise.all([
                     dc.stepInRequest({ threadId: THREAD_ID }),
                     testUtils.waitForEvent(dc, 'stopped')
@@ -116,9 +116,9 @@ suite('Stepping', () => {
             const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
             const programSource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceA.ts');
 
-            const experimentalSkipFiles = ['calls-between-sourcemapped-*/*B'];
+            const skipFiles = ['calls-between-sourcemapped-*/*B'];
 
-            return dc.hitBreakpoint({ program, sourceMaps: true, experimentalSkipFiles }, { path: programSource, line: 7 })
+            return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
                 .then(() => Promise.all([
                     dc.stepInRequest({ threadId: THREAD_ID }),
                     testUtils.waitForEvent(dc, 'stopped')
@@ -135,7 +135,7 @@ suite('Stepping', () => {
             const program = path.join(DATA_ROOT, 'calls-between-files-with-exception/out/sourceA.js');
             const programSource = path.join(DATA_ROOT, 'calls-between-files-with-exception/src/sourceA.ts');
 
-            const experimentalSkipFiles = ['calls-between-files-*/*B'];
+            const skipFiles = ['calls-between-files-*/*B'];
 
             return Promise.all([
                 testUtils.waitForEvent(dc, 'initialized').then(event => {
@@ -146,7 +146,7 @@ suite('Stepping', () => {
                 .then(() => dc.setBreakpointsRequest({ source: { path: programSource }, breakpoints: [{ line: 7 }]}))
                 .then(() => dc.configurationDoneRequest()),
 
-                dc.launch({ program, sourceMaps: true, experimentalSkipFiles }),
+                dc.launch({ program, sourceMaps: true, skipFiles }),
                 dc.assertStoppedLocation('breakpoint', { path: programSource, line: 7 })
             ]).then(() => Promise.all([
                 dc.nextRequest({ threadId: THREAD_ID }),
