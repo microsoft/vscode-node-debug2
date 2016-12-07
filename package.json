@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2 - Experimental",
-  "version": "1.8.5",
+  "version": "1.8.6",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.svg",
@@ -14,9 +14,9 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "3.8.0",
-    "vscode-debugadapter": "^1.15.0-pre.7",
-    "vscode-debugprotocol": "^1.15.0-pre.5",
+    "vscode-chrome-debug-core": "3.8.1",
+    "vscode-debugadapter": "^1.14.0",
+    "vscode-debugprotocol": "^1.14.0",
     "vscode-nls": "^1.0.4"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "mocha": "^3.1.1",
     "run-sequence": "^1.2.2",
     "tslint": "^3.15.1",
-    "typescript": "^2.0.2",
+    "typescript": "~2.0.2",
     "vsce": "^1.14.0",
     "vscode": "^1.0.0",
     "vscode-debugadapter-testsupport": "^1.15.0-pre.0",
