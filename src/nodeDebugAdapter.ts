@@ -221,7 +221,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             nodeProcess.stdout.on('data', (data: string) => {
                 let msg = data.toString();
-                logger.write(msg, /*forceLog=*/true);
+                this._session.sendEvent(new OutputEvent(msg, 'stdout'));
             });
 
             nodeProcess.stderr.on('data', (data: string) => {
@@ -232,7 +232,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     msg = msg.substr(0, chromeMsgIndex);
                 }
 
-                logger.write(msg, /*forceLog=*/true, logger.LogLevel.Error);
+                this._session.sendEvent(new OutputEvent(msg, 'stderr'));
             });
 
             resolve();
