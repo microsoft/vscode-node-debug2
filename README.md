@@ -52,10 +52,10 @@ The `sourceMapPathOverrides` option lets you set a mapping of source paths from 
 If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceRoot}` and `${cwd}` can be used here. If you aren't sure what the left side should be, you can use the `.scripts` command (details below). You can also use the `diagnosticLogging`/`verboseDiagnosticLogging` options to see the contents of the sourcemap, or look at the paths of the sources in Chrome DevTools, or open your `.js.map` file and check the values manually.
 
 ## Skipping "library code"/"blackboxed scripts"
-The `skipFiles` option allows you to specify an array of names of folders/files to skip when debugging. For example, if you set `"skipFiles": ["lib.js"]`, then you will skip any file named 'lib.js' when stepping through your code. You also won't break on exceptions thrown from 'lib.js'. This works the same as "blackboxing scripts" in Chrome DevTools. Note that this is just an experiment at the moment. The format for entries is also the same, so you can add
+The `skipFiles` option allows you to specify an array of names of folders/files to skip when debugging. For example, if you set `"skipFiles": ["lib.js"]`, then you will skip any file named 'lib.js' when stepping through your code. You also won't break on exceptions thrown from 'lib.js'. This works the same as "blackboxing scripts" in Chrome DevTools. Note that this is just an experiment at the moment. The supported formats are:
   * The name of a file (like `lib.js`)
   * The name of a folder, under which to skip all scripts (like `node_modules`)
-  * A regex, to skip all scripts that match (like `\.min\.js$`)
+  * A path glob, to skip all scripts that match (like `node_modules/lib/*.min.js`)
 
 ## Contributing
 Contributions are welcome, please see [CONTRIBUTING.txt](CONTRIBUTING.txt).
