@@ -219,21 +219,24 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this.terminateSession(msg);
             });
 
-            nodeProcess.stdout.on('data', (data: string) => {
+            const onStderr = (data: string) => {
                 let msg = data.toString();
-                this._session.sendEvent(new OutputEvent(msg, 'stdout'));
-            });
 
-            nodeProcess.stderr.on('data', (data: string) => {
-                // Print stderr, but chop off the Chrome-specific message
-                let msg = data.toString();
+                // Stop listening after 'Debugger attached' msg
+                if (msg.indexOf('Debugger attached.') >= 0) {
+                    nodeProcess.stderr.removeListener('data', onStderr);
+                }
+
+                // Chop off the Chrome-specific debug URL message
                 const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
                 if (chromeMsgIndex >= 0) {
                     msg = msg.substr(0, chromeMsgIndex);
                 }
 
                 this._session.sendEvent(new OutputEvent(msg, 'stderr'));
-            });
+            };
+
+            nodeProcess.stderr.on('data', onStderr);
 
             resolve();
          });
@@ -417,10 +420,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         },
         error => logger.error('Error evaluating `process.pid`: ' + error.message));
-    }
-
-    protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
-        // Messages come from stdout
     }
 
     private startPollingForNodeTermination(): void {
