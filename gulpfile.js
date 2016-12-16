@@ -28,18 +28,12 @@ const lintSources = [
     'src'
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
-function computeSourceRoot(file) {
-    // gulp-sourcemaps bug
-    const absPath = path.join(__dirname, file.path, '..');
-    return path.relative(path.dirname(absPath), __dirname);
-}
-
 const tsProject = ts.createProject('tsconfig.json', { typescript });
 gulp.task('build', ['copy-scripts'], function () {
     return tsProject.src()
         .pipe(sourcemaps.init())
-        .pipe(ts(tsProject)).js
-        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: computeSourceRoot }))
+        .pipe(tsProject()).js
+        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '..' })) // .. to compensate for TS returning paths from 'out'
         .pipe(gulp.dest('out'));
 });
 

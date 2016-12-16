@@ -116,7 +116,7 @@ suite('Node Debug Adapter etc', () => {
                 dc.configurationSequence(),
                 dc.launch({ program:  PROGRAM }),
                 testUtils.waitForEvent(dc, 'initialized')
-            ]);
+            ]).then(() => { });
         }
 
         test('works for a simple case', () => {
@@ -185,7 +185,7 @@ suite('Node Debug Adapter etc', () => {
                 dc.launch({ program:  PROGRAM }),
                 testUtils.waitForEvent(dc, 'initialized'),
                 testUtils.waitForEvent(dc, 'stopped')
-            ]);
+            ]).then(() => { });
         }
 
         function testCompletions(text: string, column = text.length + 1, frameIdx = 0): Promise<DebugProtocol.CompletionItem[]> {

@@ -104,7 +104,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         }
 
-        return this.resolveProgramPath(programPath, args.sourceMaps).then(resolvedProgramPath => {
+        return this.resolveProgramPath(programPath, args.sourceMaps).then<void>(resolvedProgramPath => {
             let program: string;
             let cwd = args.cwd;
             if (cwd) {

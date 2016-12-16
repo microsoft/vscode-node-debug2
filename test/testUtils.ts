@@ -17,7 +17,8 @@ export function waitForEvent(dc: DebugClient, eventType: string): Promise<DebugP
 export function setBreakpointOnStart(dc: DebugClient, bps: DebugProtocol.SourceBreakpoint[], program: string, expLine?: number, expCol?: number, expVerified = true): Promise<void> {
     return waitForEvent(dc, 'initialized')
         .then(event => setBreakpoint(dc, bps, program, expLine, expCol, expVerified))
-        .then(() => dc.configurationDoneRequest());
+        .then(() => dc.configurationDoneRequest())
+        .then(() => { });
 }
 
 export function setBreakpoint(dc: DebugClient, bps: DebugProtocol.SourceBreakpoint[], program: string, expLine?: number, expCol?: number, expVerified = true): Promise<void> {
