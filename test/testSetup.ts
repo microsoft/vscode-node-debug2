@@ -57,7 +57,8 @@ function log(e: DebugProtocol.OutputEvent) {
     if (e.body.category === 'telemetry') return;
 
     const timestamp = new Date().toISOString().split(/[TZ]/)[1];
-    const msg = ' ' + timestamp + ' ' + e.body.output.trim();
+    const outputBody = e.body.output ? e.body.output.trim() : 'variablesReference: ' + e.body.variablesReference;
+    const msg = ` ${timestamp} ${outputBody}`;
     LoggingReporter.logEE.emit('log', msg);
 
     if (msg.indexOf('********') >= 0) unhandledAdapterErrors.push(msg);
