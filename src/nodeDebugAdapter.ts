@@ -132,10 +132,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             let launchArgs = [runtimeExecutable];
             if (!args.noDebug) {
                 launchArgs.push(`--inspect=${port}`);
+
+                // Always stop on entry to set breakpoints
+                launchArgs.push('--debug-brk');
             }
 
-            // Always stop on entry to set breakpoints
-            launchArgs.push('--debug-brk');
             this._continueAfterConfigDone = !args.stopOnEntry;
 
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
@@ -219,11 +220,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this.terminateSession(msg);
             });
 
+            const noDebugMode = (<LaunchRequestArguments>this._launchAttachArgs).noDebug;
+
+            // Listen to stderr at least until the debugger is attached
             const onStderr = (data: string) => {
                 let msg = data.toString();
 
-                // Stop listening after 'Debugger attached' msg
-                if (msg.indexOf('Debugger attached.') >= 0) {
+                // Stop listening after 'Debugger attached' msg (unless this is noDebugMode)
+                if (!noDebugMode && msg.indexOf('Debugger attached.') >= 0) {
                     nodeProcess.stderr.removeListener('data', onStderr);
                 }
 
@@ -235,8 +239,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
                 this._session.sendEvent(new OutputEvent(msg, 'stderr'));
             };
-
             nodeProcess.stderr.on('data', onStderr);
+
+            // If only running, use stdout/stderr instead of debug protocol logs
+            if (noDebugMode) {
+                nodeProcess.stdout.on('data', (data: string) => {
+                    let msg = data.toString();
+                    this._session.sendEvent(new OutputEvent(msg, 'stdout'));
+                });
+            }
 
             resolve();
          });
