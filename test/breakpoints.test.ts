@@ -329,4 +329,22 @@ suite('Breakpoints', () => {
             ]);
         });
     });
+
+    suite('setBreakpoints using Webpack', () => {
+        test('webpack', () => {
+            const TS_SOURCE = path.join(DATA_ROOT, 'webpack/app.ts');
+            const TS_LINE = 1;
+
+            return dc.hitBreakpoint({
+                program: TS_SOURCE,
+                sourceMaps: true,
+                outFiles: [ path.join(DATA_ROOT, '**/*.js') ],
+                cwd: path.join(DATA_ROOT, 'webpack'),
+                runtimeArgs: [ '--nolazy' ]
+            }, {
+                path: TS_SOURCE,
+                line: TS_LINE
+            });
+        });
+    });
 });
