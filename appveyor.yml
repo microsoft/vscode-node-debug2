@@ -8,6 +8,9 @@ environment:
     - nodejs_version: 6.8
     - nodejs_version: 6.9
     - nodejs_version: 7.0
+    - nodejs_version: 7.1
+    - nodejs_version: 7.2
+    - nodejs_version: 7.3
 
 matrix:
   allow_failures:
