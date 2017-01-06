@@ -94,7 +94,7 @@
             "label": "%node.snippet.attach.label%",
             "description": "%node.snippet.attach.description%",
             "body": {
-              "type": "node",
+              "type": "node2",
               "request": "attach",
               "name": "${2:Attach to Port}",
               "port": 9229
