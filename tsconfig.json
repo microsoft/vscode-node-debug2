@@ -9,7 +9,11 @@
         "noUnusedLocals": true,
         "noImplicitThis": true,
         "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true
+        "noImplicitReturns": true,
+
+        "lib": [
+            "es2015"
+        ]
     },
     "exclude": [
         "node_modules/",
