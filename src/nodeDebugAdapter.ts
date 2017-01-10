@@ -290,7 +290,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.terminateSession(reason, requestRestart);
     }
 
-    protected onPaused(notification: Crdp.Debugger.PausedEvent): void {
+    protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: string): void {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log('Paused on entry');
@@ -307,7 +307,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this.getNodeProcessDetailsIfNeeded()
                 .then(() => this.sendInitializedEvent());
         } else {
-            super.onPaused(notification);
+            super.onPaused(notification, expectingStopReason);
         }
     }
 
