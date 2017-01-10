@@ -44,7 +44,6 @@ function provideInitialConfigurations(): string {
     if (vscode.workspace.textDocuments.some(document => document.languageId === 'typescript' || document.languageId === 'coffeescript')) {
         initialConfigurations.forEach(config => {
             config['outFiles'] = [];
-            config['sourceMaps'] = true;
         });
     }
 
