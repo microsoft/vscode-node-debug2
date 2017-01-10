@@ -232,6 +232,7 @@ suite('Stepping', () => {
             await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
         });
 
-        test('toggle non-sourcemapped')
+        test('when a non-sourcemapped script is skipped via regex, it can be unskipped');
+        test('can toggle skipping a non-sourcemapped file');
     });
 });
