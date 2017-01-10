@@ -118,7 +118,7 @@ suite('Stepping', () => {
 
             const skipFiles = ['calls-between-sourcemapped-*/*B'];
 
-            return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
+            return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 8 })
                 .then(() => Promise.all([
                     dc.stepInRequest({ threadId: THREAD_ID }),
                     testUtils.waitForEvent(dc, 'stopped')
@@ -153,5 +153,85 @@ suite('Stepping', () => {
                 dc.assertStoppedLocation('step', { path: programSource, line: 8 })
             ]));
         });
+
+        test('still stops at breakpoint in skipped file', async () => {
+            const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
+            const programASource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceA.ts');
+            const programBSource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceB.ts');
+
+            const skipFiles = ['calls-between-sourcemapped-*/*B'];
+
+            const bpLineB = 2;
+            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programASource, line: 8 })
+            await dc.setBreakpointsRequest({ source: { path: programBSource }, breakpoints: [{ line: bpLineB }]});
+            await Promise.all([
+                dc.stepInRequest({ threadId: THREAD_ID }),
+                dc.assertStoppedLocation('breakpoint', { path: programBSource, line: bpLineB })
+            ]);
+        });
+
+        test('can toggle skipping on and off', async () => {
+            const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
+            const programASource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceA.ts');
+            const programBSource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceB.ts');
+
+            const bpLineA = 8;
+            await Promise.all([
+                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                    return dc.setExceptionBreakpointsRequest({
+                        filters: ['caught']
+                    });
+                })
+                .then(() => dc.setBreakpointsRequest({ source: { path: programASource }, breakpoints: [{ line: bpLineA }]}))
+                .then(() => dc.configurationDoneRequest()),
+
+                dc.launch({ program, sourceMaps: true }),
+                dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA })
+            ]);
+
+            // Step into sourceB, set it to be skipped
+            await Promise.all([
+                dc.stepInRequest({ threadId: THREAD_ID }),
+                dc.assertStoppedLocation('step', { path: programBSource, line: 2 })
+            ]);
+            await dc.send('toggleSkipFileStatus', { path: programBSource });
+
+            // Continue back to sourceA, step through B, back to A
+            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA });
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: programASource, line: 4 });
+
+            // Toggle B back to not being skipped, continue to A, step in to B
+            await dc.send('toggleSkipFileStatus', { path: programBSource });
+            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA });
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: programBSource, line: 2 })
+        });
+
+        test('when generated script is skipped via regex, the source can be un-skipped', async () => {
+            const program = path.join(DATA_ROOT, 'calls-between-merged-files/out/sourceA.js');
+            const sourceA = path.join(DATA_ROOT, 'calls-between-merged-files/sourceA.ts');
+            const sourceB2 = path.join(DATA_ROOT, 'calls-between-merged-files/sourceB2.ts');
+
+            // Skip the full B generated script via launch config
+            const skipFiles = ['**/out/sourceB1.js'];
+            const bpLineA = 8;
+            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: sourceA, line: bpLineA });
+
+            // Step in, verify B sources are skipped
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: sourceA, line: 4 });
+            await dc.send('toggleSkipFileStatus', { path: sourceB2 });
+
+            // Continue back to sourceA, step in, should skip B1 and land on B2
+            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('breakpoint', { path: sourceA, line: bpLineA });
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
+        });
+
+        test('toggle non-sourcemapped')
     });
 });
