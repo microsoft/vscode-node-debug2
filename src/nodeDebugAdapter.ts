@@ -512,6 +512,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             urlLabel: localize('more.information', "More Information")
         });
     }
+
+    protected getReadonlyOrigin(aPath: string): string {
+        return path.isAbsolute(aPath) ?
+            localize('origin.from.node', "read-only content from Node.js") :
+            localize('origin.core.module', "read-only core module");
+    }
 }
 
 function getSourceMapPathOverrides(cwd: string, sourceMapPathOverrides?: ISourceMapPathOverrides): ISourceMapPathOverrides {
