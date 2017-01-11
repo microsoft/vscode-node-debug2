@@ -15,6 +15,7 @@ environment:
 
 matrix:
   allow_failures:
+    - nodejs_version: 6.2
     - nodejs_version: 6.3
     - nodejs_version: 6.6
     - nodejs_version: 6.7
