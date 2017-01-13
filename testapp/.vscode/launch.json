@@ -29,19 +29,19 @@
             // "restart": true
         },
         {
+            "debugServer": 4712,
             "name": "Attach remote",
             "type": "node2",
             "request": "attach",
-            "address": "10.211.55.3",
-            "port": 5860,
-            "sourceMaps": true,
-            "outDir": "${workspaceRoot}/out",
+            "address": "10.0.1.2",
+            "port": 9229,
+            "outFiles": [
+                "${workspaceRoot}/out/**/*.js"
+            ],
             "diagnosticLogging": true,
-            "trace": "all",
-            "console": "integratedTerminal",
-            "localRoot": "${workspaceRoot}/out",
-            // "remoteRoot": "/Users/roblou/code/vscode-node-cdp-debug/testapp/out"
-            "remoteRoot": "C:\\Users\\roblou\\code\\vscode-node-cdp-debug\\testapp\\out"
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": "/Users/roblou/code/vscode-node-debug2/testapp"
+            // "remoteRoot": "C:\\Users\\roblou\\code\\vscode-node-cdp-debug\\testapp\\out"
         }
     ]
 }
