@@ -83,5 +83,10 @@ function getProgram(): string {
 }
 
 function addFrameToSkipFiles(path: string): void {
+    if (!path) {
+        const activeEditor = vscode.window.activeTextEditor;
+        path = activeEditor && activeEditor.document.fileName;
+    }
+
     vscode.commands.executeCommand('workbench.customDebugRequest', 'toggleSkipFileStatus', { path });
 }
