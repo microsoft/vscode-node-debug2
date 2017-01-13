@@ -21,14 +21,14 @@
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
 			"args": [
 				"-u", "tdd",
-				"--timeout", "15000",
+				"--timeout", "180000000",
 				"--colors",
 				"./out/test",
                 "-R", "out/test/loggingReporter"
 			],
 			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ],
-			// "verboseDiagnosticLogging": true
+			"internalConsoleOptions": "openOnSessionStart"
 		},
         {
 			"name": "Run Extension",

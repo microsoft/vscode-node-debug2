@@ -41,7 +41,7 @@
   },
   "main": "./out/src/extension",
   "activationEvents": [
-    "onCommand:extension.pickNodeProcess"
+    "onCommand:extension.node-debug2.addFrameToSkipFiles"
   ],
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
@@ -318,6 +318,16 @@
           }
         }
       }
-    ]
+    ],
+    "menus": {
+      "debug/callstack/context": [{
+        "command": "extension.node-debug2.addFrameToSkipFiles",
+        "group": "navigation"
+      }]
+    },
+    "commands": [{
+        "command": "extension.node-debug2.addFrameToSkipFiles",
+        "title": "Toggle skipping active file"
+    }]
   }
 }

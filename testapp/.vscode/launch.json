@@ -2,17 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // "debugServer": 4711,
+            "debugServer": 4712,
             "name": "Launch",
-            "type": "node",
+            "type": "node2",
             "request": "launch",
             "program": "${workspaceRoot}/out/app.js",
             "cwd": "${workspaceRoot}",
-            "sourceMaps": true,
-            // "verboseDiagnosticLogging": true,
-            "outFiles": ["${workspaceRoot}/out/**/*.js"],
-            "trace": "all",
-            "console": "integratedTerminal"
+            "skipFiles": [
+                "app2.ts"
+            ],
+            "smartStep": true,
+            "outFiles": ["${workspaceRoot}/out/**/*.js"]
         },
         {
             "name": "Attach",

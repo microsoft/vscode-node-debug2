@@ -27,7 +27,13 @@ function test() {
     }
 }
 
-function locals() {
+async function foo(): Promise<void> {
+    await Promise.resolve('foo');
+    await Promise.resolve('bar');
+}
+
+async function locals() {
+    await foo();
     const veryLargeArray = [];
     veryLargeArray['blah'] = 5;
     for (let i = 0; i <= 1000; i++) veryLargeArray[i] = Math.random();
@@ -88,8 +94,6 @@ newlines`;
         ' ': 3,
         5: 1
     };
-
-    debugger;
 
     const bool = true;
     const fn = () => {
