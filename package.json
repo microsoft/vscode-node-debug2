@@ -321,12 +321,12 @@
     ],
     "menus": {
       "debug/callstack/context": [{
-        "command": "extension.node-debug2.addFrameToSkipFiles",
+        "command": "extension.node-debug2.toggleSkippingFile",
         "group": "navigation"
       }]
     },
     "commands": [{
-        "command": "extension.node-debug2.addFrameToSkipFiles",
+        "command": "extension.node-debug2.toggleSkippingFile",
         "title": "Toggle skipping this file"
     }]
   }

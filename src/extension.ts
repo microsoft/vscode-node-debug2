@@ -24,7 +24,7 @@ const initialConfigurations = [
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.node-debug2.provideInitialConfigurations', provideInitialConfigurations));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.node-debug2.addFrameToSkipFiles', addFrameToSkipFiles));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.node-debug2.toggleSkippingFile', toggleSkippingFile));
 }
 
 export function deactivate() {
@@ -82,7 +82,7 @@ function getProgram(): string {
     return program;
 }
 
-function addFrameToSkipFiles(path: string): void {
+function toggleSkippingFile(path: string): void {
     if (!path) {
         const activeEditor = vscode.window.activeTextEditor;
         path = activeEditor && activeEditor.document.fileName;
