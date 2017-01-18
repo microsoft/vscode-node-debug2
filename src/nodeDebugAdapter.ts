@@ -27,6 +27,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
+    private static NODE_INTERNALS = '<node_internals>';
 
     private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
@@ -517,6 +518,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return path.isAbsolute(aPath) ?
             localize('origin.from.node', "read-only content from Node.js") :
             localize('origin.core.module', "read-only core module");
+    }
+
+    protected getDisplayPath(aPath: string): string {
+        return path.isAbsolute(aPath) ? aPath : `${NodeDebugAdapter.NODE_INTERNALS}/${aPath}`;
     }
 }
 
