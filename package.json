@@ -327,7 +327,7 @@
     },
     "commands": [{
         "command": "extension.node-debug2.addFrameToSkipFiles",
-        "title": "Toggle skipping active file"
+        "title": "Toggle skipping this file"
     }]
   }
 }
