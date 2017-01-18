@@ -282,5 +282,34 @@ suite('Stepping', () => {
             await dc.stepInRequest({ threadId: THREAD_ID });
             await dc.assertStoppedLocation('step', { path: sourceB, line: stepLineB });
         });
+
+        test('when multiple generated scripts are skipped via one regex, one source can be un-skipped and re-skipped', async () => {
+            const program = path.join(DATA_ROOT, 'calls-between-multiple-files/sourceA.ts');
+            const sourceB2 = path.join(DATA_ROOT, 'calls-between-multiple-files/sourceB2.ts');
+
+            // Skip both B scripts
+            const bpLineA = 8;
+            const skipFiles = ['sourceB*.js'];
+            const outFiles = [path.join(DATA_ROOT, 'calls-between-multiple-files/out/**/*.js')];
+            await dc.hitBreakpoint({ program, skipFiles, outFiles }, { path: program, line: bpLineA });
+
+            // Step in, verify B sources are skipped
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: program, line: 4 });
+            await dc.send('toggleSkipFileStatus', { path: sourceB2 });
+
+            // Continue back to A, step in, should land in B2, B1 still is skipped
+            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
+
+            // Re-skip B2
+            await dc.send('toggleSkipFileStatus', { path: sourceB2 });
+            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.assertStoppedLocation('step', { path: program, line: 4 });
+        });
     });
 });
