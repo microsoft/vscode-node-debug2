@@ -10,7 +10,7 @@
             "cwd": "${workspaceRoot}",
             "skipFiles": [
                 "app2.ts",
-                "<node_internals>/*ule.js"
+                "<node_internals>/*.js"
             ],
             // "smartStep": true,
             "outFiles": ["${workspaceRoot}/out/**/*.js"]

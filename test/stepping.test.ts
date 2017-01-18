@@ -311,5 +311,24 @@ suite('Stepping', () => {
             await dc.stepInRequest({ threadId: THREAD_ID });
             await dc.assertStoppedLocation('step', { path: program, line: 4 });
         });
+
+        test('can skip node internal files using <node_internals>', async () => {
+            const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
+            const programSource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceA.ts');
+
+            const skipFiles = ['<node_internals>/*'];
+            await dc.hitBreakpoint({ program, skipFiles }, { path: programSource, line: 8 })
+            const stackTraceResponse = await dc.stackTraceRequest({ threadId: undefined });
+
+            // Assert that there are at least a few frames with paths marked with <node_internals>, and they are deemphasized
+            const internalsFrames = stackTraceResponse.body.stackFrames.filter(frame => frame.source.path.startsWith('<node_internals>/'));
+            assert(internalsFrames.length > 1);
+            internalsFrames.forEach(frame => assert.equal((<any>frame.source).presentationHint, 'deemphasize'));
+
+            await dc.stepOutRequest({ threadId: undefined });
+            await dc.assertStoppedLocation('breakpoint', { path: programSource, line: 8 });
+
+            // TODO un-skip, after https://github.com/Microsoft/vscode/issues/18761
+        });
     });
 });
