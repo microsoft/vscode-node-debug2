@@ -9,9 +9,10 @@
             "program": "${workspaceRoot}/out/app.js",
             "cwd": "${workspaceRoot}",
             "skipFiles": [
-                "app2.ts"
+                "app2.ts",
+                "<node_internals>/*ule.js"
             ],
-            "smartStep": true,
+            // "smartStep": true,
             "outFiles": ["${workspaceRoot}/out/**/*.js"]
         },
         {

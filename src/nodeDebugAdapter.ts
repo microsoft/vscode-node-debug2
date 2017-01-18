@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger, chromeUtils, ISourceMapPathOverrides} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, logger, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils} from 'vscode-chrome-debug-core';
 import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
@@ -11,7 +11,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
-import {LaunchRequestArguments, AttachRequestArguments} from './nodeDebugInterfaces';
+import {ILaunchRequestArguments, IAttachRequestArguments, ICommonRequestArgs} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import {localize} from './utils';
@@ -27,7 +27,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
-    private static NODE_INTERNALS = '<node_internals>';
+    public static NODE_INTERNALS = '<node_internals>';
 
     private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
@@ -51,8 +51,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.initialize(args);
     }
 
-    public launch(args: LaunchRequestArguments): Promise<void> {
+    public launch(args: ILaunchRequestArguments): Promise<void> {
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
+        fixNodeInternalsSkipFiles(args);
         super.launch(args);
 
         const port = args.port || utils.random(3000, 50000);
@@ -169,7 +170,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    public attach(args: AttachRequestArguments): Promise<void> {
+    public attach(args: IAttachRequestArguments): Promise<void> {
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         this._restartMode = args.restart;
         return super.attach(args);
@@ -221,7 +222,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this.terminateSession(msg);
             });
 
-            const noDebugMode = (<LaunchRequestArguments>this._launchAttachArgs).noDebug;
+            const noDebugMode = (<ILaunchRequestArguments>this._launchAttachArgs).noDebug;
 
             // Listen to stderr at least until the debugger is attached
             const onStderr = (data: string) => {
@@ -528,6 +529,31 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 function getSourceMapPathOverrides(cwd: string, sourceMapPathOverrides?: ISourceMapPathOverrides): ISourceMapPathOverrides {
     return sourceMapPathOverrides ? resolveCwdPattern(cwd, sourceMapPathOverrides, /*warnOnMissing=*/true) :
             resolveCwdPattern(cwd, DefaultSourceMapPathOverrides, /*warnOnMissing=*/false);
+}
+
+function fixNodeInternalsSkipFiles(args: ICommonRequestArgs): void {
+    if (args.skipFiles) {
+        args.skipFileRegExps = args.skipFileRegExps || [];
+        args.skipFiles = args.skipFiles.filter(pattern => {
+            const fixed = fixNodeInternalsSkipFilePattern(pattern);
+            if (fixed) {
+                args.skipFileRegExps.push(fixed);
+                return false;
+            } else {
+                return true;
+            }
+        });
+    }
+}
+
+const internalsRegex = new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}/(.*)`);
+function fixNodeInternalsSkipFilePattern(pattern: string): string {
+    const internalsMatch = pattern.match(internalsRegex);
+    if (internalsMatch) {
+        return `^(?!\/)(?![a-zA-Z]:)${CoreUtils.pathGlobToBlackboxedRegex(internalsMatch[1])}`;
+    } else {
+        return null;
+    }
 }
 
 /**

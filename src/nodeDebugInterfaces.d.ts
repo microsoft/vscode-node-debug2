@@ -7,7 +7,7 @@ import * as Core from 'vscode-chrome-debug-core';
 
 type ConsoleType = "internalConsole" | "integratedTerminal" | "externalTerminal";
 
-interface ICommonArgs {
+export interface ICommonRequestArgs extends Core.ICommonRequestArgs {
     stopOnEntry?: boolean;
     address?: string;
     timeout?: number;
@@ -16,7 +16,7 @@ interface ICommonArgs {
 /**
  * This interface should always match the schema found in the node-debug extension manifest.
  */
-export interface LaunchRequestArguments extends Core.ILaunchRequestArgs, ICommonArgs {
+export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommonRequestArgs {
     /** An absolute path to the program to debug. */
     program: string;
     /** Optional arguments passed to the debuggee. */
@@ -42,7 +42,7 @@ export interface LaunchRequestArguments extends Core.ILaunchRequestArgs, ICommon
 /**
  * This interface should always match the schema found in the node-debug extension manifest.
  */
-export interface AttachRequestArguments extends Core.IAttachRequestArgs, ICommonArgs {
+export interface IAttachRequestArguments extends Core.IAttachRequestArgs, ICommonRequestArgs {
     /** Request frontend to restart session on termination. */
     restart?: boolean;
     /** Node's root directory. */
