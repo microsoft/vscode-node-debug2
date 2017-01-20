@@ -143,6 +143,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
 
+            const envArgs = this.collectEnvFileArgs(args) || args.env;
             let launchP: Promise<void>;
             if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
                 const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
@@ -150,12 +151,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     title: localize('node.console.title', "Node Debug Console"),
                     cwd,
                     args: launchArgs,
-                    env: args.env
+                    env: envArgs
                 };
                 launchP = this.launchInTerminal(termArgs);
             } else if (!args.console || args.console === 'internalConsole') {
                 // merge environment variables into a copy of the process.env
-                const env = Object.assign({}, process.env, args.env);
+                const env = Object.assign({}, process.env, envArgs);
                 launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
             } else {
                 return Promise.reject(errors.unknownConsoleType(args.console));
@@ -253,6 +254,31 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             resolve();
          });
+    }
+
+    private collectEnvFileArgs(args: ILaunchRequestArguments): any {
+        // read env from disk and merge into envVars
+        if (args.envFile) {
+            try {
+                const env = {};
+                const buffer = fs.readFileSync(args.envFile, 'utf8');
+                buffer.split('\n').forEach(line => {
+                    const r = line.match(/^\s*([\w\.\-]+)\s*=\s*(.*)?\s*$/);
+                    if (r !== null) {
+                        let value = r[2] || '';
+                        if (value.length > 0 && value.charAt(0) === '"' && value.charAt(value.length - 1) === '"') {
+                            value = value.replace(/\\n/gm, '\n');
+                        }
+
+                        env[r[1]] = value.replace(/(^['"]|['"]$)/g, '');
+                    }
+                });
+
+                return utils.extendObject(env, args.env); // launch config env vars overwrite .env vars
+            } catch (e) {
+                throw errors.cannotLoadEnvVarsFromFile(e.message);
+            }
+        }
     }
 
     /**

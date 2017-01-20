@@ -221,6 +221,11 @@
                 "type": "array",
                 "description": "%node.skipFiles.description%",
                 "default": []
+              },
+              "envFile": {
+                "type": "string",
+                "description": "%node.launch.envFile.description%",
+                "default": "${workspaceRoot}/.env"
               }
             }
           },

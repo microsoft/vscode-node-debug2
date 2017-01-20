@@ -54,3 +54,11 @@ export function cannotLaunchBecauseOutFiles(programPath: string): DebugProtocol.
         variables: { path: programPath }
     };
 }
+
+export function cannotLoadEnvVarsFromFile(error: string): DebugProtocol.Message {
+    return {
+        id: 2029,
+        format: localize('VSND2029', "Can't load environment variables from file ({0}).", '{_error}'),
+        variables: { _error: error }
+    };
+}

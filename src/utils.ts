@@ -96,3 +96,13 @@ export function isOnPath(program: string): boolean {
 export function trimLastNewline(msg: string): string {
     return msg.replace(/(\n|\r\n)$/, '');
 }
+
+export function extendObject<T>(toObject: T, fromObject: T): T {
+    for (let key in fromObject) {
+        if (fromObject.hasOwnProperty(key)) {
+            toObject[key] = fromObject[key];
+        }
+    }
+
+    return toObject;
+}

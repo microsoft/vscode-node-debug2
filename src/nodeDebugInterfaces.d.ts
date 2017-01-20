@@ -29,6 +29,7 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
     runtimeArgs?: string[];
     /** Optional environment variables to pass to the debuggee. The string valued properties of the 'environmentVariables' are used as key/value pairs. */
     env?: { [key: string]: string; };
+    envFile?: string;
     /** Where to launch the debug target. */
     console?: ConsoleType;
     /** Manually selected debugging port */
