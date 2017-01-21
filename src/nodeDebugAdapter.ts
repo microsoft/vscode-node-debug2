@@ -174,7 +174,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public attach(args: IAttachRequestArguments): Promise<void> {
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         this._restartMode = args.restart;
-        return super.attach(args);
+        return super.attach(args).catch(err => {
+            if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
+                // hack -core error msg
+                err.format = 'Ensure Node was launched with --inspect. ' + err.format;
+            }
+
+            return Promise.reject(err);
+        })
     }
 
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {
