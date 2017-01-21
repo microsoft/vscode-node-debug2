@@ -7,6 +7,7 @@ import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
 
+import * as url from 'url';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
@@ -554,7 +555,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             localize('origin.core.module', "read-only core module");
     }
 
+    /**
+     * If aPath is an absolute path or a URL, return aPath. Otherwise, prepend the node_internals marker
+     */
     protected getDisplayPath(aPath: string): string {
+        const aUrl = url.parse(aPath);
+        if (aUrl.protocol) {
+            return aPath;
+        }
+
         return path.isAbsolute(aPath) ? aPath : `${NodeDebugAdapter.NODE_INTERNALS}/${aPath}`;
     }
 }
