@@ -550,7 +550,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     protected getReadonlyOrigin(aPath: string): string {
-        return path.isAbsolute(aPath) ?
+        return path.isAbsolute(aPath) || aPath.startsWith(ChromeDebugAdapter.PLACEHOLDER_EVAL_URL_PROTOCOL) ?
             localize('origin.from.node', "read-only content from Node.js") :
             localize('origin.core.module', "read-only core module");
     }
