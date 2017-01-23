@@ -6,6 +6,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import * as Core from 'vscode-chrome-debug-core';
+
 const initialConfigurations = [
     {
         name: "Launch Program",
@@ -82,11 +84,12 @@ function getProgram(): string {
     return program;
 }
 
-function toggleSkippingFile(path: string): void {
+function toggleSkippingFile(path: string|number): void {
     if (!path) {
         const activeEditor = vscode.window.activeTextEditor;
         path = activeEditor && activeEditor.document.fileName;
     }
 
-    vscode.commands.executeCommand('workbench.customDebugRequest', 'toggleSkipFileStatus', { path });
+    const args: Core.IToggleSkipFileStatusArgs = typeof path === 'string' ? { path } : { sourceReference: path };
+    vscode.commands.executeCommand('workbench.customDebugRequest', 'toggleSkipFileStatus', args);
 }
