@@ -55,7 +55,11 @@ If you set `sourceMapPathOverrides` in your launch config, that will override th
 The `skipFiles` option allows you to specify an array of names of folders/files to skip when debugging. For example, if you set `"skipFiles": ["lib.js"]`, then you will skip any file named 'lib.js' when stepping through your code. You also won't break on exceptions thrown from 'lib.js'. This works the same as "blackboxing scripts" in Chrome DevTools. Note that this is just an experiment at the moment. The supported formats are:
   * The name of a file (like `lib.js`)
   * The name of a folder, under which to skip all scripts (like `node_modules`)
-  * A path glob, to skip all scripts that match (like `node_modules/lib/*.min.js`)
+  * A path glob, to skip all scripts that match (like `node_modules/**/*.min.js`)
+
+You can also skip a file at runtime by right clicking on the stack frame and selecting "Toggle skipping this file". This option only persists for the current debugging session. You can also use it to stop skipping a file that is skipped by the `skipFiles` option in your launch config.
+
+When a file is skipped, it will be grayed out in the callstack.
 
 ## Contributing
 Contributions are welcome, please see [CONTRIBUTING.txt](CONTRIBUTING.txt).
