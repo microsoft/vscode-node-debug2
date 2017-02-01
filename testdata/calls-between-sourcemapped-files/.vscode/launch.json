@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node2",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceRoot}/src/sourceA.ts",
+            "outFiles": [
+                "${workspaceRoot}/out/**/*.js"
+            ],
+            "cwd": "${workspaceRoot}"
+        }
+    ]
+}

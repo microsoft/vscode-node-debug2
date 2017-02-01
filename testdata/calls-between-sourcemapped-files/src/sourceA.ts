@@ -6,4 +6,4 @@ function f() {
 
 setInterval(() => {
     callbackCaller(f);
-}, 0);
+}, 500);

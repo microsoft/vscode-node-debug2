@@ -5,5 +5,5 @@ function f() {
 }
 setInterval(function () {
     sourceB_1.callbackCaller(f);
-}, 0);
+}, 500);
 //# sourceMappingURL=sourceA.js.map
