@@ -5,20 +5,16 @@
 
 import * as assert from 'assert';
 import * as path from 'path';
-import {DebugClient} from 'vscode-debugadapter-testsupport';
 
 import * as testUtils from './testUtils';
 import * as testSetup from './testSetup';
 
-const THREAD_ID = testUtils.THREAD_ID;
-
 suite('Stepping', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;
 
-    let dc: DebugClient;
-    setup(() => {
-        return testSetup.setup()
-            .then(_dc => dc = _dc);
+    let dc: testUtils.Node2DebugClient;
+    setup(async () => {
+        dc = await testSetup.setup();
     });
 
     teardown(() => {
@@ -37,18 +33,18 @@ suite('Stepping', () => {
             return start()
                 .then(() => {
                     return Promise.all([
-                        dc.nextRequest({threadId: THREAD_ID }),
+                        dc.nextRequest(),
                         testUtils.waitForEvent(dc, 'stopped')]);
                 })
-                .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
+                .then(() => dc.stackTraceRequest())
                 .then(stackTraceResponse => {
                     firstFrameIDs = stackTraceResponse.body.stackFrames.map(frame => frame.id);
 
                     return Promise.all([
-                        dc.nextRequest({threadId: THREAD_ID }),
+                        dc.nextRequest(),
                         testUtils.waitForEvent(dc, 'stopped')]);
                 })
-                .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
+                .then(() => dc.stackTraceRequest())
                 .then(frameResponse => {
                     const secondFrameIDs = frameResponse.body.stackFrames.map(frame => frame.id);
                     assert.deepEqual(firstFrameIDs, secondFrameIDs);
@@ -61,10 +57,10 @@ suite('Stepping', () => {
 
             return dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 })
                 .then(() => Promise.all([
-                    dc.stepInRequest({ threadId: THREAD_ID }),
+                    dc.stepInRequest(),
                     testUtils.waitForEvent(dc, 'stopped')
                 ]))
-                .then(() => dc.stackTraceRequest({threadId: THREAD_ID }))
+                .then(() => dc.stackTraceRequest())
                 .then(stackTraceResponse => {
                     const firstFrame = stackTraceResponse.body.stackFrames[0];
                     assert.equal(firstFrame.source.path, programSource);
@@ -101,10 +97,10 @@ suite('Stepping', () => {
 
             return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
                 .then(() => Promise.all([
-                    dc.stepInRequest({ threadId: THREAD_ID }),
+                    dc.stepInRequest(),
                     testUtils.waitForEvent(dc, 'stopped')
                 ]))
-                .then(() => dc.stackTraceRequest({threadId: THREAD_ID }))
+                .then(() => dc.stackTraceRequest())
                 .then(stackTraceResponse => {
                     const firstFrame = stackTraceResponse.body.stackFrames[0];
                     assert.equal(firstFrame.source.path, programSource);
@@ -120,10 +116,10 @@ suite('Stepping', () => {
 
             return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 8 })
                 .then(() => Promise.all([
-                    dc.stepInRequest({ threadId: THREAD_ID }),
+                    dc.stepInRequest(),
                     testUtils.waitForEvent(dc, 'stopped')
                 ]))
-                .then(() => dc.stackTraceRequest({threadId: THREAD_ID }))
+                .then(() => dc.stackTraceRequest())
                 .then(stackTraceResponse => {
                     const firstFrame = stackTraceResponse.body.stackFrames[0];
                     assert.equal(firstFrame.source.path, programSource);
@@ -149,7 +145,7 @@ suite('Stepping', () => {
                 dc.launch({ program, sourceMaps: true, skipFiles }),
                 dc.assertStoppedLocation('breakpoint', { path: programSource, line: 7 })
             ]).then(() => Promise.all([
-                dc.nextRequest({ threadId: THREAD_ID }),
+                dc.nextRequest(),
                 dc.assertStoppedLocation('step', { path: programSource, line: 8 })
             ]));
         });
@@ -165,7 +161,7 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programASource, line: 8 })
             await dc.setBreakpointsRequest({ source: { path: programBSource }, breakpoints: [{ line: bpLineB }]});
             await Promise.all([
-                dc.stepInRequest({ threadId: THREAD_ID }),
+                dc.stepInRequest(),
                 dc.assertStoppedLocation('breakpoint', { path: programBSource, line: bpLineB })
             ]);
         });
@@ -191,22 +187,22 @@ suite('Stepping', () => {
 
             // Step into sourceB, set it to be skipped
             await Promise.all([
-                dc.stepInRequest({ threadId: THREAD_ID }),
+                dc.stepInRequest(),
                 dc.assertStoppedLocation('step', { path: programBSource, line: 2 })
             ]);
-            await dc.send('toggleSkipFileStatus', { path: programBSource });
+            await dc.toggleSkipFileStatus(programBSource);
 
             // Continue back to sourceA, step through B, back to A
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: programASource, line: 4 });
 
             // Toggle B back to not being skipped, continue to A, step in to B
-            await dc.send('toggleSkipFileStatus', { path: programBSource });
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.toggleSkipFileStatus(programBSource);
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: programBSource, line: 2 })
         });
 
@@ -221,14 +217,14 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: sourceA, line: bpLineA });
 
             // Step in, verify B sources are skipped
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: sourceA, line: 4 });
-            await dc.send('toggleSkipFileStatus', { path: sourceB2 });
+            await dc.toggleSkipFileStatus(sourceB2);
 
             // Continue back to sourceA, step in, should skip B1 and land on B2
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: sourceA, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
         });
 
@@ -243,14 +239,14 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: false, skipFiles }, { path: program, line: bpLineA });
 
             // Step in, verify B sources are skipped
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: program, line: 4 });
-            await dc.send('toggleSkipFileStatus', { path: sourceB });
+            await dc.toggleSkipFileStatus(sourceB);
 
             // Continue back to A, step in, should land in B
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: sourceB, line: 3 });
         });
 
@@ -265,21 +261,21 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: false }, { path: program, line: bpLineA });
 
             // Step in, verify B sources are not skipped
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: sourceB, line: stepLineB });
-            await dc.send('toggleSkipFileStatus', { path: sourceB });
+            await dc.toggleSkipFileStatus(sourceB);
 
             // Continue back to sourceA, step in, should skip B
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: program, line: 4 });
-            await dc.send('toggleSkipFileStatus', { path: sourceB });
+            await dc.toggleSkipFileStatus(sourceB);
 
             // Continue back to A, step in, should not skip B
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: sourceB, line: stepLineB });
         });
 
@@ -294,21 +290,21 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, skipFiles, outFiles }, { path: program, line: bpLineA });
 
             // Step in, verify B sources are skipped
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: program, line: 4 });
-            await dc.send('toggleSkipFileStatus', { path: sourceB2 });
+            await dc.toggleSkipFileStatus(sourceB2);
 
             // Continue back to A, step in, should land in B2, B1 still is skipped
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
 
             // Re-skip B2
-            await dc.send('toggleSkipFileStatus', { path: sourceB2 });
-            await dc.continueRequest({ threadId: THREAD_ID });
+            await dc.toggleSkipFileStatus(sourceB2);
+            await dc.continueRequest();
             await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest({ threadId: THREAD_ID });
+            await dc.stepInRequest();
             await dc.assertStoppedLocation('step', { path: program, line: 4 });
         });
 
@@ -319,7 +315,7 @@ suite('Stepping', () => {
 
             const skipFiles = ['<node_internals>/*'];
             await dc.hitBreakpoint({ program, skipFiles }, { path: programSource, line: 8 })
-            const stackTraceResponse = await dc.stackTraceRequest({ threadId: undefined });
+            const stackTraceResponse = await dc.stackTraceRequest();
 
             // Assert that there are at least a few frames with paths marked with <node_internals>, and they are deemphasized
             const internalsFrames = stackTraceResponse.body.stackFrames.filter(frame => frame.source.path.startsWith('<node_internals>/'));
@@ -327,18 +323,15 @@ suite('Stepping', () => {
             internalsFrames.forEach(frame => assert.equal((<any>frame.source).presentationHint, 'deemphasize'));
 
             await Promise.all([
-                dc.stepOutRequest({ threadId: undefined }),
+                dc.stepOutRequest(),
                 dc.assertStoppedLocation('breakpoint', { path: programSource, line: 8 })
             ]);
 
             // Unskip a node_internals file
-            await Promise.all([
-                dc.send('toggleSkipFileStatus', { path: timersSource }),
-                dc.waitForEvent('stopped')
-            ]);
+            await dc.toggleSkipFileStatus(timersSource);
 
             await Promise.all([
-                dc.stepOutRequest({ threadId: undefined }),
+                dc.stepOutRequest(),
                 dc.assertStoppedLocation('step', { path: timersSource })
             ]);
         });

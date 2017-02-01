@@ -182,7 +182,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             return Promise.reject(err);
-        })
+        });
     }
 
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {

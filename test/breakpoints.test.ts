@@ -5,7 +5,6 @@
 
 import * as assert from 'assert';
 import * as path from 'path';
-import {DebugClient} from 'vscode-debugadapter-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import * as testUtils from './testUtils';
@@ -14,7 +13,7 @@ import * as testSetup from './testSetup';
 suite('Breakpoints', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;
 
-    let dc: DebugClient;
+    let dc: testUtils.Node2DebugClient;
     setup(() => {
         return testSetup.setup()
             .then(_dc => dc = _dc);

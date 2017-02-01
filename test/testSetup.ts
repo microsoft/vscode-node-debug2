@@ -7,7 +7,8 @@ import * as os from 'os';
 import * as path from 'path';
 
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {DebugClient} from 'vscode-debugadapter-testsupport';
+
+import * as testUtils from './testUtils';
 
 // ES6 default export...
 const LoggingReporter = require('./loggingReporter');
@@ -15,7 +16,7 @@ const LoggingReporter = require('./loggingReporter');
 const NIGHTLY_NAME = os.platform() === 'win32' ? 'node-nightly.cmd' : 'node-nightly';
 const DEBUG_ADAPTER = './out/src/nodeDebug.js';
 
-let dc: DebugClient;
+let dc: testUtils.Node2DebugClient;
 
 let unhandledAdapterErrors: string[];
 const origTest = test;
@@ -91,14 +92,14 @@ export const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + _
 export const PROJECT_ROOT = path.join(lowercaseDriveLetterDirname, '../../');
 export const DATA_ROOT = path.join(PROJECT_ROOT, 'testdata/');
 
-export function setup(port?: number) {
+export async function setup(port?: number): Promise<testUtils.Node2DebugClient> {
     unhandledAdapterErrors = [];
-    dc = new DebugClient('node', DEBUG_ADAPTER, 'node2');
+    dc = new testUtils.Node2DebugClient('node', DEBUG_ADAPTER, 'node2');
     patchLaunchArgs();
     dc.addListener('output', log);
 
-    return dc.start(port)
-        .then(() => dc);
+    await dc.start(port);
+    return dc;
 }
 
 export function teardown() {

@@ -33,3 +33,34 @@ export function setBreakpoint(dc: DebugClient, bps: DebugProtocol.SourceBreakpoi
         if (typeof expCol === 'number') assert.equal(bp.column, expCol, 'breakpoint verification mismatch: column');
     })
 }
+
+export class Node2DebugClient extends DebugClient {
+    async toggleSkipFileStatus(aPath: string): Promise<DebugProtocol.Response> {
+        const results = await Promise.all([
+            this.send('toggleSkipFileStatus', { path: aPath }),
+            this.waitForEvent('stopped')
+        ]);
+
+        return results[0];
+    }
+
+    continueRequest(): Promise<DebugProtocol.ContinueResponse> {
+        return super.continueRequest({ threadId: THREAD_ID });
+    }
+
+    nextRequest(): Promise<DebugProtocol.NextResponse> {
+        return super.nextRequest({ threadId: THREAD_ID });
+    }
+
+    stepOutRequest(): Promise<DebugProtocol.StepOutResponse> {
+        return super.stepOutRequest({ threadId: THREAD_ID });
+    }
+
+    stepInRequest(): Promise<DebugProtocol.StepInResponse> {
+        return super.stepInRequest({ threadId: THREAD_ID });
+    }
+
+    stackTraceRequest(): Promise<DebugProtocol.StackTraceResponse> {
+        return super.stackTraceRequest({ threadId: THREAD_ID });
+    }
+}

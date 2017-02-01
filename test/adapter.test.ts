@@ -6,18 +6,16 @@
 import * as assert from 'assert';
 import * as path from 'path';
 
-import {DebugClient} from 'vscode-debugadapter-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import * as testUtils from './testUtils';
 import * as testSetup from './testSetup';
 
 const DATA_ROOT = testSetup.DATA_ROOT;
-const THREAD_ID = testUtils.THREAD_ID;
 
 suite('Node Debug Adapter etc', () => {
 
-    let dc: DebugClient;
+    let dc: testUtils.Node2DebugClient;
     setup(() => {
         return testSetup.setup()
             .then(_dc => dc = _dc);
@@ -190,7 +188,7 @@ suite('Node Debug Adapter etc', () => {
 
         function testCompletions(text: string, column = text.length + 1, frameIdx = 0): Promise<DebugProtocol.CompletionItem[]> {
             return start()
-                .then(() => dc.stackTraceRequest({ threadId: THREAD_ID }))
+                .then(() => dc.stackTraceRequest())
                 .then(stackTraceResponse => stackTraceResponse.body.stackFrames.map(frame => frame.id))
                 .then(frameIds => dc.send('completions', <DebugProtocol.CompletionsArguments>{ text, column, frameId: frameIds[frameIdx] }))
                 .then((response: DebugProtocol.CompletionsResponse) => response.body.targets);
@@ -244,7 +242,7 @@ suite('Node Debug Adapter etc', () => {
     suite('hit condition bps', () => {
         function continueAndStop(line: number): Promise<any> {
             return Promise.all([
-                dc.continueRequest({ threadId: THREAD_ID }),
+                dc.continueRequest(),
                 dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line })
             ]);
         }
