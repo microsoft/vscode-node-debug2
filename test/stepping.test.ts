@@ -315,6 +315,7 @@ suite('Stepping', () => {
         test('can skip node internal files using <node_internals>', async () => {
             const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
             const programSource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceA.ts');
+            const timersSource = '<node_internals>/timers.js';
 
             const skipFiles = ['<node_internals>/*'];
             await dc.hitBreakpoint({ program, skipFiles }, { path: programSource, line: 8 })
@@ -325,10 +326,21 @@ suite('Stepping', () => {
             assert(internalsFrames.length > 1);
             internalsFrames.forEach(frame => assert.equal((<any>frame.source).presentationHint, 'deemphasize'));
 
-            await dc.stepOutRequest({ threadId: undefined });
-            await dc.assertStoppedLocation('breakpoint', { path: programSource, line: 8 });
+            await Promise.all([
+                dc.stepOutRequest({ threadId: undefined }),
+                dc.assertStoppedLocation('breakpoint', { path: programSource, line: 8 })
+            ]);
 
-            // TODO un-skip, after https://github.com/Microsoft/vscode/issues/18761
+            // Unskip a node_internals file
+            await Promise.all([
+                dc.send('toggleSkipFileStatus', { path: timersSource }),
+                dc.waitForEvent('stopped')
+            ]);
+
+            await Promise.all([
+                dc.stepOutRequest({ threadId: undefined }),
+                dc.assertStoppedLocation('step', { path: timersSource })
+            ]);
         });
     });
 });
