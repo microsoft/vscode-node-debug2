@@ -64,7 +64,7 @@ suite('Node Debug Adapter etc', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program: PROGRAM }),
-                testUtils.waitForEvent(dc, 'terminated')
+                dc.waitForEvent('terminated')
             ]);
         });
 
@@ -113,7 +113,7 @@ suite('Node Debug Adapter etc', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program:  PROGRAM }),
-                testUtils.waitForEvent(dc, 'initialized')
+                dc.waitForEvent('initialized')
             ]).then(() => { });
         }
 
@@ -181,8 +181,8 @@ suite('Node Debug Adapter etc', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program:  PROGRAM }),
-                testUtils.waitForEvent(dc, 'initialized'),
-                testUtils.waitForEvent(dc, 'stopped')
+                dc.waitForEvent('initialized'),
+                dc.waitForEvent('stopped')
             ]).then(() => { });
         }
 
@@ -241,10 +241,7 @@ suite('Node Debug Adapter etc', () => {
 
     suite('hit condition bps', () => {
         function continueAndStop(line: number): Promise<any> {
-            return Promise.all([
-                dc.continueRequest(),
-                dc.assertStoppedLocation('breakpoint', { path: PROGRAM, line })
-            ]);
+            return dc.continueTo('breakpoint', { path: PROGRAM, line });
         }
 
         const PROGRAM = path.join(DATA_ROOT, 'programWithFunction.js');

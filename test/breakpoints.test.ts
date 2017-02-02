@@ -239,7 +239,7 @@ suite('Breakpoints', () => {
             const BP_LINE = 10;
 
             return Promise.all<DebugProtocol.ProtocolMessage>([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setBreakpointsRequest({ source: { path: BP_PROGRAM }, breakpoints: [{ line: BP_LINE }]}).then(response => {
                         assert.equal(response.body.breakpoints.length, 1);
                         assert(!response.body.breakpoints[0].verified, 'Expected bp to not be verified yet');
@@ -247,7 +247,7 @@ suite('Breakpoints', () => {
                     });
                 }),
                 dc.launch({ program: LAUNCH_PROGRAM, sourceMaps: true }),
-                testUtils.waitForEvent(dc, 'breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
+                dc.waitForEvent('breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
                     assert(event.body.breakpoint.verified);
                     return null;
                 }),
@@ -278,7 +278,7 @@ suite('Breakpoints', () => {
         // Terminate at end
         test.skip('should not stop on an exception', () => {
             return Promise.all<DebugProtocol.ProtocolMessage>([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ ]
                     });
@@ -288,7 +288,7 @@ suite('Breakpoints', () => {
 
                 dc.launch({ program: PROGRAM }),
 
-                testUtils.waitForEvent(dc, 'terminated')
+                dc.waitForEvent('terminated')
             ]);
         });
 
@@ -296,7 +296,7 @@ suite('Breakpoints', () => {
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'all' ]
                     });
@@ -314,7 +314,7 @@ suite('Breakpoints', () => {
             const UNCAUGHT_EXCEPTION_LINE = 12;
 
             return Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'uncaught' ]
                     });

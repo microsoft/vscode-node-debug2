@@ -28,44 +28,28 @@ suite('Stepping', () => {
             return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 1 });
         }
 
-        test('returns the same frameIDs between steps', () => {
+        test('returns the same frameIDs between steps', async () => {
             let firstFrameIDs: number[];
-            return start()
-                .then(() => {
-                    return Promise.all([
-                        dc.nextRequest(),
-                        testUtils.waitForEvent(dc, 'stopped')]);
-                })
-                .then(() => dc.stackTraceRequest())
-                .then(stackTraceResponse => {
-                    firstFrameIDs = stackTraceResponse.body.stackFrames.map(frame => frame.id);
-
-                    return Promise.all([
-                        dc.nextRequest(),
-                        testUtils.waitForEvent(dc, 'stopped')]);
-                })
-                .then(() => dc.stackTraceRequest())
-                .then(frameResponse => {
-                    const secondFrameIDs = frameResponse.body.stackFrames.map(frame => frame.id);
-                    assert.deepEqual(firstFrameIDs, secondFrameIDs);
-                });
+            await start();
+            await dc.nextAndStop();
+            const stackTraceResponse = await dc.stackTraceRequest();
+            firstFrameIDs = stackTraceResponse.body.stackFrames.map(frame => frame.id);
+            await dc.nextAndStop();
+            const stackTraceResponse2 = await dc.stackTraceRequest();
+            const secondFrameIDs = stackTraceResponse2.body.stackFrames.map(frame => frame.id);
+            assert.deepEqual(firstFrameIDs, secondFrameIDs);
         });
 
-        test('smart stepping steps over unmapped files', () => {
+        test('smart stepping steps over unmapped files', async () => {
             const program = path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
             const programSource = path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
 
-            return dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 })
-                .then(() => Promise.all([
-                    dc.stepInRequest(),
-                    testUtils.waitForEvent(dc, 'stopped')
-                ]))
-                .then(() => dc.stackTraceRequest())
-                .then(stackTraceResponse => {
-                    const firstFrame = stackTraceResponse.body.stackFrames[0];
-                    assert.equal(firstFrame.source.path, programSource);
-                    assert.equal(firstFrame.line, 4);
-                });
+            await dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 })
+            await dc.stepInAndStop();
+            const stackTraceResponse = await dc.stackTraceRequest();
+            const firstFrame = stackTraceResponse.body.stackFrames[0];
+            assert.equal(firstFrame.source.path, programSource);
+            assert.equal(firstFrame.line, 4);
         });
 
         test('smart stepping stops on exceptions in unmapped files', () => {
@@ -73,7 +57,7 @@ suite('Stepping', () => {
             const EXCEPTION_LINE = 6;
 
             return Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: [ 'all' ]
                     });
@@ -89,42 +73,32 @@ suite('Stepping', () => {
     });
 
     suite('skipFiles', () => {
-        test('steps through un-sourcemapped file', () => {
+        test('steps through un-sourcemapped file', async () => {
             const program = path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
             const programSource = path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
 
             const skipFiles = ['unmapped'];
 
-            return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
-                .then(() => Promise.all([
-                    dc.stepInRequest(),
-                    testUtils.waitForEvent(dc, 'stopped')
-                ]))
-                .then(() => dc.stackTraceRequest())
-                .then(stackTraceResponse => {
-                    const firstFrame = stackTraceResponse.body.stackFrames[0];
-                    assert.equal(firstFrame.source.path, programSource);
-                    assert.equal(firstFrame.line, 4);
-                });
+            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
+            await dc.stepInAndStop();
+            const stackTraceResponse = await dc.stackTraceRequest();
+            const firstFrame = stackTraceResponse.body.stackFrames[0];
+            assert.equal(firstFrame.source.path, programSource);
+            assert.equal(firstFrame.line, 4);
         });
 
-        test('steps through sourcemapped file', () => {
+        test('steps through sourcemapped file', async () => {
             const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
             const programSource = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/src/sourceA.ts');
 
             const skipFiles = ['calls-between-sourcemapped-*/*B'];
 
-            return dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 8 })
-                .then(() => Promise.all([
-                    dc.stepInRequest(),
-                    testUtils.waitForEvent(dc, 'stopped')
-                ]))
-                .then(() => dc.stackTraceRequest())
-                .then(stackTraceResponse => {
-                    const firstFrame = stackTraceResponse.body.stackFrames[0];
-                    assert.equal(firstFrame.source.path, programSource);
-                    assert.equal(firstFrame.line, 4);
-                });
+            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 8 });
+            await dc.stepInAndStop();
+            const stackTraceResponse = await dc.stackTraceRequest();
+            const firstFrame = stackTraceResponse.body.stackFrames[0];
+            assert.equal(firstFrame.source.path, programSource);
+            assert.equal(firstFrame.line, 4);
         });
 
         test('steps over exception in skipped file', () => {
@@ -134,7 +108,7 @@ suite('Stepping', () => {
             const skipFiles = ['calls-between-files-*/*B'];
 
             return Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: ['caught']
                     });
@@ -144,10 +118,7 @@ suite('Stepping', () => {
 
                 dc.launch({ program, sourceMaps: true, skipFiles }),
                 dc.assertStoppedLocation('breakpoint', { path: programSource, line: 7 })
-            ]).then(() => Promise.all([
-                dc.nextRequest(),
-                dc.assertStoppedLocation('step', { path: programSource, line: 8 })
-            ]));
+            ]).then(() => dc.nextTo('step', { path: programSource, line: 8 }));
         });
 
         test('still stops at breakpoint in skipped file', async () => {
@@ -160,10 +131,7 @@ suite('Stepping', () => {
             const bpLineB = 2;
             await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programASource, line: 8 })
             await dc.setBreakpointsRequest({ source: { path: programBSource }, breakpoints: [{ line: bpLineB }]});
-            await Promise.all([
-                dc.stepInRequest(),
-                dc.assertStoppedLocation('breakpoint', { path: programBSource, line: bpLineB })
-            ]);
+            await dc.stepInTo('breakpoint', { path: programBSource, line: bpLineB });
         });
 
         test('can toggle skipping on and off', async () => {
@@ -173,7 +141,7 @@ suite('Stepping', () => {
 
             const bpLineA = 8;
             await Promise.all([
-                testUtils.waitForEvent(dc, 'initialized').then(event => {
+                dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
                         filters: ['caught']
                     });
@@ -186,24 +154,17 @@ suite('Stepping', () => {
             ]);
 
             // Step into sourceB, set it to be skipped
-            await Promise.all([
-                dc.stepInRequest(),
-                dc.assertStoppedLocation('step', { path: programBSource, line: 2 })
-            ]);
+            await dc.stepInTo('step', { path: programBSource, line: 2 })
             await dc.toggleSkipFileStatus(programBSource);
 
             // Continue back to sourceA, step through B, back to A
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: programASource, line: 4 });
+            await dc.continueTo('breakpoint', { path: programASource, line: bpLineA });
+            await dc.stepInTo('step', { path: programASource, line: 4 });
 
             // Toggle B back to not being skipped, continue to A, step in to B
             await dc.toggleSkipFileStatus(programBSource);
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: programASource, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: programBSource, line: 2 })
+            await dc.continueTo('breakpoint', { path: programASource, line: bpLineA });
+            await dc.stepInTo('step', { path: programBSource, line: 2 })
         });
 
         test('when generated script is skipped via regex, the source can be un-skipped', async () => {
@@ -217,15 +178,12 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: sourceA, line: bpLineA });
 
             // Step in, verify B sources are skipped
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: sourceA, line: 4 });
+            await dc.stepInTo('step', { path: sourceA, line: 4 });
             await dc.toggleSkipFileStatus(sourceB2);
 
             // Continue back to sourceA, step in, should skip B1 and land on B2
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: sourceA, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
+            await dc.continueTo('breakpoint', { path: sourceA, line: bpLineA });
+            await dc.stepInTo('step', { path: sourceB2, line: 2 });
         });
 
         test('when a non-sourcemapped script is skipped via regex, it can be unskipped', async () => {
@@ -239,15 +197,12 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: false, skipFiles }, { path: program, line: bpLineA });
 
             // Step in, verify B sources are skipped
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: program, line: 4 });
+            await dc.stepInTo('step', { path: program, line: 4 });
             await dc.toggleSkipFileStatus(sourceB);
 
             // Continue back to A, step in, should land in B
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: sourceB, line: 3 });
+            await dc.continueTo('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInTo('step', { path: sourceB, line: 3 });
         });
 
         test('can toggle skipping a non-sourcemapped file', async () => {
@@ -261,22 +216,17 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, sourceMaps: false }, { path: program, line: bpLineA });
 
             // Step in, verify B sources are not skipped
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: sourceB, line: stepLineB });
+            await dc.stepInTo('step', { path: sourceB, line: stepLineB });
             await dc.toggleSkipFileStatus(sourceB);
 
             // Continue back to sourceA, step in, should skip B
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: program, line: 4 });
+            await dc.continueTo('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInTo('step', { path: program, line: 4 });
             await dc.toggleSkipFileStatus(sourceB);
 
             // Continue back to A, step in, should not skip B
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: sourceB, line: stepLineB });
+            await dc.continueTo('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInTo('step', { path: sourceB, line: stepLineB });
         });
 
         test('when multiple generated scripts are skipped via one regex, one source can be un-skipped and re-skipped', async () => {
@@ -290,22 +240,17 @@ suite('Stepping', () => {
             await dc.hitBreakpoint({ program, skipFiles, outFiles }, { path: program, line: bpLineA });
 
             // Step in, verify B sources are skipped
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: program, line: 4 });
+            await dc.stepInTo('step', { path: program, line: 4 });
             await dc.toggleSkipFileStatus(sourceB2);
 
             // Continue back to A, step in, should land in B2, B1 still is skipped
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: sourceB2, line: 2 });
+            await dc.continueTo('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInTo('step', { path: sourceB2, line: 2 });
 
             // Re-skip B2
             await dc.toggleSkipFileStatus(sourceB2);
-            await dc.continueRequest();
-            await dc.assertStoppedLocation('breakpoint', { path: program, line: bpLineA });
-            await dc.stepInRequest();
-            await dc.assertStoppedLocation('step', { path: program, line: 4 });
+            await dc.continueTo('breakpoint', { path: program, line: bpLineA });
+            await dc.stepInTo('step', { path: program, line: 4 });
         });
 
         test('can skip node internal files using <node_internals>', async () => {
@@ -322,18 +267,12 @@ suite('Stepping', () => {
             assert(internalsFrames.length > 1);
             internalsFrames.forEach(frame => assert.equal((<any>frame.source).presentationHint, 'deemphasize'));
 
-            await Promise.all([
-                dc.stepOutRequest(),
-                dc.assertStoppedLocation('breakpoint', { path: programSource, line: 8 })
-            ]);
+            await dc.stepOutTo('breakpoint', { path: programSource, line: 8 });
 
             // Unskip a node_internals file
             await dc.toggleSkipFileStatus(timersSource);
 
-            await Promise.all([
-                dc.stepOutRequest(),
-                dc.assertStoppedLocation('step', { path: timersSource })
-            ]);
+            await dc.stepOutTo('step', { path: timersSource });
         });
     });
 });

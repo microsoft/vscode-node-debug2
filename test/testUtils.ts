@@ -10,12 +10,8 @@ import {DebugProtocol} from 'vscode-debugprotocol';
 
 export const THREAD_ID = 1;
 
-export function waitForEvent(dc: DebugClient, eventType: string): Promise<DebugProtocol.Event> {
-    return dc.waitForEvent(eventType, 2e3);
-}
-
 export function setBreakpointOnStart(dc: DebugClient, bps: DebugProtocol.SourceBreakpoint[], program: string, expLine?: number, expCol?: number, expVerified = true): Promise<void> {
-    return waitForEvent(dc, 'initialized')
+    return dc.waitForEvent('initialized')
         .then(event => setBreakpoint(dc, bps, program, expLine, expCol, expVerified))
         .then(() => dc.configurationDoneRequest())
         .then(() => { });
@@ -32,6 +28,12 @@ export function setBreakpoint(dc: DebugClient, bps: DebugProtocol.SourceBreakpoi
         if (typeof expLine === 'number') assert.equal(bp.line, expLine, 'breakpoint verification mismatch: line');
         if (typeof expCol === 'number') assert.equal(bp.column, expCol, 'breakpoint verification mismatch: column');
     })
+}
+
+export interface IExpectedStopLocation {
+    path?: string;
+    line?: number;
+    column?: number;
 }
 
 export class Node2DebugClient extends DebugClient {
@@ -62,5 +64,80 @@ export class Node2DebugClient extends DebugClient {
 
     stackTraceRequest(): Promise<DebugProtocol.StackTraceResponse> {
         return super.stackTraceRequest({ threadId: THREAD_ID });
+    }
+
+    continueAndStop(): Promise<any> {
+        return Promise.all([
+            super.continueRequest({ threadId: THREAD_ID }),
+            this.waitForEvent('stopped')
+        ]);
+    }
+
+    nextAndStop(): Promise<any> {
+        return Promise.all([
+            super.nextRequest({ threadId: THREAD_ID }),
+            this.waitForEvent('stopped')
+        ]);
+    }
+
+    stepOutAndStop(): Promise<any> {
+        return Promise.all([
+            super.stepOutRequest({ threadId: THREAD_ID }),
+            this.waitForEvent('stopped')
+        ]);
+    }
+
+    stepInAndStop(): Promise<any> {
+        return Promise.all([
+            super.stepInRequest({ threadId: THREAD_ID }),
+            this.waitForEvent('stopped')
+        ]);
+    }
+
+    stackTraceAndStop(): Promise<any> {
+        return Promise.all([
+            super.stackTraceRequest({ threadId: THREAD_ID }),
+            this.waitForEvent('stopped')
+        ]);
+    }
+
+    async continueTo(reason: string, expected: IExpectedStopLocation): Promise<DebugProtocol.StackTraceResponse> {
+        const results = await Promise.all([
+            this.continueRequest(),
+            this.assertStoppedLocation(reason, expected)
+        ]);
+
+        return results[1];
+    }
+
+    async nextTo(reason: string, expected: IExpectedStopLocation): Promise<DebugProtocol.StackTraceResponse> {
+        const results = await Promise.all([
+            this.nextRequest(),
+            this.assertStoppedLocation(reason, expected)
+        ]);
+
+        return results[1] as any;
+    }
+
+    async stepOutTo(reason: string, expected: IExpectedStopLocation): Promise<DebugProtocol.StackTraceResponse> {
+        const results = await Promise.all([
+            this.stepOutRequest(),
+            this.assertStoppedLocation(reason, expected)
+        ]);
+
+        return results[1] as any;
+    }
+
+    async stepInTo(reason: string, expected: IExpectedStopLocation): Promise<DebugProtocol.StackTraceResponse> {
+        const results = await Promise.all([
+            this.stepInRequest(),
+            this.assertStoppedLocation(reason, expected)
+        ]);
+
+        return results[1] as any;
+    }
+
+    waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
+        return super.waitForEvent(eventType, 2e3);
     }
 }
