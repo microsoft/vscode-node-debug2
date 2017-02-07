@@ -332,7 +332,7 @@
     },
     "commands": [{
         "command": "extension.node-debug2.toggleSkippingFile",
-        "title": "Toggle skipping this file"
+        "title": "Toggle Skipping This File"
     }]
   }
 }
