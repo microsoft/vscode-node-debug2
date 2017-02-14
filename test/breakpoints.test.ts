@@ -234,9 +234,11 @@ suite('Breakpoints', () => {
         });
 
         test('should stop on a breakpoint when the sourcemap is loaded after the bp is set', () => {
-            const BP_PROGRAM = path.join(DATA_ROOT, 'sourcemaps-setinterval', 'src/file2.ts');
-            const LAUNCH_PROGRAM = path.join(DATA_ROOT, 'sourcemaps-setinterval', 'dist/program.js');
+            const projectRoot = path.join(DATA_ROOT, 'sourcemaps-setinterval');
+            const BP_PROGRAM = path.join(projectRoot, 'src/file2.ts');
+            const LAUNCH_PROGRAM = path.join(projectRoot, 'dist/program.js');
             const BP_LINE = 10;
+            const outFiles = [path.join(projectRoot, 'dist/*.js')];
 
             return Promise.all<DebugProtocol.ProtocolMessage>([
                 dc.waitForEvent('initialized').then(event => {
@@ -246,7 +248,7 @@ suite('Breakpoints', () => {
                         return dc.configurationDoneRequest();
                     });
                 }),
-                dc.launch({ program: LAUNCH_PROGRAM, sourceMaps: true }),
+                dc.launch({ program: LAUNCH_PROGRAM, outFiles }),
                 dc.waitForEvent('breakpoint').then((event: DebugProtocol.BreakpointEvent) => {
                     assert(event.body.breakpoint.verified);
                     return null;
