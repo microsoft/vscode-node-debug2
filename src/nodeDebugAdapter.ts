@@ -185,6 +185,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     protected commonArgs(args: ICommonRequestArgs): void {
+        super.commonArgs(args);
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         fixNodeInternalsSkipFiles(args);
         this._restartMode = args.restart;
