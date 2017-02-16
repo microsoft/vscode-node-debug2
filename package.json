@@ -108,6 +108,11 @@
                 },
                 "default": []
               },
+              "restart": {
+                "type": "boolean",
+                "description": "%node.restart.description%",
+                "default": true
+              },
               "cwd": {
                 "type": "string",
                 "description": "%node.launch.cwd.description%",
@@ -225,7 +230,7 @@
               },
               "restart": {
                 "type": "boolean",
-                "description": "%node.attach.restart.description%",
+                "description": "%node.restart.description%",
                 "default": true
               },
               "sourceMaps": {

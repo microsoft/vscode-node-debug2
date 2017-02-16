@@ -173,7 +173,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public attach(args: IAttachRequestArguments): Promise<void> {
         this.commonArgs(args);
-        this._restartMode = args.restart;
 
         return super.attach(args).catch(err => {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
@@ -188,6 +187,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected commonArgs(args: ICommonRequestArgs): void {
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         fixNodeInternalsSkipFiles(args);
+        this._restartMode = args.restart;
     }
 
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {

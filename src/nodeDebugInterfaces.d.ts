@@ -11,9 +11,10 @@ export interface ICommonRequestArgs extends Core.ICommonRequestArgs {
     stopOnEntry?: boolean;
     address?: string;
     timeout?: number;
-
     /** Optional cwd for sourceMapPathOverrides resolution */
     cwd?: string;
+    /** Request frontend to restart session on termination. */
+    restart?: boolean;
 }
 
 /**
@@ -47,8 +48,6 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
  * This interface should always match the schema found in the node-debug extension manifest.
  */
 export interface IAttachRequestArguments extends Core.IAttachRequestArgs, ICommonRequestArgs {
-    /** Request frontend to restart session on termination. */
-    restart?: boolean;
     /** Node's root directory. */
     remoteRoot?: string;
     /** VS Code's root directory. */
