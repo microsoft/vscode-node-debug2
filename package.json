@@ -1,6 +1,6 @@
 {
   "name": "node-debug2",
-  "displayName": "Node Debug 2 - Experimental",
+  "displayName": "Node Debug 2",
   "version": "1.9.13",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
@@ -72,7 +72,7 @@
     "debuggers": [
       {
         "type": "node2",
-        "label": "Node.js v6.3+ (Experimental)",
+        "label": "Node.js v6.3+",
         "program": "./out/src/nodeDebug.js",
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",

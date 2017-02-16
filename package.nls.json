@@ -1,7 +1,7 @@
 {
-	"extension.description": "Experimental Visual Studio Code debugger extension for Node.js v6.3+, using the new Inspector Protocol",
+	"extension.description": "Visual Studio Code debugger extension for Node.js v6.3+, using the new Inspector Protocol",
 
-	"node.label": "Node.js v6.3+ (Experimental) via Inspector Protocol",
+	"node.label": "Node.js v6.3+ via Inspector Protocol",
 
 	"node.sourceMaps.description": "Use JavaScript source maps (if they exist).",
 	"node.outDir.description": "If source maps are enabled, the generated code is expected in this directory. Deprecated: use 'outFiles' attribute instead.",
@@ -36,11 +36,6 @@
 	"node.attach.config.name": "Attach",
 
 	"node.processattach.config.name": "Attach to Process",
-
-	"node.snippet.launch.label": "Node.js v6.3+ (Experimental): Launch Configuration",
-	"node.snippet.launch.description": "A new configuration for launching a node program, using the new Inspector Protocol",
-	"node.snippet.attach.label": "Node.js v6.3+ (Experimental): Attach Configuration",
-	"node.snippet.attach.description": "A new configuration for attaching to a running node program, using the new Inspector Protocol",
 
 	"extensionHost.label": "VS Code Extension Development",
 
