@@ -11,6 +11,9 @@ export interface ICommonRequestArgs extends Core.ICommonRequestArgs {
     stopOnEntry?: boolean;
     address?: string;
     timeout?: number;
+
+    /** Optional cwd for sourceMapPathOverrides resolution */
+    cwd?: string;
 }
 
 /**
@@ -52,8 +55,6 @@ export interface IAttachRequestArguments extends Core.IAttachRequestArgs, ICommo
     localRoot?: string;
     /** Send a USR1 signal to this process. */
     processId?: string;
-    /** Optional cwd for sourceMapPathOverrides resolution */
-    cwd?: string;
 }
 
 export type NodeDebugError = DebugProtocol.Message & Error;

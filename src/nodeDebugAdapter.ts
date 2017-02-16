@@ -53,8 +53,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public launch(args: ILaunchRequestArguments): Promise<void> {
-        args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
-        fixNodeInternalsSkipFiles(args);
+        this.commonArgs(args);
         super.launch(args);
 
         const port = args.port || utils.random(3000, 50000);
@@ -173,8 +172,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public attach(args: IAttachRequestArguments): Promise<void> {
-        args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
+        this.commonArgs(args);
         this._restartMode = args.restart;
+
         return super.attach(args).catch(err => {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
@@ -183,6 +183,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             return Promise.reject(err);
         });
+    }
+
+    protected commonArgs(args: ICommonRequestArgs): void {
+        args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
+        fixNodeInternalsSkipFiles(args);
     }
 
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {
