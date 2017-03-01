@@ -12,8 +12,13 @@
 	"node.address.description": "TCP/IP address of debug port. Default is 'localhost'.",
 	"node.timeout.description": "Retry for this number of milliseconds to connect to Node.js. Default is 10000 ms.",
 	"node.smartStep.description": "Automatically step through generated code that cannot be mapped back to the original source.",
+
 	"node.diagnosticLogging.description": "When true, the adapter logs its own diagnostic info to the console",
+		"node.diagnosticLogging.deprecationMessage": "'diagnosticLogging' is deprecated. Use 'trace' instead.",
 	"node.verboseDiagnosticLogging.description": "When true, the adapter logs all traffic with the client and target (as well as the info logged by 'diagnosticLogging')",
+		"node.verboseDiagnosticLogging.deprecationMessage": "'verboseDiagnosticLogging' is deprecated. Use 'trace' instead.",
+	"node.trace.description": "When 'true', the debugger will log tracing info to a file. When 'verbose', it will also show logs in the console.",
+
 	"node.sourceMapPathOverrides.description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk. See README for details.",
 	"node.skipFiles.description": "An array of file or folder names, or glob patterns, to skip when debugging.",
 	"node.restart.description": "Restart session after Node.js has terminated.",

@@ -501,7 +501,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             cli += ' ';
         }
 
-        this._session.sendEvent(new OutputEvent(cli + '\n', 'console'));
+        logger.warn(cli);
     }
 
     protected globalEvaluate(args: Crdp.Runtime.EvaluateRequest): Promise<Crdp.Runtime.EvaluateResponse> {

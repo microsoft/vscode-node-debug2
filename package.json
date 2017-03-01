@@ -187,12 +187,26 @@
               "diagnosticLogging": {
                 "type": "boolean",
                 "description": "%node.diagnosticLogging.description%",
-                "default": true
+                "default": true,
+                "deprecationMessage": "%node.diagnosticLogging.deprecationMessage%"
               },
               "verboseDiagnosticLogging": {
                 "type": "boolean",
                 "description": "%node.verboseDiagnosticLogging.description%",
-                "default": true
+                "default": true,
+                "deprecationMessage": "%node.verboseDiagnosticLogging.deprecationMessage%"
+              },
+              "trace": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "verbose",
+                  true
+                ],
+                "default": true,
+                "description": ""
               },
               "sourceMapPathOverrides": {
                 "type": "object",
@@ -284,12 +298,14 @@
               "diagnosticLogging": {
                 "type": "boolean",
                 "description": "%node.diagnosticLogging.description%",
-                "default": true
+                "default": true,
+                "deprecationMessage": "%node.diagnosticLogging.deprecationMessage%"
               },
               "verboseDiagnosticLogging": {
                 "type": "boolean",
                 "description": "%node.verboseDiagnosticLogging.description%",
-                "default": true
+                "default": true,
+                "deprecationMessage": "%node.verboseDiagnosticLogging.deprecationMessage%"
               },
               "sourceMapPathOverrides": {
                 "type": "object",
