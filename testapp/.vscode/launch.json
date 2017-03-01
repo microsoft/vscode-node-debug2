@@ -4,7 +4,8 @@
         {
             "debugServer": 4712,
             "name": "Launch",
-            "type": "node2",
+            "type": "node",
+            "protocol": "inspector",
             "request": "launch",
             "program": "${workspaceRoot}/out/app.js",
             "cwd": "${workspaceRoot}",
@@ -12,7 +13,9 @@
                 "app2.ts",
                 "<node_internals>/*.js"
             ],
-            // "smartStep": true,
+            // "diagnosticLogging": true,
+            "trace": true,
+            "smartStep": true,
             "outFiles": ["${workspaceRoot}/out/**/*.js"]
         },
         {
