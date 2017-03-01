@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, logger, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger} from 'vscode-chrome-debug-core';
 import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
@@ -53,7 +53,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public launch(args: ILaunchRequestArguments): Promise<void> {
-        this.commonArgs(args);
         super.launch(args);
 
         const port = args.port || utils.random(3000, 50000);
@@ -172,8 +171,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public attach(args: IAttachRequestArguments): Promise<void> {
-        this.commonArgs(args);
-
         return super.attach(args).catch(err => {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg

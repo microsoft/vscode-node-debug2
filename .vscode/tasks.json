@@ -2,6 +2,8 @@
     "version": "0.1.0",
     "command": "gulp",
     "isShellCommand": true,
+    "showOutput": "never",
+    "_runner": "terminal",
     "tasks": [
        {
             "taskName": "watch",
