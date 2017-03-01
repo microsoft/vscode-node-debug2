@@ -1,0 +1,6 @@
+{
+    "compilerOptions": {
+        "inlineSourceMap": true,
+        "inlineSources": true
+    }
+}

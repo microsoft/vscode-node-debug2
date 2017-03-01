@@ -272,6 +272,29 @@ suite('Breakpoints', () => {
                 runtimeArgs: [ '--nolazy' ]
             }, { path: TS_SOURCE, line: TS_LINE } );
         });
+
+        test('can set a breakpoint in inlined sources', async () => {
+            const TEST_ROOT = path.join(DATA_ROOT, 'sourcemaps-inline-sources');
+            const outFiles = [path.join(TEST_ROOT, '**/*.js')];
+            const LAUNCH_PROGRAM = path.join(TEST_ROOT, 'program.js');
+            const PROGRAM = path.join(TEST_ROOT, 'program.ts');
+            const DEBUGGER_LINE = 5;
+            const BP_LINE = 4;
+
+            let inlinedSource: DebugProtocol.Source;
+            await Promise.all([
+                dc.configurationSequence(),
+                dc.launch({ program: LAUNCH_PROGRAM, outFiles }),
+                dc.assertStoppedLocation('debugger statement', { path: PROGRAM, line: DEBUGGER_LINE }).then(stackTrace => {
+                    inlinedSource = stackTrace.body.stackFrames[0].source;
+                })
+            ]);
+
+            const bpRequest = await dc.setBreakpointsRequest({ breakpoints: [{ line: BP_LINE }], source: inlinedSource });
+            assert(bpRequest.body.breakpoints[0] && bpRequest.body.breakpoints[0].verified);
+
+            await dc.continueTo('breakpoint', { line: BP_LINE, path: PROGRAM });
+        });
     });
 
     suite('setExceptionBreakpoints', () => {

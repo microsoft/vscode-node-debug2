@@ -101,7 +101,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             programPath = path.normalize(programPath);
             if (pathUtils.normalizeDriveLetter(programPath) !== pathUtils.realPath(programPath)) {
-                logger.log(localize('program.path.case.mismatch.warning', "Program path uses differently cased character as file on disk; this might result in breakpoints not being hit."), /*forceLog=*/true);
+                logger.warn(localize('program.path.case.mismatch.warning', "Program path uses differently cased character as file on disk; this might result in breakpoints not being hit."));
             }
         }
 

@@ -94,13 +94,6 @@ export class Node2DebugClient extends DebugClient {
         ]);
     }
 
-    stackTraceAndStop(): Promise<any> {
-        return Promise.all([
-            super.stackTraceRequest({ threadId: THREAD_ID }),
-            this.waitForEvent('stopped')
-        ]);
-    }
-
     async continueTo(reason: string, expected: IExpectedStopLocation): Promise<DebugProtocol.StackTraceResponse> {
         const results = await Promise.all([
             this.continueRequest(),
