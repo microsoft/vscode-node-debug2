@@ -206,7 +206,7 @@
                   true
                 ],
                 "default": true,
-                "description": ""
+                "description": "%node.trace.description%"
               },
               "sourceMapPathOverrides": {
                 "type": "object",
@@ -306,6 +306,18 @@
                 "description": "%node.verboseDiagnosticLogging.description%",
                 "default": true,
                 "deprecationMessage": "%node.verboseDiagnosticLogging.deprecationMessage%"
+              },
+              "trace": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "enum": [
+                  "verbose",
+                  true
+                ],
+                "default": true,
+                "description": "%node.trace.description%"
               },
               "sourceMapPathOverrides": {
                 "type": "object",
