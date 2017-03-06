@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.svg",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "3.13.0",
+    "vscode-chrome-debug-core": "3.14.0",
     "vscode-debugadapter": "^1.18.0-pre.0",
     "vscode-debugprotocol": "^1.17.0-pre.2",
     "vscode-nls": "^1.0.4"
@@ -222,6 +222,11 @@
                 "type": "string",
                 "description": "%node.launch.envFile.description%",
                 "default": "${workspaceRoot}/.env"
+              },
+              "showAsyncStacks": {
+                "type": "boolean",
+                "description": "%node.showAsyncStacks.description%",
+                "default": true
               }
             }
           },
@@ -328,6 +333,11 @@
                 "type": "array",
                 "description": "%node.skipFiles.description%",
                 "default": []
+              },
+              "showAsyncStacks": {
+                "type": "boolean",
+                "description": "%node.showAsyncStacks.description%",
+                "default": true
               }
             }
           }
