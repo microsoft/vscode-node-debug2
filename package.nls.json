@@ -22,7 +22,7 @@
 	"node.sourceMapPathOverrides.description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk. See README for details.",
 	"node.skipFiles.description": "An array of file or folder names, or glob patterns, to skip when debugging.",
 	"node.restart.description": "Restart session after Node.js has terminated.",
-	"node.showAsyncStacks.description": "Show the async calls that led to the current pause location. Enabled by default.",
+	"node.showAsyncStacks.description": "Show the async calls that led to the current call stack.",
 
 	"node.launch.program.description": "Absolute path to the program.",
 	"node.launch.console.description": "Where to launch the debug target: internal console, integrated terminal, or external terminal.",
