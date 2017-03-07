@@ -302,6 +302,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public configurationDone(): Promise<void> {
+        if (!this.chrome) {
+            // It's possible to get this request after we've detached, see #21973
+            return super.configurationDone();
+        }
+
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
         // So tell the target to continue, or tell the client that we paused, as needed
         this._finishedConfig = true;
