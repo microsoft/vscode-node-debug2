@@ -5,7 +5,7 @@
   "main": "app.js",
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^2.0.0"
+    "typescript": "^2.2.1"
   },
   "scripts": {
     "build": "tsc -w -p ."
