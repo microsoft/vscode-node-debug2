@@ -240,15 +240,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             const onStderr = (data: string) => {
                 let msg = data.toString();
 
-                // Stop listening after 'Debugger attached' msg (unless this is noDebugMode)
-                if (!noDebugMode && msg.indexOf('Debugger attached.') >= 0) {
-                    nodeProcess.stderr.removeListener('data', onStderr);
-                }
-
                 // Chop off the Chrome-specific debug URL message
                 const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
                 if (chromeMsgIndex >= 0) {
                     msg = msg.substr(0, chromeMsgIndex);
+                    nodeProcess.stderr.removeListener('data', onStderr);
                 }
 
                 this._session.sendEvent(new OutputEvent(msg, 'stderr'));
