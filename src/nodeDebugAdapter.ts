@@ -563,8 +563,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * If realPath is an absolute path or a URL, return realPath. Otherwise, prepend the node_internals marker
      */
     protected realPathToDisplayPath(realPath: string): string {
-        const aUrl = url.parse(realPath);
-        if (aUrl.protocol) {
+        if (realPath.match(/VM\d+/)) {
             return realPath;
         }
 
