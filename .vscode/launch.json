@@ -15,7 +15,8 @@
         },
         {
 			"name": "Run Tests",
-			"type": "node2",
+			"type": "node",
+			"protocol": "inspector",
 			"request": "launch",
 			"cwd": "${workspaceRoot}",
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
@@ -24,7 +25,7 @@
 				"--timeout", "180000000",
 				"--colors",
 				"./out/test",
-                "-R", "out/test/loggingReporter"
+                "-R", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js"
 			],
 			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ],

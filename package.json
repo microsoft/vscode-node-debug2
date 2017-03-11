@@ -36,6 +36,7 @@
     "typescript": "^2.1.4",
     "vsce": "^1.14.0",
     "vscode": "^1.0.0",
+    "vscode-chrome-debug-core-testsupport": "^3.14.0",
     "vscode-debugadapter-testsupport": "^1.15.0-pre.0",
     "vscode-nls-dev": "^2.0.0-beta.1"
   },
@@ -46,7 +47,7 @@
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
     "build": "gulp build",
-    "test": "mocha --timeout 20000 -s 2000 -u tdd --colors --reporter out/test/loggingReporter.js ./out/test/",
+    "test": "mocha --timeout 20000 -s 2000 -u tdd --colors --reporter node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js ./out/test/",
     "vscode:prepublish": "gulp verify-no-linked-modules"
   },
   "engines": {

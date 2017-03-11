@@ -7,16 +7,16 @@ import * as assert from 'assert';
 import * as path from 'path';
 
 import {ILoadedScript} from 'vscode-chrome-debug-core';
+import * as ts from 'vscode-chrome-debug-core-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
-import * as testUtils from './testUtils';
 import * as testSetup from './testSetup';
 
 const DATA_ROOT = testSetup.DATA_ROOT;
 
 suite('Node Debug Adapter etc', () => {
 
-    let dc: testUtils.Node2DebugClient;
+    let dc: ts.debugClient.ExtendedDebugClient;
     setup(() => {
         return testSetup.setup()
             .then(_dc => dc = _dc);
@@ -254,7 +254,7 @@ suite('Node Debug Adapter etc', () => {
                     { line: noCondBpLine }];
 
             return Promise.all([
-                testUtils.setBreakpointOnStart(dc, bps, PROGRAM),
+                ts.debugClient.setBreakpointOnStart(dc, bps, PROGRAM),
 
                 dc.launch({ program: PROGRAM }),
 
@@ -274,7 +274,7 @@ suite('Node Debug Adapter etc', () => {
                     { line: noCondBpLine }];
 
             return Promise.all([
-                testUtils.setBreakpointOnStart(dc, bps, PROGRAM),
+                ts.debugClient.setBreakpointOnStart(dc, bps, PROGRAM),
 
                 dc.launch({ program: PROGRAM }),
 
@@ -292,7 +292,7 @@ suite('Node Debug Adapter etc', () => {
                     { line: condBpLine, hitCondition: 'lsdf' }];
 
             return Promise.all([
-                testUtils.setBreakpointOnStart(dc, bps, PROGRAM, undefined, undefined, /*expVerified=*/false),
+                ts.debugClient.setBreakpointOnStart(dc, bps, PROGRAM, undefined, undefined, /*expVerified=*/false),
                 dc.launch({ program: PROGRAM })
             ]);
         });
@@ -311,7 +311,6 @@ suite('Node Debug Adapter etc', () => {
 
             assert(!!loadedScripts);
             assert(loadedScripts.length > 10);
-            console.log(loadedScripts);
 
             // Has the program
             assertHasScript(loadedScripts, PROGRAM);

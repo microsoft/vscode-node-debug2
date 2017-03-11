@@ -6,14 +6,14 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
+import * as ts from 'vscode-chrome-debug-core-testsupport';
 
-import * as testUtils from './testUtils';
 import * as testSetup from './testSetup';
 
 suite('Breakpoints', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;
 
-    let dc: testUtils.Node2DebugClient;
+    let dc: ts.debugClient.ExtendedDebugClient;
     setup(() => {
         return testSetup.setup()
             .then(_dc => dc = _dc);
@@ -61,7 +61,7 @@ suite('Breakpoints', () => {
 
             const bp: DebugProtocol.SourceBreakpoint = { line: COND_BREAKPOINT_LINE, column: COND_BREAKPOINT_COLUMN, condition: 'i === 3' };
             return Promise.all([
-                testUtils.setBreakpointOnStart(dc, [bp], PROGRAM, COND_BREAKPOINT_LINE, COND_BREAKPOINT_COLUMN),
+                ts.debugClient.setBreakpointOnStart(dc, [bp], PROGRAM, COND_BREAKPOINT_LINE, COND_BREAKPOINT_COLUMN),
 
                 dc.launch({ program: PROGRAM }),
 

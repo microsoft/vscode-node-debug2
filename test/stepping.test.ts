@@ -6,13 +6,13 @@
 import * as assert from 'assert';
 import * as path from 'path';
 
-import * as testUtils from './testUtils';
+import * as ts from 'vscode-chrome-debug-core-testsupport';
 import * as testSetup from './testSetup';
 
 suite('Stepping', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;
 
-    let dc: testUtils.Node2DebugClient;
+    let dc: ts.debugClient.ExtendedDebugClient;
     setup(async () => {
         dc = await testSetup.setup();
     });
