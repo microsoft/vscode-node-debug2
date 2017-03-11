@@ -5,6 +5,7 @@
 
 import * as assert from 'assert';
 
+import {IAllLoadedScriptsResponseBody} from 'vscode-chrome-debug-core';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
@@ -44,6 +45,11 @@ export class Node2DebugClient extends DebugClient {
         ]);
 
         return results[0];
+    }
+
+    async getLoadScripts(): Promise<IAllLoadedScriptsResponseBody> {
+        const response = await this.send('getLoadScripts')
+        return response.body;
     }
 
     continueRequest(): Promise<DebugProtocol.ContinueResponse> {

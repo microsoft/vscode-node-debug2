@@ -6,6 +6,7 @@
 import * as assert from 'assert';
 import * as path from 'path';
 
+import {ILoadedScript} from 'vscode-chrome-debug-core';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 import * as testUtils from './testUtils';
@@ -294,6 +295,33 @@ suite('Node Debug Adapter etc', () => {
                 testUtils.setBreakpointOnStart(dc, bps, PROGRAM, undefined, undefined, /*expVerified=*/false),
                 dc.launch({ program: PROGRAM })
             ]);
+        });
+    });
+
+    suite('get loaded scripts', () => {
+        function assertHasScript(loadedScripts: ILoadedScript[], fullPath: string): void {
+            const name = path.basename(fullPath);
+            assert(loadedScripts.filter(script => script.label === name && script.description === fullPath && script.source.path === fullPath).length === 1);
+        }
+
+        test('returns all scripts', async () => {
+            const PROGRAM = path.join(DATA_ROOT, 'simple-eval/index.js');
+            await dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 3 });
+            const { loadedScripts } = await dc.getLoadScripts();
+
+            assert(!!loadedScripts);
+            assert(loadedScripts.length > 10);
+            console.log(loadedScripts);
+
+            // Has the program
+            assertHasScript(loadedScripts, PROGRAM);
+
+            // Has some node_internals script
+            const nodeInternalsScript = '<node_internals>/timers.js';
+            assertHasScript(loadedScripts, nodeInternalsScript);
+
+            // Has the eval script
+            assert(loadedScripts.filter(script => script.description.match(/VM\d+/)).length === 1);
         });
     });
 });
