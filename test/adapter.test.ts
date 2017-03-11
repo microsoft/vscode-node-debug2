@@ -321,7 +321,7 @@ suite('Node Debug Adapter etc', () => {
             assertHasScript(loadedScripts, nodeInternalsScript);
 
             // Has the eval script
-            assert(loadedScripts.filter(script => script.description.match(/VM\d+/)).length === 1);
+            assert(loadedScripts.filter(script => script.label.match(/VM\d+/)).length === 1);
         });
     });
 });
