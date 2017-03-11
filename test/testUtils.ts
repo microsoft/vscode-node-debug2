@@ -131,6 +131,6 @@ export class Node2DebugClient extends DebugClient {
     }
 
     waitForEvent(eventType: string): Promise<DebugProtocol.Event> {
-        return super.waitForEvent(eventType, 2e3);
+        return super.waitForEvent(eventType);
     }
 }
