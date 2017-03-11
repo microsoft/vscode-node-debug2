@@ -451,6 +451,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 }).then(response => {
+            if (this._loggedTargetVersion) {
+                // Possible to get two of these requests going simultaneously
+                return;
+            }
+
             if (response.exceptionDetails) {
                 const description = chromeUtils.errorMessageFromExceptionDetails(response.exceptionDetails);
                 if (description.startsWith('ReferenceError: process is not defined')) {
