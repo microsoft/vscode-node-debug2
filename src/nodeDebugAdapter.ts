@@ -446,6 +446,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private getNodeProcessDetailsIfNeeded(): Promise<void> {
+        // temp logging for test in travis
+        try {
+            throw new Error();
+        } catch (e) {
+            logger.log('getNodeProcessDetailsIfNeeded');
+            logger.log(e.stack);
+        }
+
         if (this._loggedTargetVersion || !this.chrome) {
             return Promise.resolve();
         }
