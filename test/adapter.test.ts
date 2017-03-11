@@ -321,7 +321,37 @@ suite('Node Debug Adapter etc', () => {
             assertHasScript(loadedScripts, nodeInternalsScript);
 
             // Has the eval script
-            assert(loadedScripts.filter(script => script.label.match(/VM\d+/)).length === 1);
+            assert(loadedScripts.filter(script => script.label.match(/VM\d+/)).length >= 1);
+        });
+    });
+
+    suite('async callstacks', () => {
+        function assertAsyncLabelCount(stackTrace: DebugProtocol.StackTraceResponse, expectedAsyncLabels: number): void {
+            assert.equal(stackTrace.body.stackFrames.filter(frame => !frame.source).length, expectedAsyncLabels);
+        }
+
+        test.only('shows async stacks for promise resolution', async () => {
+            const PROGRAM = path.join(DATA_ROOT, 'promise-chain/index.js');
+            const breakpoints: DebugProtocol.SourceBreakpoint[] = [7, 13, 19, 25, 31].map(line => ({ line }));
+
+            await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true }, { path: PROGRAM, line: 45});
+            await dc.setBreakpointsRequest({ source: { path: PROGRAM }, breakpoints });
+
+            await dc.continueAndStop();
+            assertAsyncLabelCount(await dc.stackTraceRequest(), 1);
+
+            await dc.continueAndStop();
+            assertAsyncLabelCount(await dc.stackTraceRequest(), 2);
+
+            await dc.continueAndStop();
+            assertAsyncLabelCount(await dc.stackTraceRequest(), 3);
+
+            await dc.continueAndStop();
+            assertAsyncLabelCount(await dc.stackTraceRequest(), 4);
+
+            // Hit the limit of 4 async parents
+            await dc.continueAndStop();
+            assertAsyncLabelCount(await dc.stackTraceRequest(), 4);
         });
     });
 });
