@@ -143,7 +143,7 @@ suite('Stepping', () => {
             await Promise.all([
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
-                        filters: ['caught']
+                        filters: ['all']
                     });
                 })
                 .then(() => dc.setBreakpointsRequest({ source: { path: programASource }, breakpoints: [{ line: bpLineA }]}))
