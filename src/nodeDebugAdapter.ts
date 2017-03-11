@@ -7,7 +7,6 @@ import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
 
-import * as url from 'url';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
@@ -554,7 +553,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     protected getReadonlyOrigin(aPath: string): string {
-        return path.isAbsolute(aPath) || aPath.startsWith(ChromeDebugAdapter.PLACEHOLDER_EVAL_URL_PROTOCOL) ?
+        return path.isAbsolute(aPath) || aPath.startsWith(ChromeDebugAdapter.EVAL_NAME_PREFIX) ?
             localize('origin.from.node', "read-only content from Node.js") :
             localize('origin.core.module', "read-only core module");
     }
