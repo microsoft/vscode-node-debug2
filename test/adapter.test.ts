@@ -329,7 +329,7 @@ suite('Node Debug Adapter etc', () => {
             assert.equal(stackTrace.body.stackFrames.filter(frame => !frame.source).length, expectedAsyncLabels);
         }
 
-        test.only('shows async stacks for promise resolution', async () => {
+        test('shows async stacks for promise resolution', async () => {
             const PROGRAM = path.join(DATA_ROOT, 'promise-chain/index.js');
             const breakpoints: DebugProtocol.SourceBreakpoint[] = [7, 13, 19, 25, 31].map(line => ({ line }));
 
