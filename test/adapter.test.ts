@@ -329,8 +329,15 @@ suite('Node Debug Adapter etc', () => {
             assert.equal(stackTrace.body.stackFrames.filter(frame => !frame.source).length, expectedAsyncLabels);
         }
 
+        function assertStackFrame(stackTrace: DebugProtocol.StackTraceResponse, i: number, sourcePath: string, line: number): void {
+            const frame = stackTrace.body.stackFrames[i];
+            assert(!!frame);
+            assert.equal(frame.source && frame.source.path, sourcePath);
+            assert.equal(frame.line, line);
+        }
+
         test('shows async stacks for promise resolution', async () => {
-            const PROGRAM = path.join(DATA_ROOT, 'promise-chain/index.js');
+            const PROGRAM = path.join(DATA_ROOT, 'promise-chain/main.js');
             const breakpoints: DebugProtocol.SourceBreakpoint[] = [7, 13, 19, 25, 31].map(line => ({ line }));
 
             await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true }, { path: PROGRAM, line: 45});
@@ -351,6 +358,43 @@ suite('Node Debug Adapter etc', () => {
             // Hit the limit of 4 async parents
             await dc.continueAndStop();
             assertAsyncLabelCount(await dc.stackTraceRequest(), 4);
+        });
+
+        async function stepOverNativeAwait(fromLine: number, toLine = fromLine + 1) {
+            await dc.nextTo('step', { line: fromLine });
+            await dc.nextTo('step', { line: fromLine });
+
+            await dc.nextTo('step', { line: toLine });
+        }
+
+        test('shows async stacks and steps correctly for native async/await', async () => {
+            const PROGRAM = path.join(DATA_ROOT, 'native-async-await/main.js');
+
+            await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true }, { path: PROGRAM, line: 8 });
+
+            await stepOverNativeAwait(8);
+            let stackTrace = await dc.stepInTo('step', { line: 13 });
+            assertStackFrame(stackTrace, 3, PROGRAM, 7);
+            assertStackFrame(stackTrace, 4, PROGRAM, 40);
+            assertAsyncLabelCount(stackTrace, 1);
+
+            await stepOverNativeAwait(13);
+            stackTrace = await dc.stepInTo('step', { line: 18 });
+            assertStackFrame(stackTrace, 3, PROGRAM, 12);
+            assertStackFrame(stackTrace, 4, PROGRAM, 9);
+            assertAsyncLabelCount(stackTrace, 2);
+
+            await stepOverNativeAwait(18);
+            stackTrace = await dc.stepInTo('step', { line: 23 });
+            assertStackFrame(stackTrace, 3, PROGRAM, 17);
+            assertStackFrame(stackTrace, 4, PROGRAM, 14);
+            assertAsyncLabelCount(stackTrace, 3);
+
+            await stepOverNativeAwait(23);
+            stackTrace = await dc.stepInTo('step', { line: 28 });
+            assertStackFrame(stackTrace, 3, PROGRAM, 22);
+            assertStackFrame(stackTrace, 4, PROGRAM, 19);
+            assertAsyncLabelCount(stackTrace, 4);
         });
     });
 });
