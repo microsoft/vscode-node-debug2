@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent} from 'vscode-chrome-debug-core';
 import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
@@ -329,7 +329,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.terminateSession(reason, requestRestart);
     }
 
-    protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: string): void {
+    protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: stoppedEvent.ReasonType): void {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log('Paused on entry');
