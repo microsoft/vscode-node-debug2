@@ -108,19 +108,19 @@
       "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
     },
     "vscode-chrome-debug-core": {
-      "version": "3.14.3",
-      "from": "vscode-chrome-debug-core@3.14.3",
-      "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.14.3.tgz"
+      "version": "3.14.4",
+      "from": "vscode-chrome-debug-core@3.14.4",
+      "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.14.4.tgz"
     },
     "vscode-debugadapter": {
-      "version": "1.18.0-pre.3",
-      "from": "vscode-debugadapter@1.18.0-pre.3",
-      "resolved": "https://registry.npmjs.org/vscode-debugadapter/-/vscode-debugadapter-1.18.0-pre.3.tgz"
+      "version": "1.18.0-pre.4",
+      "from": "vscode-debugadapter@1.18.0-pre.4",
+      "resolved": "https://registry.npmjs.org/vscode-debugadapter/-/vscode-debugadapter-1.18.0-pre.4.tgz"
     },
     "vscode-debugprotocol": {
-      "version": "1.18.0-pre.1",
-      "from": "vscode-debugprotocol@1.18.0-pre.1",
-      "resolved": "https://registry.npmjs.org/vscode-debugprotocol/-/vscode-debugprotocol-1.18.0-pre.1.tgz"
+      "version": "1.18.0-pre.2",
+      "from": "vscode-debugprotocol@1.18.0-pre.2",
+      "resolved": "https://registry.npmjs.org/vscode-debugprotocol/-/vscode-debugprotocol-1.18.0-pre.2.tgz"
     },
     "vscode-nls": {
       "version": "1.0.7",
