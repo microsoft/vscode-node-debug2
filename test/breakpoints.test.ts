@@ -57,11 +57,10 @@ suite('Breakpoints', () => {
         test('should stop on a conditional breakpoint', () => {
             const PROGRAM = path.join(DATA_ROOT, 'program.js');
             const COND_BREAKPOINT_LINE = 13;
-            const COND_BREAKPOINT_COLUMN = 2;
 
-            const bp: DebugProtocol.SourceBreakpoint = { line: COND_BREAKPOINT_LINE, column: COND_BREAKPOINT_COLUMN, condition: 'i === 3' };
+            const bp: DebugProtocol.SourceBreakpoint = { line: COND_BREAKPOINT_LINE, condition: 'i === 3' };
             return Promise.all([
-                ts.debugClient.setBreakpointOnStart(dc, [bp], PROGRAM, COND_BREAKPOINT_LINE, COND_BREAKPOINT_COLUMN),
+                ts.debugClient.setBreakpointOnStart(dc, [bp], PROGRAM, COND_BREAKPOINT_LINE),
 
                 dc.launch({ program: PROGRAM }),
 
@@ -285,7 +284,7 @@ suite('Breakpoints', () => {
             await Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program: LAUNCH_PROGRAM, outFiles }),
-                dc.assertStoppedLocation('debugger statement', { path: PROGRAM, line: DEBUGGER_LINE }).then(stackTrace => {
+                dc.assertStoppedLocation('debugger_statement', { path: PROGRAM, line: DEBUGGER_LINE }).then(stackTrace => {
                     inlinedSource = stackTrace.body.stackFrames[0].source;
                 })
             ]);
