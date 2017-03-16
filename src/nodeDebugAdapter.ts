@@ -184,6 +184,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.commonArgs(args);
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         fixNodeInternalsSkipFiles(args);
+        args.showAsyncStacks = true;
+
         this._restartMode = args.restart;
     }
 
