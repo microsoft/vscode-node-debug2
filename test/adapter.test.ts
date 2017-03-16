@@ -87,7 +87,7 @@ suite('Node Debug Adapter etc', () => {
             return Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program: PROGRAM }),
-                dc.assertStoppedLocation('debugger statement', { path: PROGRAM, line: DEBUGGER_LINE } )
+                dc.assertStoppedLocation('debugger_statement', { path: PROGRAM, line: DEBUGGER_LINE } )
             ]);
         });
 
@@ -368,6 +368,11 @@ suite('Node Debug Adapter etc', () => {
         }
 
         test('shows async stacks and steps correctly for native async/await', async () => {
+            if (testSetup.compareNodeVersions(process.version, 'v7.6.0') >= 0) {
+                // Skip test if the node version doesn't support native async/await
+                return Promise.resolve();
+            }
+
             const PROGRAM = path.join(DATA_ROOT, 'native-async-await/main.js');
 
             await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true }, { path: PROGRAM, line: 8 });
