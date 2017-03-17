@@ -14,6 +14,7 @@ const nls = require('vscode-nls-dev');
 const cp = require('child_process');
 const del = require('del');
 const fs = require('fs');
+var vsce = require('vsce');
 
 const watchedSources = [
 	'src/**/*',
@@ -92,21 +93,12 @@ function verifyNoLinkedModules() {
 
 gulp.task('verify-no-linked-modules', cb => verifyNoLinkedModules().then(() => cb, cb));
 
-function vsceTask(task) {
-    return cb => {
-        verifyNoLinkedModules().then(() => {
-            const cmd = cp.spawn('./node_modules/.bin/vsce', [ task ], { stdio: 'inherit' });
-            cmd.on('close', code => {
-                log(`vsce exited with ${code}`);
-                cb(code);
-            });
-        },
-        cb);
-    }
-}
-
-gulp.task('vsce-publish', vsceTask('publish'));
-gulp.task('vsce-package', vsceTask('package'));
+gulp.task('vsce-publish', function () {
+    return vsce.publish();
+});
+gulp.task('vsce-package', function () {
+    return vsce.createVSIX();
+});
 
 gulp.task('publish', function(callback) {
 	runSequence('build', 'add-i18n', 'vsce-publish', callback);
