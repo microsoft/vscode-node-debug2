@@ -181,12 +181,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     protected commonArgs(args: ICommonRequestArgs): void {
-        super.commonArgs(args);
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         fixNodeInternalsSkipFiles(args);
-        args.showAsyncStacks = true;
+        args.showAsyncStacks = typeof args.showAsyncStacks === 'undefined' || args.showAsyncStacks;
 
         this._restartMode = args.restart;
+        super.commonArgs(args);
     }
 
     protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {
