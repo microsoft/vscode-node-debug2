@@ -419,6 +419,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }, 50);
     }
 
+    protected threadName(): string {
+        return `Node (${this._nodeProcessId})`;
+    }
+
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
