@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent, telemetry} from 'vscode-chrome-debug-core';
 import Crdp from 'chrome-remote-debug-protocol';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
@@ -466,14 +466,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     logger.log('Exception evaluating `process.pid`: ' + description + '. Will try again later.');
                 }
             } else {
-                const value = response.result.value;
+                const [pid, version, arch] = response.result.value;
                 if (this._pollForNodeProcess) {
-                    this._nodeProcessId = value[0];
+                    this._nodeProcessId = pid;
                     this.startPollingForNodeTermination();
                 }
 
                 this._loggedTargetVersion = true;
-                logger.log(`Target node version: ${value[1]} ${value[2]}`);
+                logger.log(`Target node version: ${version} ${arch}`);
+                telemetry.reportEvent('nodeVersion', version);
             }
         },
         error => logger.error('Error evaluating `process.pid`: ' + error.message));
