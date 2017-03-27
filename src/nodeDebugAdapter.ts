@@ -478,7 +478,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
                 this._loggedTargetVersion = true;
                 logger.log(`Target node version: ${version} ${arch}`);
-                telemetry.reportEvent('nodeVersion', version);
+                telemetry.reportEvent('nodeVersion', { version });
             }
         },
         error => logger.error('Error evaluating `process.pid`: ' + error.message));
