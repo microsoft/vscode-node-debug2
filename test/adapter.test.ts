@@ -307,7 +307,7 @@ suite('Node Debug Adapter etc', () => {
         test('returns all scripts', async () => {
             const PROGRAM = path.join(DATA_ROOT, 'simple-eval/index.js');
             await dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 3 });
-            const { loadedScripts } = await dc.getLoadScripts();
+            const { loadedScripts } = await dc.getLoadedScripts();
 
             assert(!!loadedScripts);
             assert(loadedScripts.length > 10);

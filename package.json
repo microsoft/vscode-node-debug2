@@ -36,7 +36,7 @@
     "typescript": "^2.1.4",
     "vsce": "^1.14.0",
     "vscode": "^1.0.0",
-    "vscode-chrome-debug-core-testsupport": "^3.14.0",
+    "vscode-chrome-debug-core-testsupport": "^3.14.3",
     "vscode-debugadapter-testsupport": "^1.15.0-pre.0",
     "vscode-nls-dev": "^2.0.0-beta.1"
   },
