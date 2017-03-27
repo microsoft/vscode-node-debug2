@@ -113,9 +113,9 @@
       "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.14.11.tgz"
     },
     "vscode-debugadapter": {
-      "version": "1.18.0-pre.4",
-      "from": "vscode-debugadapter@1.18.0-pre.4",
-      "resolved": "https://registry.npmjs.org/vscode-debugadapter/-/vscode-debugadapter-1.18.0-pre.4.tgz"
+      "version": "1.18.0-pre.5",
+      "from": "vscode-debugadapter@1.18.0-pre.5",
+      "resolved": "https://registry.npmjs.org/vscode-debugadapter/-/vscode-debugadapter-1.18.0-pre.5.tgz"
     },
     "vscode-debugprotocol": {
       "version": "1.18.0-pre.2",
