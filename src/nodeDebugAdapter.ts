@@ -585,7 +585,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * If displayPath starts with the NODE_INTERNALS indicator, strip it.
      */
     protected displayPathToRealPath(displayPath: string): string {
-        const match = displayPath.match(new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}/(.*)`));
+        const match = displayPath.match(new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}[\\\\/](.*)`));
         return match ? match[1] : displayPath;
     }
 }
