@@ -4,6 +4,7 @@ function log() {
     console.log('Hello, world!');
     test();
 }
+
 log();
 setInterval(log, 3000);
 

@@ -3,49 +3,84 @@
     "configurations": [
         {
             "debugServer": 4712,
-            "name": "Launch",
+            "name": "Launch Eval",
             "type": "node",
             "protocol": "inspector",
             "request": "launch",
-            "program": "${workspaceRoot}/out/app.js",
+            "program": "${workspaceRoot}/out/eval.js",
             "cwd": "${workspaceRoot}",
-            "skipFiles": [
-                "app2.ts",
-                "<node_internals>/*.js"
-            ],
-            // "diagnosticLogging": true,
-            "trace": true,
+            "outFiles": ["${workspaceRoot}/out/**/*.js"]
+        },
+        {
+            "name": "Launch Async/await",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v7.7.1/bin/node",
+            "program": "${workspaceRoot}/async/app.js",
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "name": "Launch Promise",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/out/async/promise.js",
+            "cwd": "${workspaceRoot}",
             "smartStep": true,
+            "outFiles": [
+                "${workspaceRoot}/out/**/*.js"
+            ]
+        },
+        {
+            "debugServer": 4712,
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "name": "Launch Program",
+            "program": "${workspaceRoot}/out/app.js",
             "outFiles": ["${workspaceRoot}/out/**/*.js"]
         },
         {
             "name": "Attach",
-            "type": "node2",
+            "type": "node",
             "request": "attach",
             "port": 9229,
             "address": "localhost",
             // "sourceMaps": true,
-            "outDir": "${workspaceRoot}/out",
+            "outFiles": [ "${workspaceRoot}/out/**/*.js" ],
             // "localRoot": "${workspaceRoot}",
             // "remoteRoot": "/Users/roblou/Downloads/testapp",
-            "trace": "all",
+            // "trace": "all"
             // "verboseDiagnosticLogging": true
             // "restart": true
         },
         {
             "debugServer": 4712,
             "name": "Attach remote",
-            "type": "node2",
+            "type": "node",
+            "showAsyncStacks": true,
             "request": "attach",
-            "address": "10.0.1.2",
+            "protocol": "inspector",
             "port": 9229,
-            "outFiles": [
-                "${workspaceRoot}/out/**/*.js"
-            ],
-            "diagnosticLogging": true,
             "localRoot": "${workspaceRoot}",
-            "remoteRoot": "/Users/roblou/code/vscode-node-debug2/testapp"
-            // "remoteRoot": "C:\\Users\\roblou\\code\\vscode-node-cdp-debug\\testapp\\out"
+            "remoteRoot": "/Users/roblou/tmp/remote-debug"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "nodemon",
+            "protocol": "inspector",
+            "runtimeExecutable": "nodemon",
+            "runtimeArgs": [
+                "--debug=5858"
+            ],
+            "program": "${workspaceRoot}/out/app.js",
+            "restart": true,
+            "port": 5858,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "outFiles": [ "${workspaceRoot}/out/**/*.js" ]
         }
     ]
 }
