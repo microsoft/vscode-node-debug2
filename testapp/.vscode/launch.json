@@ -2,6 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            // "debugServer": 4712,
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "name": "Launch Program",
+            "program": "${workspaceRoot}/out/app.js",
+            "outFiles": ["${workspaceRoot}/out/**/*.js"]
+        },
+        {
             "debugServer": 4712,
             "name": "Launch Eval",
             "type": "node",
@@ -31,15 +40,6 @@
             "outFiles": [
                 "${workspaceRoot}/out/**/*.js"
             ]
-        },
-        {
-            "debugServer": 4712,
-            "type": "node",
-            "request": "launch",
-            "protocol": "inspector",
-            "name": "Launch Program",
-            "program": "${workspaceRoot}/out/app.js",
-            "outFiles": ["${workspaceRoot}/out/**/*.js"]
         },
         {
             "name": "Attach",
