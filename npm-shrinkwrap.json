@@ -117,11 +117,6 @@
       "from": "vscode-debugadapter@1.18.0-pre.5",
       "resolved": "https://registry.npmjs.org/vscode-debugadapter/-/vscode-debugadapter-1.18.0-pre.5.tgz"
     },
-    "vscode-debugprotocol": {
-      "version": "1.18.0-pre.2",
-      "from": "vscode-debugprotocol@1.18.0-pre.2",
-      "resolved": "https://registry.npmjs.org/vscode-debugprotocol/-/vscode-debugprotocol-1.18.0-pre.2.tgz"
-    },
     "vscode-nls": {
       "version": "1.0.7",
       "from": "vscode-nls@>=1.0.4 <2.0.0",
