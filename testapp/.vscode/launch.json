@@ -2,13 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // "debugServer": 4712,
+            "debugServer": 4712,
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
             "name": "Launch Program",
             "program": "${workspaceRoot}/out/app.js",
-            "outFiles": ["${workspaceRoot}/out/**/*.js"]
+            "outFiles": ["${workspaceRoot}/out/**/*.js"],
+            "trace": true
+        },
+        {
+            "debugServer": 4712,
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program nodemon",
+            "runtimeArgs": [
+                "${workspaceRoot}/node_modules/nodemon/bin/nodemon.js",
+                "--inspect=12346"
+            ],
+            "program": "${workspaceRoot}/out/app.js",
+            "protocol": "inspector",
+            "restart": true,
+            "port": 12346
         },
         {
             "debugServer": 4712,
