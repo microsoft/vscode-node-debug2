@@ -130,7 +130,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             const programArgs = args.args || [];
 
             let launchArgs = [runtimeExecutable];
-            if (!args.noDebug) {
+            if (!args.noDebug && !args.port) {
                 launchArgs.push(`--inspect=${port}`);
 
                 // Always stop on entry to set breakpoints
