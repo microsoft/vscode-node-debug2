@@ -137,7 +137,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 launchArgs.push(`--inspect=${port}`);
 
                 // Always stop on entry to set breakpoints
-                launchArgs.push('--debug-brk');
+                launchArgs.push('--inspect-brk');
             }
 
             this._continueAfterConfigDone = !args.stopOnEntry;
