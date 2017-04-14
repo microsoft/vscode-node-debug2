@@ -34,17 +34,6 @@ export function random(low: number, high: number): number {
     return Math.floor(Math.random() * (high - low) + low);
 }
 
-/**
- * Placeholder localize function
- */
-export function localize(id: string, msg: string, ...args: any[]): string {
-    args.forEach((arg, i) => {
-        msg = msg.replace(new RegExp(`\\{${i}\\}`, 'g'), arg);
-    });
-
-    return msg;
-}
-
 export function killTree(processId: number): void {
     if (process.platform === 'win32') {
         const TASK_KILL = 'C:\\Windows\\System32\\taskkill.exe';

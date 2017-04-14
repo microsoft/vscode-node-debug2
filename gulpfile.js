@@ -30,12 +30,22 @@ const lintSources = [
 ].map(function(tsFolder) { return tsFolder + '/**/*.ts'; });
 
 const tsProject = ts.createProject('tsconfig.json', { typescript });
-gulp.task('build', ['copy-scripts'], function () {
+function doBuild(buildNls) {
     return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(tsProject()).js
+        .pipe(buildNls ? nls.rewriteLocalizeCalls() : es.through())
+        .pipe(buildNls ? nls.createAdditionalLanguageFiles(nls.coreLanguages, 'i18n', 'out') : es.through())
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '..' })) // .. to compensate for TS returning paths from 'out'
         .pipe(gulp.dest('out'));
+}
+
+gulp.task('build', ['copy-scripts'], function () {
+    doBuild(true);
+});
+
+gulp.task('dev-build', ['copy-scripts'], function () {
+    doBuild(false);
 });
 
 gulp.task('copy-scripts', () => {
@@ -43,9 +53,9 @@ gulp.task('copy-scripts', () => {
         .pipe(gulp.dest('out'));
 });
 
-gulp.task('watch', ['build'], function(cb) {
+gulp.task('watch', ['dev-build'], function(cb) {
     log('Watching build sources...');
-    return gulp.watch(watchedSources, ['build']);
+    return gulp.watch(watchedSources, ['dev-build']);
 });
 
 gulp.task('default', ['build']);

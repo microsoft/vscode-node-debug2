@@ -14,8 +14,10 @@ import * as cp from 'child_process';
 import {ILaunchRequestArguments, IAttachRequestArguments, ICommonRequestArgs} from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
-import {localize} from './utils';
 import * as errors from './errors';
+
+import * as nls from 'vscode-nls';
+const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
     'webpack:///./*': '${cwd}/*',
