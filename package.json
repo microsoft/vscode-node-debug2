@@ -24,6 +24,7 @@
     "@types/source-map": "^0.1.27",
     "chrome-remote-debug-protocol": "^1.1.20160822",
     "del": "^2.2.2",
+    "event-stream": "^3.3.4",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^2.2.0",
     "gulp-tslint": "^6.1.2",

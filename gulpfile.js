@@ -14,7 +14,8 @@ const nls = require('vscode-nls-dev');
 const cp = require('child_process');
 const del = require('del');
 const fs = require('fs');
-var vsce = require('vsce');
+const vsce = require('vsce');
+const es = require('event-stream');
 
 const watchedSources = [
 	'src/**/*',
