@@ -257,9 +257,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             };
             nodeProcess.stderr.on('data', onStderr);
 
-            // If only running, use stdout/stderr instead of debug protocol logs
+            // Must attach a listener to stdout or process will hang on Windows
             nodeProcess.stdout.on('data', (data: string) => {
-                // Must attach a listener to stdout or process will hang on Windows
+                // If only running, use stdout/stderr instead of debug protocol logs
                 if (noDebugMode) {
                     let msg = data.toString();
                     this._session.sendEvent(new OutputEvent(msg, 'stdout'));
