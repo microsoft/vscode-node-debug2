@@ -95,7 +95,14 @@
     "request-light": {
       "version": "0.1.0",
       "from": "request-light@>=0.1.0 <0.2.0",
-      "resolved": "https://registry.npmjs.org/request-light/-/request-light-0.1.0.tgz"
+      "resolved": "https://registry.npmjs.org/request-light/-/request-light-0.1.0.tgz",
+      "dependencies": {
+        "vscode-nls": {
+          "version": "1.0.7",
+          "from": "vscode-nls@>=1.0.4 <2.0.0",
+          "resolved": "https://registry.npmjs.org/vscode-nls/-/vscode-nls-1.0.7.tgz"
+        }
+      }
     },
     "source-map": {
       "version": "0.5.6",
