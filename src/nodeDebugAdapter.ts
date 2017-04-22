@@ -2,8 +2,9 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent, telemetry} from 'vscode-chrome-debug-core';
-import Crdp from 'chrome-remote-debug-protocol';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent, telemetry as CoreTelemetry, ISetBreakpointResult, Crdp} from 'vscode-chrome-debug-core';
+const telemetry = CoreTelemetry.telemetry;
+
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {OutputEvent} from 'vscode-debugadapter';
 
@@ -434,7 +435,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
-    protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<Crdp.Debugger.SetBreakpointResponse[]> {
+    protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
         return super.addBreakpoints(url, breakpoints).then(responses => {
             if (this._entryPauseEvent && !this._finishedConfig) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;

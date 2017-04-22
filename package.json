@@ -22,7 +22,6 @@
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.52",
     "@types/source-map": "^0.1.27",
-    "chrome-remote-debug-protocol": "^1.1.20160822",
     "del": "^2.2.2",
     "event-stream": "^3.3.4",
     "gulp": "^3.9.1",
