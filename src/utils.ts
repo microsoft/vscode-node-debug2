@@ -95,3 +95,10 @@ export function extendObject<T>(toObject: T, fromObject: T): T {
 
     return toObject;
 }
+
+export function stripBOM(s: string): string {
+    if (s && s[0] === '\uFEFF') {
+        s = s.substr(1);
+    }
+    return s;
+}
