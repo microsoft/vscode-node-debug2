@@ -195,12 +195,18 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.commonArgs(args);
     }
 
-    protected doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<void> {
-        return super.doAttach(port, targetUrl, address, timeout)
-            .then(() => {
-                this.beginWaitingForDebuggerPaused();
-                this.getNodeProcessDetailsIfNeeded();
-            });
+    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<any> {
+        await super.doAttach(port, targetUrl, address, timeout);
+        this.beginWaitingForDebuggerPaused();
+        this.getNodeProcessDetailsIfNeeded();
+
+        const supportsStepBack = await this.supportsStepBack();
+        return { supportsStepBack };
+    }
+
+    private async supportsStepBack(): Promise<boolean> {
+        const { domains } = await this.chrome.Schema.getDomains();
+        return !!domains.find(d => d.name === 'TimeTravel');
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
