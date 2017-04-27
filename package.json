@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2",
-  "version": "1.12.3",
+  "version": "1.12.4",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.svg",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "3.15.2",
+    "vscode-chrome-debug-core": "3.15.3",
     "vscode-debugadapter": "^1.19.0-pre.0",
     "vscode-nls": "^2.0.2"
   },
