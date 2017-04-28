@@ -205,8 +205,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private async supportsStepBack(): Promise<boolean> {
-        const { domains } = await this.chrome.Schema.getDomains();
-        return !!domains.find(d => d.name === 'TimeTravel');
+        try {
+            const { domains } = await this.chrome.Schema.getDomains();
+            return !!domains.find(d => d.name === 'TimeTravel');
+        } catch (e) {
+            // API not supported by runtime
+            return Promise.resolve(false);
+        }
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
