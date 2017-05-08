@@ -34,6 +34,12 @@ async function foo(): Promise<void> {
 }
 
 async function locals() {
+    function consoleDotLog(m) {
+        console.log(m)
+    }
+
+    Promise.resolve().then(() => consoleDotLog('handler 1')).then(() => consoleDotLog('handler 2'));
+
     await foo();
     const veryLargeArray = [];
     veryLargeArray['blah'] = 5;
