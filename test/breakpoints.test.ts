@@ -361,7 +361,7 @@ suite('Breakpoints', () => {
             return dc.hitBreakpoint({
                 program: TS_SOURCE,
                 sourceMaps: true,
-                outFiles: [ path.join(DATA_ROOT, '**/*.js') ],
+                outFiles: [ path.join(DATA_ROOT, 'webpack/**/*.js') ],
                 cwd: path.join(DATA_ROOT, 'webpack'),
                 runtimeArgs: [ '--nolazy' ]
             }, {
