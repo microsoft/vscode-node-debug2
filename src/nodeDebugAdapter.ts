@@ -136,11 +136,22 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             const programArgs = args.args || [];
 
             let launchArgs = [runtimeExecutable];
+            let majorVersion = 7;
+            try {
+                const version = cp.execFileSync(runtimeExecutable, ['--version'], {encoding: "utf8"}).trim().slice(1);
+                majorVersion = Number(version.split('.').shift());
+            } catch (e) {
+                logger.log('Could not detect runtimeExecutable version assuming ' + majorVersion);
+            }
             if (!args.noDebug && !args.port) {
-                launchArgs.push(`--inspect=${port}`);
+                if (majorVersion < 8) {
+                    launchArgs.push(`--inspect=${port}`);
 
-                // Always stop on entry to set breakpoints
-                launchArgs.push('--debug-brk');
+                    // Always stop on entry to set breakpoints
+                    launchArgs.push('--debug-brk');
+                } else {
+                    launchArgs.push(`--inspect-brk=${port}`);
+                }
             }
 
             this._continueAfterConfigDone = !args.stopOnEntry;
