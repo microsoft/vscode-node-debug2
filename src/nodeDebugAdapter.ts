@@ -30,6 +30,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
+    private static DEBUG_BRK_DEP_MSG = /\(node:\d+\) \[DEP0062\] DeprecationWarning: `node --inspect --debug-brk` is deprecated\. Please use `node --inspect-brk` instead\.\s*/;
+
     public static NODE_INTERNALS = '<node_internals>';
 
     private _loggedTargetVersion: boolean;
@@ -254,20 +256,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             const noDebugMode = (<ILaunchRequestArguments>this._launchAttachArgs).noDebug;
 
-            // Listen to stderr at least until the debugger is attached
-            const onStderr = (data: string) => {
-                let msg = data.toString();
-
-                // Chop off the Chrome-specific debug URL message
-                const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
-                if (chromeMsgIndex >= 0) {
-                    msg = msg.substr(0, chromeMsgIndex);
-                    nodeProcess.stderr.removeListener('data', onStderr);
-                }
-
-                this._session.sendEvent(new OutputEvent(msg, 'stderr'));
-            };
-            nodeProcess.stderr.on('data', onStderr);
+            this.captureStderr(nodeProcess, noDebugMode);
 
             // Must attach a listener to stdout or process will hang on Windows
             nodeProcess.stdout.on('data', (data: string) => {
@@ -280,6 +269,54 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             resolve();
          });
+    }
+
+    private captureStderr(nodeProcess: cp.ChildProcess, noDebugMode: boolean): void {
+        let handlingEarlyNodeMsgs = true;
+
+        nodeProcess.stderr.on('data', (data: string) => {
+            let msg = data.toString();
+            let isLastEarlyNodeMsg = false;
+
+            // There are some messages printed to stderr at the start of debugging that can be misleading.
+            // Node is "handlingEarlyNodeMsgs" from launch to when one of these messages is printed:
+            //   "To start debugging, open the following URL in Chrome: ..." - Node <8
+            //   --debug-brk deprecation message - Node 8+
+            // In this mode, we strip those messages from stderr output. After one of them is printed, we don't
+            // watch stderr anymore and pass it along (unless in noDebugMode)
+            if (handlingEarlyNodeMsgs && !noDebugMode) {
+                const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
+                if (chromeMsgIndex >= 0) {
+                    msg = msg.substr(0, chromeMsgIndex);
+                    isLastEarlyNodeMsg = true;
+                }
+
+
+                const msgMatch = msg.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG);
+                if (msgMatch) {
+                    isLastEarlyNodeMsg = true;
+                    msg = msg.replace(NodeDebugAdapter.DEBUG_BRK_DEP_MSG, '');
+                }
+
+                const helpMsg = /For help see https:\/\/nodejs.org\/en\/docs\/inspector\s*/;
+                msg = msg.replace(helpMsg, '');
+            }
+
+            if (handlingEarlyNodeMsgs || noDebugMode) {
+                this._session.sendEvent(new OutputEvent(msg, 'stderr'));
+            }
+
+            if (isLastEarlyNodeMsg) {
+                handlingEarlyNodeMsgs = false;
+            }
+        });
+    }
+
+    protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
+        // Strip the --debug-brk deprecation message which is printed at startup
+        if (!params.args || params.args.length !== 1 || !params.args[0].value || !params.args[0].value.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG)) {
+            super.onConsoleAPICalled(params);
+        }
     }
 
     private collectEnvFileArgs(args: ILaunchRequestArguments): any {
