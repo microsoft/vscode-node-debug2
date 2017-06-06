@@ -314,7 +314,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
         // Strip the --debug-brk deprecation message which is printed at startup
-        if (!params.args || params.args.length !== 1 || !params.args[0].value || !params.args[0].value.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG)) {
+        if (!params.args || params.args.length !== 1 || typeof params.args[0].value !== 'string' || !params.args[0].value.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG)) {
             super.onConsoleAPICalled(params);
         }
     }
