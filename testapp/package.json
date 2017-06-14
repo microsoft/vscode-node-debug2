@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {},
   "devDependencies": {
+    "nodemon": "^1.11.0",
     "typescript": "^2.2.1"
   },
   "scripts": {
