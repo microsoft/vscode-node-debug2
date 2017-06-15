@@ -31,7 +31,10 @@ const vscodeLanguages = [
     'fr',
     'es',
     'ru',
-    'it'
+    'it',
+    'pt-br',
+    'hu',
+    'tr'
 ];
 
 const watchedSources = [
