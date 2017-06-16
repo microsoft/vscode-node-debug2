@@ -159,7 +159,8 @@ suite('Node Debug Adapter etc', () => {
                 .then(() => dc.evaluateRequest({ expression: 'x = {a: 1, b: [1], c: {a: 1}}' }))
                 .then(response => {
                     assert(response.success);
-                    assert.equal(response.body.result, 'Object {a: 1, b: Array[1], c: Object}');
+                    assert(response.body.result === 'Object {a: 1, b: Array(1), c: Object}' ||
+                        response.body.result === 'Object {a: 1, b: Array[1], c: Object}');
                     assert(response.body.variablesReference > 0);
                 });
         });
@@ -169,7 +170,8 @@ suite('Node Debug Adapter etc', () => {
                 .then(() => dc.evaluateRequest({ expression: '[1, [1], {a: 3}]' }))
                 .then(response => {
                     assert(response.success);
-                    assert.equal(response.body.result, 'Array[3] [1, Array[1], Object]');
+                    assert(response.body.result === 'Array[3] [1, Array[1], Object]' ||
+                        response.body.result === 'Array(3) [1, Array(1), Object]');
                     assert(response.body.variablesReference > 0);
                 });
         });
@@ -368,7 +370,7 @@ suite('Node Debug Adapter etc', () => {
         }
 
         test('shows async stacks and steps correctly for native async/await', async () => {
-            if (testSetup.compareNodeVersions(process.version, 'v7.6.0') >= 0) {
+            if (testSetup.compareSemver(process.version, 'v7.6.0') >= 0) {
                 // Skip test if the node version doesn't support native async/await
                 return Promise.resolve();
             }

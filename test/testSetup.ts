@@ -34,8 +34,8 @@ export const lowercaseDriveLetterDirname = __dirname.charAt(0).toLowerCase() + _
 export const PROJECT_ROOT = path.join(lowercaseDriveLetterDirname, '../../');
 export const DATA_ROOT = path.join(PROJECT_ROOT, 'testdata/');
 
-const nodeVersionRegex = /v?(\d+)\.(\d+)\.(\d+)/;
-export function compareNodeVersions(a: string, b: string): number {
+const semverRegex = /v?(\d+)\.(\d+)\.(\d+)/;
+export function compareSemver(a: string, b: string): number {
     const aNum = versionStringToNumber(a);
     const bNum = versionStringToNumber(b);
 
@@ -43,7 +43,7 @@ export function compareNodeVersions(a: string, b: string): number {
 }
 
 function versionStringToNumber(str: string): number {
-    const match = str.match(nodeVersionRegex);
+    const match = str.match(semverRegex);
     if (!match) {
         throw new Error('Invalid node version string: ' + str);
     }
