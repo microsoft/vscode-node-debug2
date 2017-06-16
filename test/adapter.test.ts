@@ -362,15 +362,23 @@ suite('Node Debug Adapter etc', () => {
             assertAsyncLabelCount(await dc.stackTraceRequest(), 4);
         });
 
-        async function stepOverNativeAwait(fromLine: number, toLine = fromLine + 1) {
-            await dc.nextTo('step', { line: fromLine });
-            await dc.nextTo('step', { line: fromLine });
+        async function stepOverNativeAwait(fromLine: number, afterBp = false) {
+            const toLine = fromLine + 1;
+
+            if (testSetup.compareSemver(process.version, 'v8.0.0') < 0) {
+                // In pre-8, must always step twice over await lines
+                await dc.nextTo('step', { line: fromLine });
+                await dc.nextTo('step', { line: fromLine });
+            } else if (!afterBp) {
+                // In 8, must step an extra time if a BP on this line didn't cause the break
+                await dc.nextTo('step', { line: fromLine });
+            }
 
             await dc.nextTo('step', { line: toLine });
         }
 
         test('shows async stacks and steps correctly for native async/await', async () => {
-            if (testSetup.compareSemver(process.version, 'v7.6.0') >= 0) {
+            if (testSetup.compareSemver(process.version, 'v7.6.0') < 0) {
                 // Skip test if the node version doesn't support native async/await
                 return Promise.resolve();
             }
@@ -379,7 +387,7 @@ suite('Node Debug Adapter etc', () => {
 
             await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true }, { path: PROGRAM, line: 8 });
 
-            await stepOverNativeAwait(8);
+            await stepOverNativeAwait(8, /*afterBp=*/true);
             let stackTrace = await dc.stepInTo('step', { line: 13 });
             assertStackFrame(stackTrace, 3, PROGRAM, 7);
             assertStackFrame(stackTrace, 4, PROGRAM, 40);

@@ -39,7 +39,7 @@ export function compareSemver(a: string, b: string): number {
     const aNum = versionStringToNumber(a);
     const bNum = versionStringToNumber(b);
 
-    return bNum - aNum;
+    return aNum - bNum;
 }
 
 function versionStringToNumber(str: string): number {
