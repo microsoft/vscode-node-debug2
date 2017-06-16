@@ -14,6 +14,12 @@ function patchLaunchArgs(launchArgs: any): void {
     if (process.version.startsWith('v6.2')) {
         launchArgs.runtimeExecutable = NIGHTLY_NAME;
     }
+
+    if (!launchArgs.port) {
+        launchArgs.port = 9229;
+        launchArgs.runtimeArgs = launchArgs.runtimeArgs || [];
+        launchArgs.runtimeArgs.push(`--inspect=${launchArgs.port}`, '--debug-brk');
+    }
 }
 
 export function setup(port?: number) {
