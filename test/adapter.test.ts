@@ -58,8 +58,7 @@ suite('Node Debug Adapter etc', () => {
     });
 
     suite('launch', () => {
-		// #11
-        test.skip('should run program to the end', () => {
+        test('should run program to the end', () => {
             const PROGRAM = path.join(DATA_ROOT, 'program.js');
 
             return Promise.all([
