@@ -197,6 +197,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         super.commonArgs(args);
     }
 
+    protected hookConnectionEvents(): void {
+        super.hookConnectionEvents();
+
+        this.chrome.Runtime.onExecutionContextDestroyed(params => {
+            if (params.executionContextId === 1) {
+                this.terminateSession('Program ended');
+            }
+        });
+    }
+
     protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<any> {
         await super.doAttach(port, targetUrl, address, timeout);
         this.beginWaitingForDebuggerPaused();
