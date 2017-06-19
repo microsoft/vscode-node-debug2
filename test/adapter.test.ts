@@ -59,6 +59,11 @@ suite('Node Debug Adapter etc', () => {
 
     suite('launch', () => {
         test('should run program to the end', () => {
+            if (testSetup.compareSemver(process.version, 'v8.0.0') < 0) {
+                // Skip test if the node version doesn't emit the Runtime.executionContextDestroyed event
+                return Promise.resolve();
+            }
+
             const PROGRAM = path.join(DATA_ROOT, 'program.js');
 
             return Promise.all([
