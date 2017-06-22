@@ -56,8 +56,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.initialize(args);
     }
 
-    public launch(args: ILaunchRequestArguments): Promise<void> {
-        super.launch(args);
+    public async launch(args: ILaunchRequestArguments): Promise<void> {
+        if (args.__restart && typeof args.__restart.port === 'number') {
+            args.port = args.__restart.port;
+            return this.attach(<IAttachRequestArguments>args);
+        }
+
+        await super.launch(args);
 
         const port = args.port || utils.random(3000, 50000);
 
@@ -177,15 +182,17 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    public attach(args: IAttachRequestArguments): Promise<void> {
-        return super.attach(args).catch(err => {
+    public async attach(args: IAttachRequestArguments): Promise<void> {
+        try {
+            await super.attach(args)
+        } catch(err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
                 err.format = 'Ensure Node was launched with --inspect. ' + err.format;
             }
 
-            return Promise.reject(err);
-        });
+            throw err;
+        };
     }
 
     protected commonArgs(args: ICommonRequestArgs): void {
@@ -393,9 +400,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public terminateSession(reason: string): void {
-        const requestRestart = this._restartMode && !this._inShutdown;
+        const restartArgs = this._restartMode && !this._inShutdown ? { port: this._port } : undefined;
         this.killNodeProcess();
-        super.terminateSession(reason, requestRestart);
+        super.terminateSession(reason, restartArgs);
     }
 
     protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: stoppedEvent.ReasonType): void {
