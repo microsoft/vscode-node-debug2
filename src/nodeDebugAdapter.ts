@@ -43,6 +43,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _entryPauseEvent: Crdp.Debugger.PausedEvent;
     private _waitingForEntryPauseEvent = true;
     private _finishedConfig = false;
+    private _handlingEarlyNodeMsgs = true;
 
     private _supportsRunInTerminalRequest: boolean;
     private _restartMode: boolean;
@@ -289,25 +290,23 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private captureStderr(nodeProcess: cp.ChildProcess, noDebugMode: boolean): void {
-        let handlingEarlyNodeMsgs = true;
-
         nodeProcess.stderr.on('data', (data: string) => {
             let msg = data.toString();
             let isLastEarlyNodeMsg = false;
 
-            // There are some messages printed to stderr at the start of debugging that can be misleading.
+            // We want to send initial stderr output back to the console because they can contain useful errors.
+            // But there are some messages printed to stderr at the start of debugging that can be misleading.
             // Node is "handlingEarlyNodeMsgs" from launch to when one of these messages is printed:
             //   "To start debugging, open the following URL in Chrome: ..." - Node <8
             //   --debug-brk deprecation message - Node 8+
             // In this mode, we strip those messages from stderr output. After one of them is printed, we don't
-            // watch stderr anymore and pass it along (unless in noDebugMode)
-            if (handlingEarlyNodeMsgs && !noDebugMode) {
+            // watch stderr anymore and pass it along (unless in noDebugMode).
+            if (this._handlingEarlyNodeMsgs && !noDebugMode) {
                 const chromeMsgIndex = msg.indexOf('To start debugging, open the following URL in Chrome:');
                 if (chromeMsgIndex >= 0) {
                     msg = msg.substr(0, chromeMsgIndex);
                     isLastEarlyNodeMsg = true;
                 }
-
 
                 const msgMatch = msg.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG);
                 if (msgMatch) {
@@ -319,17 +318,20 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 msg = msg.replace(helpMsg, '');
             }
 
-            if (handlingEarlyNodeMsgs || noDebugMode) {
+            if (this._handlingEarlyNodeMsgs || noDebugMode) {
                 this._session.sendEvent(new OutputEvent(msg, 'stderr'));
             }
 
             if (isLastEarlyNodeMsg) {
-                handlingEarlyNodeMsgs = false;
+                this._handlingEarlyNodeMsgs = false;
             }
         });
     }
 
     protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
+        // Once any console API message is received, we are done listening to initial stderr output
+        this._handlingEarlyNodeMsgs = false;
+
         // Strip the --debug-brk deprecation message which is printed at startup
         if (!params.args || params.args.length !== 1 || typeof params.args[0].value !== 'string' || !params.args[0].value.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG)) {
             super.onConsoleAPICalled(params);
