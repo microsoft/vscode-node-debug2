@@ -58,12 +58,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
-        if (args.__restart && typeof args.__restart.port === 'number') {
-            args.port = args.__restart.port;
-            return this.attach(<IAttachRequestArguments>args);
-        }
-
         await super.launch(args);
+
+        if (args.__restart && typeof args.__restart.port === 'number') {
+            return this.doAttach(args.__restart.port, undefined, args.address, args.timeout);
+        }
 
         const port = args.port || utils.random(3000, 50000);
 
