@@ -73,8 +73,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 if (!pathUtils.isOnPath(runtimeExecutable)) {
                     return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
                 }
-            } else if (!fs.existsSync(runtimeExecutable)) {
-                return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
+            } else {
+                const re = pathUtils.findExecutable(runtimeExecutable);
+                if (!re) {
+                    return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
+                }
+
+                runtimeExecutable = re;
             }
         } else {
             if (!utils.isOnPath(NodeDebugAdapter.NODE)) {
