@@ -1,6 +1,6 @@
 {
   "name": "node-debug2",
-  "version": "1.14.0",
+  "version": "1.14.3",
   "lockfileVersion": 1,
   "dependencies": {
     "@gulp-sourcemaps/identity-map": {
@@ -3047,8 +3047,9 @@
       }
     },
     "vscode-chrome-debug-core": {
-      "version": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.15.8.tgz",
-      "integrity": "sha1-vpiXF7yu4Nx7Cyl77w4DwDGFecE="
+      "version": "3.15.9",
+      "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.15.9.tgz",
+      "integrity": "sha1-iAq/RazmrrXuEnUyJR2Mx9VD1hg="
     },
     "vscode-chrome-debug-core-testsupport": {
       "version": "3.14.5",
