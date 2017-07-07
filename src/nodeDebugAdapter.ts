@@ -177,7 +177,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 .then(() => {
                     return args.noDebug ?
                         Promise.resolve() :
-                        this.doAttach(port, undefined, args.address, args.timeout);
+                        this.doAttach(port, undefined, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
                 });
         });
     }
@@ -214,8 +214,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number): Promise<any> {
-        await super.doAttach(port, targetUrl, address, timeout);
+    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<any> {
+        await super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort);
         this.beginWaitingForDebuggerPaused();
         this.getNodeProcessDetailsIfNeeded();
 
