@@ -42,9 +42,6 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
     /** Logging options */
     diagnosticLogging?: boolean;
     verboseDiagnosticLogging?: boolean;
-
-    /** Private undocumented property to multiplex the CRDP connection into an additional channel */
-    extraCRDPChannelPort?: number;
 }
 
 /**
