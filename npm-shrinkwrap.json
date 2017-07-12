@@ -472,7 +472,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -1029,7 +1029,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -1159,7 +1159,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -1271,7 +1271,7 @@
             "readable-stream": {
               "version": "2.2.11",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-              "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+              "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
               "dev": true
             },
             "string_decoder": {
@@ -1321,7 +1321,7 @@
             "readable-stream": {
               "version": "2.2.11",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-              "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+              "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
               "dev": true
             },
             "string_decoder": {
@@ -1383,7 +1383,7 @@
             "readable-stream": {
               "version": "2.2.11",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-              "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+              "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
               "dev": true
             },
             "string_decoder": {
@@ -1784,7 +1784,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -1984,7 +1984,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -2637,7 +2637,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -2737,7 +2737,7 @@
         "readable-stream": {
           "version": "2.2.11",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -3048,9 +3048,9 @@
       }
     },
     "vscode-chrome-debug-core": {
-      "version": "3.15.9",
-      "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.15.9.tgz",
-      "integrity": "sha1-iAq/RazmrrXuEnUyJR2Mx9VD1hg="
+      "version": "3.15.10",
+      "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.15.10.tgz",
+      "integrity": "sha1-AFecIpWnv1V/lvF81upIqAwreuY="
     },
     "vscode-chrome-debug-core-testsupport": {
       "version": "3.14.5",
