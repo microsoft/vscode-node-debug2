@@ -5,6 +5,7 @@
 
 import * as assert from 'assert';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -71,6 +72,25 @@ suite('Node Debug Adapter etc', () => {
                 dc.waitForEvent('terminated')
             ]);
         });
+
+        if (process.platform === 'win32') {
+            const bash32bitPath = path.join(process.env.SystemRoot, 'SYSNATIVE', 'bash.exe');
+            const bash64bitPath = path.join(process.env.SystemRoot, 'System32', 'bash.exe');
+            if (fs.existsSync(bash32bitPath) || fs.existsSync(bash64bitPath)) {
+                test('should run program using subsystem linux', () => {
+                    if (testSetup.compareSemver(process.version, 'v8.0.0') < 0) {
+                    return Promise.resolve();
+                    }
+
+                    const PROGRAM = path.join(DATA_ROOT, 'program.js');
+                    return Promise.all([
+                        dc.configurationSequence(),
+                        dc.launch({ program: PROGRAM, useWSL: true }),
+                        dc.waitForEvent('terminated')
+                    ]);
+                });
+            }
+        }
 
         test('should stop on entry', () => {
             const PROGRAM = path.join(DATA_ROOT, 'program.js');
