@@ -398,7 +398,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -868,7 +868,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -977,7 +977,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -1071,7 +1071,7 @@
             },
             "readable-stream": {
               "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-              "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+              "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
               "dev": true
             },
             "string_decoder": {
@@ -1113,7 +1113,7 @@
             },
             "readable-stream": {
               "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-              "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+              "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
               "dev": true
             },
             "string_decoder": {
@@ -1165,7 +1165,7 @@
             },
             "readable-stream": {
               "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-              "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+              "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
               "dev": true
             },
             "string_decoder": {
@@ -1502,7 +1502,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -1669,7 +1669,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -2220,7 +2220,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -2304,7 +2304,7 @@
         },
         "readable-stream": {
           "version": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.11.tgz",
-          "integrity": "sha512-h+8+r3MKEhkiVrwdKL8aWs1oc1VvBu33ueshOvS26RsZQ3Amhx/oO3TKe4lApSV9ueY6as8EAh7mtuFjdlhg9Q==",
+          "integrity": "sha1-B5azH412iAB/8Lk6gIjTSqF8D3I=",
           "dev": true
         },
         "string_decoder": {
@@ -2567,8 +2567,9 @@
       }
     },
     "vscode-chrome-debug-core": {
-      "version": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.16.0.tgz",
-      "integrity": "sha1-OcE0SqVZYrKIK06UOGM2aysBi+o="
+      "version": "3.16.1",
+      "resolved": "https://registry.npmjs.org/vscode-chrome-debug-core/-/vscode-chrome-debug-core-3.16.1.tgz",
+      "integrity": "sha1-17kgzZC/A1ZQYhmNvw8XpvuKcBk="
     },
     "vscode-chrome-debug-core-testsupport": {
       "version": "https://registry.npmjs.org/vscode-chrome-debug-core-testsupport/-/vscode-chrome-debug-core-testsupport-3.14.5.tgz",
