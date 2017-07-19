@@ -189,15 +189,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public async attach(args: IAttachRequestArguments): Promise<void> {
         try {
-            await super.attach(args)
-        } catch(err) {
+            await super.attach(args);
+        } catch (err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
                 err.format = 'Ensure Node was launched with --inspect. ' + err.format;
             }
 
             throw err;
-        };
+        }
     }
 
     protected commonArgs(args: ICommonRequestArgs): void {
