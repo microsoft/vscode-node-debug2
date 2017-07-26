@@ -6,7 +6,6 @@
 import * as assert from 'assert';
 import * as path from 'path';
 
-import {ILoadedScript} from 'vscode-chrome-debug-core';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
@@ -305,28 +304,27 @@ suite('Node Debug Adapter etc', () => {
     });
 
     suite('get loaded scripts', () => {
-        function assertHasScript(loadedScripts: ILoadedScript[], fullPath: string): void {
-            const name = path.basename(fullPath);
-            assert(loadedScripts.filter(script => script.label === name && script.description === fullPath && script.source.path === fullPath).length === 1);
+        function assertHasScript(loadedScripts: string[], expectedPath: string): void {
+            assert(loadedScripts.find(script => script === expectedPath));
         }
 
         test('returns all scripts', async () => {
             const PROGRAM = path.join(DATA_ROOT, 'simple-eval/index.js');
             await dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 3 });
-            const { loadedScripts } = await dc.getLoadedScripts();
+            const { paths } = await dc.getLoadedScripts();
 
-            assert(!!loadedScripts);
-            assert(loadedScripts.length > 10);
+            assert(!!paths);
+            assert(paths.length > 10);
 
             // Has the program
-            assertHasScript(loadedScripts, PROGRAM);
+            assertHasScript(paths, PROGRAM);
 
             // Has some node_internals script
             const nodeInternalsScript = '<node_internals>/timers.js';
-            assertHasScript(loadedScripts, nodeInternalsScript);
+            assertHasScript(paths, nodeInternalsScript);
 
             // Has the eval script
-            assert(loadedScripts.filter(script => script.label.match(/VM\d+/)).length >= 1);
+            assert(paths.filter(script => script.match(/VM\d+/)).length >= 1);
         });
     });
 
