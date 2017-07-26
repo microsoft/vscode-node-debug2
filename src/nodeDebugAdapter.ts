@@ -654,11 +654,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * If realPath is an absolute path or a URL, return realPath. Otherwise, prepend the node_internals marker
      */
     protected realPathToDisplayPath(realPath: string): string {
-        if (realPath.match(/VM\d+/)) {
-            return realPath;
+        if (!realPath.match(/VM\d+/) && !path.isAbsolute(realPath)) {
+            return `${NodeDebugAdapter.NODE_INTERNALS}/${realPath}`;
         }
 
-        return path.isAbsolute(realPath) ? realPath : `${NodeDebugAdapter.NODE_INTERNALS}/${realPath}`;
+        return super.realPathToDisplayPath(realPath);
     }
 
     /**
@@ -666,7 +666,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      */
     protected displayPathToRealPath(displayPath: string): string {
         const match = displayPath.match(new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}[\\\\/](.*)`));
-        return match ? match[1] : displayPath;
+        return match ? match[1] : super.displayPathToRealPath(displayPath);
     }
 }
 
