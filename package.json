@@ -73,6 +73,13 @@
     ],
     "debuggers": [
       {
+        "type": "extensionHost2",
+        "label": "VS Code Extension Development",
+        "program": "./out/src/nodeDebug.js",
+        "runtime": "node",
+        "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217"
+      },
+      {
         "type": "node2",
         "label": "Node.js v6.3+",
         "program": "./out/src/nodeDebug.js",

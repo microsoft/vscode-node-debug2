@@ -42,6 +42,9 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
     /** Logging options */
     diagnosticLogging?: boolean;
     verboseDiagnosticLogging?: boolean;
+
+    // extensionHost option
+    __sessionId?: number;
 }
 
 /**

@@ -27,6 +27,7 @@ const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
 };
 
 export class NodeDebugAdapter extends ChromeDebugAdapter {
+    private static EXTENSION_HOST_2 = 'extensionHost2';
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
@@ -89,18 +90,26 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             runtimeExecutable = NodeDebugAdapter.NODE;
         }
 
-        if (this._adapterID === 'extensionHost') {
+        this._continueAfterConfigDone = !args.stopOnEntry;
+
+        if (this._adapterID === NodeDebugAdapter.EXTENSION_HOST_2) {
             // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
             let launchArgs = [];
             if (!args.noDebug) {
-                launchArgs.push(`--debugBrkPluginHost=${port}`, '--inspect');
+                launchArgs.push(`--debugBrkPluginHost=${port}`);
+
+                // pass the debug session ID to the EH so that broadcast events know where they come from
+                if (args.__sessionId) {
+                    launchArgs.push(`--debugId=${args.__sessionId}`);
+                }
             }
 
             const runtimeArgs = args.runtimeArgs || [];
             const programArgs = args.args || [];
             launchArgs = launchArgs.concat(runtimeArgs, programArgs);
 
-            return this.launchInInternalConsole(runtimeExecutable, launchArgs);
+            const envArgs = this.collectEnvFileArgs(args) || args.env;
+            return this.launchInInternalConsole(runtimeExecutable, launchArgs, envArgs);
         }
 
         let programPath = args.program;
@@ -155,8 +164,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 launchArgs.push('--debug-brk');
             }
 
-            this._continueAfterConfigDone = !args.stopOnEntry;
-
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
 
             const envArgs = this.collectEnvFileArgs(args) || args.env;
@@ -171,9 +178,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 };
                 launchP = this.launchInTerminal(termArgs);
             } else if (!args.console || args.console === 'internalConsole') {
-                // merge environment variables into a copy of the process.env
-                const env = Object.assign({}, process.env, envArgs);
-                launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), { cwd, env });
+                launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), envArgs, cwd);
             } else {
                 return Promise.reject(errors.unknownConsoleType(args.console));
             }
@@ -190,6 +195,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public async attach(args: IAttachRequestArguments): Promise<void> {
         try {
             await super.attach(args);
+
+            if (this._adapterID === NodeDebugAdapter.EXTENSION_HOST_2 || this._adapterID === 'extensionHost') {
+                this._attachMode = false;
+            }
         } catch (err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
@@ -254,7 +263,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], spawnOpts?: cp.SpawnOptions): Promise<void> {
+    private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], envArgs?: any, cwd?: string): Promise<void> {
+        // merge environment variables into a copy of the process.env
+        const env = Object.assign({}, process.env, envArgs);
+        const spawnOpts: cp.SpawnOptions = { cwd, env };
+
         this.logLaunchCommand(runtimeExecutable, launchArgs);
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
         return new Promise<void>((resolve, reject) => {
