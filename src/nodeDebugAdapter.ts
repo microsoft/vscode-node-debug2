@@ -27,7 +27,6 @@ const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
 };
 
 export class NodeDebugAdapter extends ChromeDebugAdapter {
-    private static EXTENSION_HOST_2 = 'extensionHost2';
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
@@ -92,7 +91,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         this._continueAfterConfigDone = !args.stopOnEntry;
 
-        if (this._adapterID === NodeDebugAdapter.EXTENSION_HOST_2) {
+        if (this.isExtensionHost()) {
             // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
             let launchArgs = [];
             if (!args.noDebug) {
@@ -196,7 +195,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         try {
             await super.attach(args);
 
-            if (this._adapterID === NodeDebugAdapter.EXTENSION_HOST_2 || this._adapterID === 'extensionHost') {
+            if (this.isExtensionHost()) {
                 this._attachMode = false;
             }
         } catch (err) {
@@ -418,10 +417,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
-    public terminateSession(reason: string): void {
-        const restartArgs = this._restartMode && !this._inShutdown ? { port: this._port } : undefined;
+    public terminateSession(reason: string, args?: DebugProtocol.DisconnectArguments): void {
+        if (this.isExtensionHost() && args && typeof (<any>args).restart === 'boolean' && (<any>args).restart) {
+            this._nodeProcessId = 0;
+        }
+
         this.killNodeProcess();
-        super.terminateSession(reason, restartArgs);
+        const restartArgs = this._restartMode && !this._inShutdown ? { port: this._port } : undefined;
+        super.terminateSession(reason, undefined, restartArgs);
     }
 
     protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: stoppedEvent.ReasonType): void {
@@ -567,6 +570,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 if (this._pollForNodeProcess) {
                     this._nodeProcessId = pid;
                     this.startPollingForNodeTermination();
+                } else if (this.isExtensionHost()) {
+                    this._nodeProcessId = pid;
                 }
 
                 this._loggedTargetVersion = true;
@@ -680,6 +685,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected displayPathToRealPath(displayPath: string): string {
         const match = displayPath.match(new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}[\\\\/](.*)`));
         return match ? match[1] : super.displayPathToRealPath(displayPath);
+    }
+
+    private isExtensionHost(): boolean {
+        return this._adapterID === 'extensionHost2' || this._adapterID === 'extensionHost';
     }
 }
 
