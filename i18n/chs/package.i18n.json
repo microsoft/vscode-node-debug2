@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "与 \"remoteRoot\" 对应的本地源根目录。",
 	"node.attach.remoteRoot.description": "远程主机的源根目录。",
 	"node.attach.config.name": "附加",
-	"node.processattach.config.name": "附加到进程",
-	"extensionHost.label": "VS Code 扩展开发",
-	"extensionHost.launch.runtimeExecutable.description": "VS Code 的绝对路径。",
-	"extensionHost.launch.args.description": "传递给程序的命令行参数。",
-	"extensionHost.launch.stopOnEntry.description": "启动后自动停止扩展主机。",
-	"extensionHost.launch.sourceMaps.description": "使用 JavaScript 源映射。",
-	"extensionHost.launch.outFiles.description": "如果启用源映射，则这些 glob 模式将指定生成的 JavaScript 文件。如果模式以 \"!\" 开始，则排除这些文件。如果未指定，则生成的代码应与其源位于同一目录中。",
-	"extensionHost.smartStep.description": "自动单步执行无法映射回原始源的生成代码。",
-	"extensionHost.launch.config.name": "启动扩展"
+	"node.processattach.config.name": "附加到进程"
 }

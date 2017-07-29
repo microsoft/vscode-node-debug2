@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "Локальный корневой каталог исходных файлов, который соответствует 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "Корневой каталог исходных файлов для удаленного узла.",
 	"node.attach.config.name": "Подключить",
-	"node.processattach.config.name": "Подключение к процессу",
-	"extensionHost.label": "Разработка расширения VS Code",
-	"extensionHost.launch.runtimeExecutable.description": "Абсолютный путь к VS Code.",
-	"extensionHost.launch.args.description": "Аргументы командной строки, переданные в программу.",
-	"extensionHost.launch.stopOnEntry.description": "Автоматически остановить хост-процесс для расширений после запуска.",
-	"extensionHost.launch.sourceMaps.description": "Использовать карты исходного кода JavaScript.",
-	"extensionHost.launch.outFiles.description": "Если включены сопоставления исходного кода, эти глобальные шаблоны указывают созданные файлы JavaScript. Если шаблон начинается с \"!\", файлы исключаются. Если не указан, созданный код должен быть в том же каталоге, что и исходный.",
-	"extensionHost.smartStep.description": "Автоматическая пошаговая отработка сформированного кода, который невозможно снова добавить в исходный источник.",
-	"extensionHost.launch.config.name": "Запуск расширения"
+	"node.processattach.config.name": "Подключение к процессу"
 }

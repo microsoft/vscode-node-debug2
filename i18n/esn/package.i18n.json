@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "La raíz de origen local que corresponde con la 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "La raíz de origen del host remoto.",
 	"node.attach.config.name": "Asociar",
-	"node.processattach.config.name": "Asociar al proceso",
-	"extensionHost.label": "Desarrollo de extensiones de VS Code",
-	"extensionHost.launch.runtimeExecutable.description": "Ruta de acceso absoluta a VS Code.",
-	"extensionHost.launch.args.description": "Argumentos de línea de comandos pasados al programa.",
-	"extensionHost.launch.stopOnEntry.description": "El host de extensiones se detiene automáticamente tras el inicio.",
-	"extensionHost.launch.sourceMaps.description": "Se usan los mapas de origen de JavaScript.",
-	"extensionHost.launch.outFiles.description": "Si los mapas de origen están habilitados, estos patrones globales especifican los archivos JavaScript generados. Si un patrón comienza con '!' los archivos se excluyen. Si no se especifica, el código generado se espera en el mismo directorio que su origen.",
-	"extensionHost.smartStep.description": "Explore automáticamente el código generado que no se puede volver a asignar al código fuente original.",
-	"extensionHost.launch.config.name": "Extensión de inicio"
+	"node.processattach.config.name": "Asociar al proceso"
 }

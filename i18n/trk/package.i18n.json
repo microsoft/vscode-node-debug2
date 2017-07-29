@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "'remoteRoot' ögesine karşılık gelen yerel kaynak kökü.",
 	"node.attach.remoteRoot.description": "Uzak sunucunun kaynak kökü.",
 	"node.attach.config.name": "Bağla",
-	"node.processattach.config.name": "İşleme Bağla",
-	"extensionHost.label": "VS Code Eklentisi Geliştirme",
-	"extensionHost.launch.runtimeExecutable.description": "VS Code'un mutlak yolu",
-	"extensionHost.launch.args.description": "Programa iletilecek komut satırı argümanları.",
-	"extensionHost.launch.stopOnEntry.description": "Başlatıldıktan sonra eklenti sunucusunu otomatik olarak durdur.",
-	"extensionHost.launch.sourceMaps.description": "JavaScript kaynak haritaları kullanın.",
-	"extensionHost.launch.outFiles.description": "Kaynak haritaları etkinleştirilmiş ise, bu glob desenleri oluşturulan JavaScript dosyalarını belirtir. '!' ile başlayan kalıpta dosyalar hariç tutulur. Eğer belirtilmemişse, oluşturulan kodun kaynağıyla aynı dizinde olması beklenir.",
-	"extensionHost.smartStep.description": "Orijinal kaynağa geri eşlenemeyen oluşturulmuş kodlar üzerinde otomatik olarak adım adım ilerleyin.",
-	"extensionHost.launch.config.name": "Eklentiyi Başlat"
+	"node.processattach.config.name": "İşleme Bağla"
 }

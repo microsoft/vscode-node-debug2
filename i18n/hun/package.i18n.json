@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "A helyi forráskönyvtár, ami megfelel a 'remoteRoot'-nak.",
 	"node.attach.remoteRoot.description": "A távoli kiszolgáló forrásainak gyökérkönyvtára.",
 	"node.attach.config.name": "Csatlakozás",
-	"node.processattach.config.name": "Csatlakozás egy folyamathoz",
-	"extensionHost.label": "VS Code-kiegészítőfejlesztés ",
-	"extensionHost.launch.runtimeExecutable.description": "A VS Code abszolút elérési útja.",
-	"extensionHost.launch.args.description": "A program számára átadott parancssori argumentumok.",
-	"extensionHost.launch.stopOnEntry.description": "A kiegészítő gazdafolyamatának automatikus leállítása az indítás után.",
-	"extensionHost.launch.sourceMaps.description": "JavaScript-forráskódtérképek használata.",
-	"extensionHost.launch.outFiles.description": "Ha a forráskódtérképek engedélyezve vannak, ez a globális minta írja le a generált JavaScript-fájlok elérési útjait. Ha a minta '!'-lel kezdődik, az illeszkedő fájlok ki lesznek zárva. Ha nincs megadva, a generált kódnak ugyanabban a mappában kell lennie, mint a forrása.",
-	"extensionHost.smartStep.description": "Olyan generált kódok automatikus átugrása, amelyeknek nem sikerül visszakövetni az eredeti forrását. ",
-	"extensionHost.launch.config.name": "Kiegészítő indítása"
+	"node.processattach.config.name": "Csatlakozás egy folyamathoz"
 }

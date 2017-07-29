@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "'remoteRoot'에 대응하는 로컬 소스 루트입니다.",
 	"node.attach.remoteRoot.description": "원격 호스트의 소스 루트입니다.",
 	"node.attach.config.name": "연결",
-	"node.processattach.config.name": "프로세스에 연결",
-	"extensionHost.label": "VS Code 확장 개발",
-	"extensionHost.launch.runtimeExecutable.description": "VS Code의 절대 경로입니다.",
-	"extensionHost.launch.args.description": "프로그램에 전달된 명령줄 인수입니다.",
-	"extensionHost.launch.stopOnEntry.description": "시작한 후 자동으로 확장 호스트를 중지합니다.",
-	"extensionHost.launch.sourceMaps.description": "JavaScript 소스 맵을 사용합니다.",
-	"extensionHost.launch.outFiles.description": "소스 맵이 사용되는 경우 이러한 GLOB 패턴은 생성된 JavaScript 파일을 지정합니다. 패턴이 '!'로 시작하면 파일이 제외됩니다. 지정하지 않으면 생성된 코드가 소스와 동일한 디렉터리에 필요합니다.",
-	"extensionHost.smartStep.description": "생성된 코드 중 원래 소스로 다시 매핑할 수 없는 코드를 단계별로 자동 실행합니다.",
-	"extensionHost.launch.config.name": "확장 시작"
+	"node.processattach.config.name": "프로세스에 연결"
 }

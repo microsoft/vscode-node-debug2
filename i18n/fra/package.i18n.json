@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "Racine de la source locale qui correspond à 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "Racine source de l'hôte distant.",
 	"node.attach.config.name": "Attacher",
-	"node.processattach.config.name": "Attacher au processus",
-	"extensionHost.label": "Développement d'extension VS Code",
-	"extensionHost.launch.runtimeExecutable.description": "Chemin absolu de VS Code.",
-	"extensionHost.launch.args.description": "Arguments de ligne de commande passés au programme.",
-	"extensionHost.launch.stopOnEntry.description": "Arrêtez automatiquement l'hôte d'extension après le lancement.",
-	"extensionHost.launch.sourceMaps.description": "Utilisez des mappages de sources JavaScript.",
-	"extensionHost.launch.outFiles.description": "Si les mappages de sources sont activés, ces modèles Glob spécifient les fichiers JavaScript générés. Si un modèle commence par '!', les fichiers sont exclus. En l'absence de spécification, le code généré est censé se trouver dans le même répertoire que sa source.",
-	"extensionHost.smartStep.description": "Exécutez pas à pas de façon automatique le code généré qui ne peut être mappé à la source d'origine.",
-	"extensionHost.launch.config.name": "Lancer l'extension"
+	"node.processattach.config.name": "Attacher au processus"
 }

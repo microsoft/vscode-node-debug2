@@ -37,13 +37,5 @@
 	"node.attach.localRoot.description": "La radice dei sorgenti locali che corrisponde a 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "La radice dei sorgenti dell'host remoto.",
 	"node.attach.config.name": "Attach",
-	"node.processattach.config.name": "Collega a processo",
-	"extensionHost.label": "Sviluppo di estensioni per Visual Studio Code",
-	"extensionHost.launch.runtimeExecutable.description": "Percorso assoluto di Visual Studio Code.",
-	"extensionHost.launch.args.description": "Argomenti della riga di comando passati al programma.",
-	"extensionHost.launch.stopOnEntry.description": "Arresta automaticamente l'host dell'estensione dopo l'avvio.",
-	"extensionHost.launch.sourceMaps.description": "Usa i mapping di origine JavaScript.",
-	"extensionHost.launch.outFiles.description": "Se sono abilitati i mapping di origine, questi criteri GLOB specificano i file JavaScript generati. Se un criterio inizia con '!', i file sono esclusi. Se non è specificato, il codice generato dovrebbe trovarsi nella stessa directory dell'origine.",
-	"extensionHost.smartStep.description": "Esegue automaticamente un'istruzione alla volta del codice generato che non può essere mappato all'origine.",
-	"extensionHost.launch.config.name": "Avvia estensione"
+	"node.processattach.config.name": "Collega a processo"
 }
