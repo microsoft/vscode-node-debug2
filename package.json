@@ -365,7 +365,7 @@
     "commands": [
       {
         "command": "extension.node-debug2.toggleSkippingFile",
-        "title": "Toggle Skipping This File"
+        "title": "%toggle.skipping.this.file%"
       }
     ],
     "keybindings": [

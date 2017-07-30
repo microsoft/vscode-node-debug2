@@ -41,5 +41,6 @@
 
 	"node.attach.config.name": "Attach",
 
-	"node.processattach.config.name": "Attach to Process"
+	"node.processattach.config.name": "Attach to Process",
+	"toggle.skipping.this.file": "Toggle Skipping this File"
 }
