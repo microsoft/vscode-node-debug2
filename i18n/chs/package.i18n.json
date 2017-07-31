@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "与 \"remoteRoot\" 对应的本地源根目录。",
 	"node.attach.remoteRoot.description": "远程主机的源根目录。",
 	"node.attach.config.name": "附加",
-	"node.processattach.config.name": "附加到进程"
+	"node.processattach.config.name": "附加到进程",
+	"toggle.skipping.this.file": "切换是否跳过此文件"
 }

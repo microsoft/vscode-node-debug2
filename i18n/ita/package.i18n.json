@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "La radice dei sorgenti locali che corrisponde a 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "La radice dei sorgenti dell'host remoto.",
 	"node.attach.config.name": "Attach",
-	"node.processattach.config.name": "Collega a processo"
+	"node.processattach.config.name": "Collega a processo",
+	"toggle.skipping.this.file": "Attiva/disattiva Ignora questo file"
 }

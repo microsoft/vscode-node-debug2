@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "相對應 'remoteRoot' 的本機來源根目錄。",
 	"node.attach.remoteRoot.description": "遠端主機的來源根目錄.",
 	"node.attach.config.name": "附加",
-	"node.processattach.config.name": "附加至處理序"
+	"node.processattach.config.name": "附加至處理序",
+	"toggle.skipping.this.file": "略過此檔案"
 }

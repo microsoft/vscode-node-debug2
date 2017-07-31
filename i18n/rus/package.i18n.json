@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "Локальный корневой каталог исходных файлов, который соответствует 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "Корневой каталог исходных файлов для удаленного узла.",
 	"node.attach.config.name": "Подключить",
-	"node.processattach.config.name": "Подключение к процессу"
+	"node.processattach.config.name": "Подключение к процессу",
+	"toggle.skipping.this.file": "Отключить пропуск для этого файла"
 }

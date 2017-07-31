@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "Racine de la source locale qui correspond à 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "Racine source de l'hôte distant.",
 	"node.attach.config.name": "Attacher",
-	"node.processattach.config.name": "Attacher au processus"
+	"node.processattach.config.name": "Attacher au processus",
+	"toggle.skipping.this.file": "Ignorer/Ne pas ignorer ce fichier"
 }

@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "'RemoteRoot' に対応するローカルのソース ルート。",
 	"node.attach.remoteRoot.description": "リモート ホストのソース ルート。",
 	"node.attach.config.name": "アタッチ",
-	"node.processattach.config.name": "プロセスにアタッチ"
+	"node.processattach.config.name": "プロセスにアタッチ",
+	"toggle.skipping.this.file": "このファイルをスキップする"
 }

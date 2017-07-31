@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "A raiz de origem local que corresponde a 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "A raiz de origem do host remoto.",
 	"node.attach.config.name": "Anexar",
-	"node.processattach.config.name": "Anexar ao processo"
+	"node.processattach.config.name": "Anexar ao processo",
+	"toggle.skipping.this.file": "Alternar para ignorar este arquivo"
 }

@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "A helyi forráskönyvtár, ami megfelel a 'remoteRoot'-nak.",
 	"node.attach.remoteRoot.description": "A távoli kiszolgáló forrásainak gyökérkönyvtára.",
 	"node.attach.config.name": "Csatlakozás",
-	"node.processattach.config.name": "Csatlakozás egy folyamathoz"
+	"node.processattach.config.name": "Csatlakozás egy folyamathoz",
+	"toggle.skipping.this.file": "Fájl kihagyásának be- és kikapcsolása"
 }

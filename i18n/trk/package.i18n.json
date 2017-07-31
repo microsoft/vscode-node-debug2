@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "'remoteRoot' ögesine karşılık gelen yerel kaynak kökü.",
 	"node.attach.remoteRoot.description": "Uzak sunucunun kaynak kökü.",
 	"node.attach.config.name": "Bağla",
-	"node.processattach.config.name": "İşleme Bağla"
+	"node.processattach.config.name": "İşleme Bağla",
+	"toggle.skipping.this.file": "Bu Dosyayı Atlamayı Aç/Kapa"
 }

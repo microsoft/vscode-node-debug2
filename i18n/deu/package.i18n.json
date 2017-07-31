@@ -37,5 +37,6 @@
 	"node.attach.localRoot.description": "Der lokale Quellstamm, der dem \"remoteRoot\" entspricht.",
 	"node.attach.remoteRoot.description": "Der Quellstamm des Remotehosts.",
 	"node.attach.config.name": "Anfügen",
-	"node.processattach.config.name": "An den Prozess anhängen"
+	"node.processattach.config.name": "An den Prozess anhängen",
+	"toggle.skipping.this.file": "Überspringen dieser Datei umschalten"
 }
