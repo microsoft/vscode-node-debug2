@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2",
-  "version": "1.15.4",
+  "version": "1.15.5",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -33,7 +33,7 @@
     "run-sequence": "^1.2.2",
     "tslint": "^3.15.1",
     "typescript": "^2.1.4",
-    "vsce": "^1.14.0",
+    "vsce": "^1.30.0",
     "vscode": "^1.0.0",
     "vscode-chrome-debug-core-testsupport": "^3.14.3",
     "vscode-debugadapter-testsupport": "1.19.0",
@@ -49,7 +49,7 @@
     "build": "gulp build",
     "watch": "gulp watch",
     "test": "mocha --timeout 20000 -s 2000 -u tdd --colors --reporter node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js ./out/test/",
-    "vscode:prepublish": "gulp verify-no-linked-modules"
+    "vscode:prepublish": "gulp verify-no-linked-modules && gulp build"
   },
   "engines": {
     "vscode": "^1.14.0",
