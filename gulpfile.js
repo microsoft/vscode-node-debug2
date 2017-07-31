@@ -93,12 +93,6 @@ gulp.task('clean', function() {
 	return del(['out/**', 'package.nls.*.json', 'vscode-node-debug2-*.vsix']);
 });
 
-gulp.task('add-i18n', function() {
-	return gulp.src(['package.nls.json'])
-		.pipe(nls.createAdditionalLanguageFiles(nls.coreLanguages, 'i18n'))
-		.pipe(gulp.dest('.'));
-});
-
 function verifyNotALinkedModule(modulePath) {
     return new Promise((resolve, reject) => {
         fs.lstat(modulePath, (err, stat) => {
@@ -137,6 +131,12 @@ gulp.task('publish', function(callback) {
 
 gulp.task('package', function(callback) {
 	runSequence('build', 'add-i18n', 'vsce-package', callback);
+});
+
+gulp.task('add-i18n', function () {
+    return gulp.src(['package.nls.json'])
+        .pipe(nls.createAdditionalLanguageFiles(nls.coreLanguages, 'i18n'))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('transifex-push', function () {
