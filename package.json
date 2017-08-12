@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2",
-  "version": "1.15.5",
+  "version": "1.16.0",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -73,11 +73,123 @@
     ],
     "debuggers": [
       {
-        "type": "extensionHost2",
+        "type": "extensionHost",
         "label": "VS Code Extension Development",
         "program": "./out/src/nodeDebug.js",
         "runtime": "node",
-        "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217"
+        "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
+        "configurationSnippets": [
+          {
+            "label": "%extensionHost.snippet.launch.label%",
+            "description": "%extensionHost.snippet.launch.description%",
+            "body": {
+              "type": "extensionHost",
+              "request": "launch",
+              "name": "%extensionHost.launch.config.name%",
+              "runtimeExecutable": "^\"\\${execPath}\"",
+              "args": [
+                "^\"--extensionDevelopmentPath=\\${workspaceRoot}\""
+              ],
+              "outFiles": [
+                "^\"\\${workspaceRoot}/out/**/*.js\""
+              ],
+              "preLaunchTask": "npm"
+            }
+          }
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "runtimeExecutable",
+              "args"
+            ],
+            "properties": {
+              "runtimeExecutable": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "%extensionHost.launch.runtimeExecutable.description%",
+                "default": "${execPath}"
+              },
+              "args": {
+                "type": "array",
+                "description": "%node.launch.args.description%",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "--extensionDevelopmentPath=${workspaceRoot}"
+                ]
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "%extensionHost.launch.env.description%",
+                "default": {}
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "%extensionHost.launch.stopOnEntry.description%",
+                "default": true
+              },
+              "sourceMaps": {
+                "type": "boolean",
+                "description": "%node.sourceMaps.description%",
+                "default": true
+              },
+              "outDir": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "deprecationMessage": "%outDir.deprecationMessage%",
+                "default": "${workspaceRoot}/out"
+              },
+              "outFiles": {
+                "type": "array",
+                "description": "%node.outFiles.description%",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "${workspaceRoot}/out/**/*.js"
+                ]
+              },
+              "smartStep": {
+                "type": "boolean",
+                "description": "%node.smartStep.description%",
+                "default": true
+              },
+              "skipFiles": {
+                "type": "array",
+                "description": "%node.skipFiles.description%",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "trace": {
+                "type": [
+                  "boolean",
+                  "string"
+                ],
+                "description": "%node.trace.description%",
+                "default": true
+              },
+              "protocol": {
+                "type": "string",
+                "enum": [
+                  "legacy",
+                  "inspector"
+                ],
+                "default": "inspector"
+              }
+            }
+          }
+        }
       },
       {
         "type": "node2",
@@ -161,7 +273,6 @@
                   "string",
                   "null"
                 ],
-                "description": "%node.outDir.description%",
                 "deprecationMessage": "%outDir.deprecationMessage%",
                 "default": null
               },
@@ -271,7 +382,6 @@
                   "string",
                   "null"
                 ],
-                "description": "%node.outDir.description%",
                 "deprecationMessage": "%outDir.deprecationMessage%",
                 "default": null
               },

@@ -4,7 +4,6 @@
 	"node.label": "Node.js v6.3+ via Inspector Protocol",
 
 	"node.sourceMaps.description": "Use JavaScript source maps (if they exist).",
-	"node.outDir.description": "If source maps are enabled, the generated code is expected in this directory. Deprecated: use 'outFiles' attribute instead.",
 	"outDir.deprecationMessage": "Attribute 'outDir' is deprecated, use 'outFiles' instead.",
 	"node.outFiles.description": "If source maps are enabled, these glob patterns specify the generated JavaScript files. If a pattern starts with '!' the files are excluded. If not specified, the generated code is expected in the same directory as its source.",
 	"node.stopOnEntry.description": "Automatically stop program after launch.",
@@ -42,5 +41,16 @@
 	"node.attach.config.name": "Attach",
 
 	"node.processattach.config.name": "Attach to Process",
-	"toggle.skipping.this.file": "Toggle Skipping this File"
+	"toggle.skipping.this.file": "Toggle Skipping this File",
+
+	"extensionHost.label": "VS Code Extension Development",
+
+	"extensionHost.launch.runtimeExecutable.description": "Absolute path to VS Code.",
+	"extensionHost.launch.stopOnEntry.description": "Automatically stop the extension host after launch.",
+	"extensionHost.launch.env.description": "Environment variables passed to the extension host.",
+
+	"extensionHost.snippet.launch.label": "VS Code Extension Development",
+	"extensionHost.snippet.launch.description": "Launch a VS Code extension in debug mode",
+
+	"extensionHost.launch.config.name": "Launch Extension"
 }
