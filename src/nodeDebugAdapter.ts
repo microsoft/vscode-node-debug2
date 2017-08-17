@@ -643,7 +643,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private getRuntimeNotOnPathErrorResponse(runtime: string): Promise<void> {
         return Promise.reject(<DebugProtocol.Message>{
             id: 2001,
-            format: localize('VSND2001', "Cannot find runtime '{0}' on PATH.", '{_runtime}'),
+            format: localize('VSND2001', "Cannot find runtime '{0}' on PATH. Make sure to have '{0}' installed.", '{_runtime}'),
             variables: { _runtime: runtime }
         });
     }
