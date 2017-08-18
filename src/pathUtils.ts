@@ -202,34 +202,47 @@ export function makeRelative2(from: string, to: string): string {
 }
 
 /*
- * Is the given runtime executable on the PATH.
+ * Lookup the given program on the PATH and return its absolute path on success and undefined otherwise.
  */
-export function isOnPath(program: string): boolean {
+export function findOnPath(program: string): string | undefined {
+    let locator: string;
     if (process.platform === 'win32') {
-        const WHERE = 'C:\\Windows\\System32\\where.exe';
-        try {
-            if (FS.existsSync(WHERE)) {
-                CP.execSync(`${WHERE} ${program}`);
-            } else {
-                // do not report error if 'where' doesn't exist
-            }
-            return true;
-        } catch (e) {
-            // ignore
-        }
+        const windir = process.env['WINDIR'] || 'C:\\Windows';
+        locator = Path.join(windir, 'System32', 'where.exe');
     } else {
-        const WHICH = '/usr/bin/which';
-        try {
-            if (FS.existsSync(WHICH)) {
-                CP.execSync(`${WHICH} '${program}'`);
-            } else {
-                // do not report error if 'which' doesn't exist
-            }
-            return true;
-        } catch (e) {
-        }
+        locator = '/usr/bin/which';
     }
-    return false;
+
+    try {
+        if (FS.existsSync(locator)) {
+            const lines = CP.execSync(`${locator} ${program}`).toString().split(/\r?\n/);
+            if (process.platform === 'win32') {
+                // return the first path that has a executable extension
+                const executableExtensions = process.env['PATHEXT'].toUpperCase();
+                for (const path of lines) {
+                    const ext = Path.extname(path).toUpperCase();
+                    if (ext && executableExtensions.indexOf(ext + ';') > 0) {
+                        return path;
+                    }
+                }
+            } else {
+                // return the first path
+                if (lines.length > 0) {
+                    return lines[0];
+                }
+            }
+
+            return undefined;
+        } else {
+            // do not report failure if 'locator' app doesn't exist
+        }
+        return program;
+    } catch (err) {
+        // fall through
+    }
+
+    // fail
+    return undefined;
 }
 
 export function findExecutable(program: string): string | undefined {

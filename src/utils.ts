@@ -54,34 +54,6 @@ export function killTree(processId: number): void {
     }
 }
 
-export function isOnPath(program: string): boolean {
-    if (process.platform === 'win32') {
-        const WHERE = 'C:\\Windows\\System32\\where.exe';
-        try {
-            if (fs.existsSync(WHERE)) {
-                cp.execSync(`${WHERE} ${program}`);
-            } else {
-                // do not report error if 'where' doesn't exist
-            }
-            return true;
-        } catch (Exception) {
-            // ignore
-        }
-    } else {
-        const WHICH = '/usr/bin/which';
-        try {
-            if (fs.existsSync(WHICH)) {
-                cp.execSync(`${WHICH} '${program}'`);
-            } else {
-                // do not report error if 'which' doesn't exist
-            }
-            return true;
-        } catch (Exception) {
-        }
-    }
-    return false;
-}
-
 export function trimLastNewline(msg: string): string {
     return msg.replace(/(\n|\r\n)$/, '');
 }

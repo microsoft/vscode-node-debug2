@@ -69,7 +69,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         let runtimeExecutable = args.runtimeExecutable;
         if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
-                if (!pathUtils.isOnPath(runtimeExecutable)) {
+                if (!pathUtils.findOnPath(runtimeExecutable)) {
                     return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
                 }
             } else {
@@ -81,7 +81,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 runtimeExecutable = re;
             }
         } else {
-            if (!utils.isOnPath(NodeDebugAdapter.NODE)) {
+            if (!pathUtils.findOnPath(NodeDebugAdapter.NODE)) {
                 return Promise.reject(errors.runtimeNotFound(NodeDebugAdapter.NODE));
             }
 
