@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "^3.16.5",
+    "vscode-chrome-debug-core": "^3.16.6",
     "vscode-debugadapter": "^1.22.0",
     "vscode-nls": "^2.0.2"
   },
