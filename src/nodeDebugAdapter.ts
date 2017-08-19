@@ -50,11 +50,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _isTerminated: boolean;
     private _adapterID: string;
 
-    public initialize(args: DebugProtocol.InitializeRequestArguments, enablePromiseRejectExceptionFilter?: boolean): DebugProtocol.Capabilities {
+    public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
+        this._promiseRejectExceptionFilterEnabled = this.isExtensionHost();
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
         this._adapterID = args.adapterID;
 
-        return super.initialize(args, this.isExtensionHost());
+        return super.initialize(args);
     }
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
