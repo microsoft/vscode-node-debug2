@@ -12,7 +12,8 @@ ChromeDebugSession.run(ChromeDebugSession.getSession(
     {
         logFilePath: path.join(os.tmpdir(), 'vscode-node-debug2.txt'), // non-.txt file types can't be uploaded to github
         adapter: NodeDebugAdapter,
-        extensionName: 'node-debug2'
+        extensionName: 'node-debug2',
+        enableSourceMapCaching: true
     }));
 
 /* tslint:disable:no-var-requires */
