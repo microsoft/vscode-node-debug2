@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2",
-  "version": "1.16.3",
+  "version": "1.16.4",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -35,8 +35,8 @@
     "typescript": "^2.1.4",
     "vsce": "^1.30.0",
     "vscode": "^1.0.0",
-    "vscode-chrome-debug-core-testsupport": "^3.14.3",
-    "vscode-debugadapter-testsupport": "1.19.0",
+    "vscode-chrome-debug-core-testsupport": "^3.16.0",
+    "vscode-debugadapter-testsupport": "1.22.0",
     "vscode-debugprotocol": "^1.22.0",
     "vscode-nls-dev": "^2.1.3"
   },
