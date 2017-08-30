@@ -236,18 +236,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         this.beginWaitingForDebuggerPaused();
         this.getNodeProcessDetailsIfNeeded();
 
-        const supportsStepBack = await this.supportsStepBack();
-        return { supportsStepBack };
+        return { supportsStepBack: this.supportsStepBack() };
     }
 
-    private async supportsStepBack(): Promise<boolean> {
-        try {
-            const { domains } = await this.chrome.Schema.getDomains();
-            return !!domains.find(d => d.name === 'TimeTravel');
-        } catch (e) {
-            // API not supported by runtime
-            return Promise.resolve(false);
-        }
+    private supportsStepBack(): boolean {
+        return this._domains.has(<keyof Crdp.CrdpClient>'TimeTravel');
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
