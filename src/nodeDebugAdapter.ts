@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent, telemetry as CoreTelemetry, ISetBreakpointResult, Crdp} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, stoppedEvent, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp} from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -541,6 +541,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             return responses;
+        });
+    }
+
+    protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
+        return super.validateBreakpointsPath(args).catch(e => {
+            if (args.source.path && utils.isJavaScript(args.source.path)) {
+                return undefined;
+            } else {
+                return Promise.reject(e);
+            }
         });
     }
 
