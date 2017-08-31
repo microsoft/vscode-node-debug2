@@ -51,9 +51,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _adapterID: string;
 
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
+        this._adapterID = args.adapterID;
         this._promiseRejectExceptionFilterEnabled = this.isExtensionHost();
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
-        this._adapterID = args.adapterID;
 
         return super.initialize(args);
     }
