@@ -178,14 +178,6 @@
                 ],
                 "description": "%node.trace.description%",
                 "default": true
-              },
-              "protocol": {
-                "type": "string",
-                "enum": [
-                  "legacy",
-                  "inspector"
-                ],
-                "default": "inspector"
               }
             }
           }
