@@ -574,11 +574,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
             } else {
                 const [pid, version, arch] = response.result.value;
+                this._nodeProcessId = pid;
                 if (this._pollForNodeProcess) {
-                    this._nodeProcessId = pid;
                     this.startPollingForNodeTermination();
-                } else if (this.isExtensionHost()) {
-                    this._nodeProcessId = pid;
                 }
 
                 this._loggedTargetVersion = true;
