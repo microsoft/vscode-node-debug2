@@ -7,7 +7,6 @@
 	"extension.description": "Visual Studio-Codedebuggererweiterung für Node.js v6.3+ mit dem neuen Inspektorprotokoll",
 	"node.label": "Node.js v6.3+ über Inspektorprotokoll",
 	"node.sourceMaps.description": "Verwendet JavaScript-Quellzuordnungen (wenn vorhanden).",
-	"node.outDir.description": "Wenn Quellzuordnungen aktiviert sind, wird erwartet, dass der generierte Code in diesem Verzeichnis vorhanden ist. Veraltet: Verwenden Sie stattdessen das outFiles-Attribut.",
 	"outDir.deprecationMessage": "Das Attribut \"outDir\" ist veraltet. Verwenden Sie stattdessen \"outFiles\".",
 	"node.outFiles.description": "Wenn Quellzuordnungen aktiviert sind, geben diese Globmuster die generierten JavaScript-Dateien an. Wenn ein Muster mit \"!\" beginnt, werden die Dateien ausgeschlossen. Wenn keine Angabe erfolgt, wird der generierte Code im gleichen Verzeichnis wie seine Quelle erwartet.",
 	"node.stopOnEntry.description": "Beendet das Programm nach dem Start automatisch.",
@@ -38,5 +37,12 @@
 	"node.attach.remoteRoot.description": "Der Quellstamm des Remotehosts.",
 	"node.attach.config.name": "Anfügen",
 	"node.processattach.config.name": "An den Prozess anhängen",
-	"toggle.skipping.this.file": "Überspringen dieser Datei umschalten"
+	"toggle.skipping.this.file": "Überspringen dieser Datei umschalten",
+	"extensionHost.label": "VSCode-Erweiterungsentwicklung",
+	"extensionHost.launch.runtimeExecutable.description": "Der absolute Pfad zu VS Code.",
+	"extensionHost.launch.stopOnEntry.description": "Beendet den Erweiterungshost nach dem Start automatisch.",
+	"extensionHost.launch.env.description": "Umgebungsvariablen wurden an den Erweiterungshost weitergegeben.",
+	"extensionHost.snippet.launch.label": "VSCode-Erweiterungsentwicklung",
+	"extensionHost.snippet.launch.description": "VS Code-Erweiterung im Debugmodus starten",
+	"extensionHost.launch.config.name": "Extension starten"
 }

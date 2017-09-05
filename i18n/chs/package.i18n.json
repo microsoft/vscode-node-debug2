@@ -7,7 +7,6 @@
 	"extension.description": "适用于 Node.js v6.3+ 的 Visual Studio Code 调试器扩展，使用新的检查器协议",
 	"node.label": "借助于检查器协议的 Node.js v6.3+",
 	"node.sourceMaps.description": "使用 JavaScript 源映射(如果存在)。",
-	"node.outDir.description": "如果启用了源映射，则应当会在此目录中生成代码。已弃用: 请改为使用 \"outFiles\" 属性。",
 	"outDir.deprecationMessage": "属性 \"outDir\" 已弃用，请改用 \"outFiles\"。",
 	"node.outFiles.description": "如果启用源映射，则这些 glob 模式将指定生成的 JavaScript 文件。如果模式以 \"!\" 开始，则排除这些文件。如果未指定，则生成的代码应与其源位于同一目录中。",
 	"node.stopOnEntry.description": "启动后自动停止程序。",
@@ -38,5 +37,12 @@
 	"node.attach.remoteRoot.description": "远程主机的源根目录。",
 	"node.attach.config.name": "附加",
 	"node.processattach.config.name": "附加到进程",
-	"toggle.skipping.this.file": "切换是否跳过此文件"
+	"toggle.skipping.this.file": "切换是否跳过此文件",
+	"extensionHost.label": "VS Code 扩展开发",
+	"extensionHost.launch.runtimeExecutable.description": "VS Code 的绝对路径。",
+	"extensionHost.launch.stopOnEntry.description": "启动后自动停止扩展主机。",
+	"extensionHost.launch.env.description": "传递到扩展主机的环境变量。",
+	"extensionHost.snippet.launch.label": "VS Code 扩展开发",
+	"extensionHost.snippet.launch.description": "在调试模式下启动 VS Code 扩展",
+	"extensionHost.launch.config.name": "启动扩展"
 }

@@ -7,7 +7,6 @@
 	"extension.description": "Extension de débogueur Visual Studio Code pour Node.js v6.3+, utilisant le nouveau protocole Inspector",
 	"node.label": "Node.js v6.3+ via le protocole Inspector",
 	"node.sourceMaps.description": "Utilisez des mappages de sources JavaScript (s'ils existent)",
-	"node.outDir.description": "Si les mappages de source sont activés, le code généré est attendu dans ce répertoire. Déprécié : utilisez l'attribut 'outFiles' à la place.",
 	"outDir.deprecationMessage": "Attribut 'outDir' déconseillé, utilisez 'outFiles' à la place.",
 	"node.outFiles.description": "Si les mappages de sources sont activés, ces modèles Glob spécifient les fichiers JavaScript générés. Si un modèle commence par '!', les fichiers sont exclus. En l'absence de spécification, le code généré est censé se trouver dans le même répertoire que sa source.",
 	"node.stopOnEntry.description": "Arrêtez automatiquement le programme après le lancement.",
@@ -38,5 +37,12 @@
 	"node.attach.remoteRoot.description": "Racine source de l'hôte distant.",
 	"node.attach.config.name": "Attacher",
 	"node.processattach.config.name": "Attacher au processus",
-	"toggle.skipping.this.file": "Ignorer/Ne pas ignorer ce fichier"
+	"toggle.skipping.this.file": "Ignorer/Ne pas ignorer ce fichier",
+	"extensionHost.label": "Développement d'extension VS Code",
+	"extensionHost.launch.runtimeExecutable.description": "Chemin absolu de VS Code.",
+	"extensionHost.launch.stopOnEntry.description": "Arrêtez automatiquement l'hôte d'extension après le lancement.",
+	"extensionHost.launch.env.description": "Variables d'environnement passées à l'hôte d'extension.",
+	"extensionHost.snippet.launch.label": "Développement d'extension VS Code",
+	"extensionHost.snippet.launch.description": "Lancer une extension VS Code en mode débogage",
+	"extensionHost.launch.config.name": "Lancer l'extension"
 }
