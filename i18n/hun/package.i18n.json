@@ -7,7 +7,6 @@
 	"extension.description": "Visual Studio Code hibakeresési kiegészítő Node.js v6.3+-hoz. Az új Inspector protokollt használja.",
 	"node.label": "Node.js v6.3+ Inspector protokollon keresztül",
 	"node.sourceMaps.description": "JavaScript-kódtérképek használata (ha léteznek).",
-	"node.outDir.description": "Ha a forráskódtérképek engedélyezve vannak, a generált kódok ebben a mappában található. Elavult: használja helyette az 'outFiles' beállítást!",
 	"outDir.deprecationMessage": "Az 'outDir' attribútum elavult, használja helyette az 'outFiles'-t!",
 	"node.outFiles.description": "Ha a forráskódtérképek engedélyezve vannak, ez a globális minta írja le a generált JavaScript-fájlok elérési útjait. Ha a minta '!'-lel kezdődik, az illeszkedő fájlok ki lesznek zárva. Ha nincs megadva, a generált kódnak ugyanabban a mappában kell lennie, mint a forrása. ",
 	"node.stopOnEntry.description": "Program automatikus leállítása indítás után.",
@@ -38,5 +37,12 @@
 	"node.attach.remoteRoot.description": "A távoli kiszolgáló forrásainak gyökérkönyvtára.",
 	"node.attach.config.name": "Csatlakozás",
 	"node.processattach.config.name": "Csatlakozás egy folyamathoz",
-	"toggle.skipping.this.file": "Fájl kihagyásának be- és kikapcsolása"
+	"toggle.skipping.this.file": "Fájl kihagyásának be- és kikapcsolása",
+	"extensionHost.label": "VS Code-kiegészítőfejlesztés ",
+	"extensionHost.launch.runtimeExecutable.description": "A VS Code abszolút elérési útja.",
+	"extensionHost.launch.stopOnEntry.description": "A kiegészítő gazdafolyamatának automatikus leállítása az indítás után.",
+	"extensionHost.launch.env.description": "A kiegészítő gazdafolyamata számára átadott környezeti változók.",
+	"extensionHost.snippet.launch.label": "VS Code-kiegészítőfejlesztés ",
+	"extensionHost.snippet.launch.description": "VS Code kiegészítő indítása hibakeresési módban",
+	"extensionHost.launch.config.name": "Kiegészítő indítása"
 }

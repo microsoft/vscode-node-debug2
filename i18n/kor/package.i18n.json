@@ -7,7 +7,6 @@
 	"extension.description": "Node.js v6.3+용 Visual Studio Code 디버거 확장, 검사 프로토콜 사용",
 	"node.label": "검사 프로토콜을 통한 Node.js v6.3+",
 	"node.sourceMaps.description": "JavaScript 소스 맵을 사용합니다(있는 경우에만).",
-	"node.outDir.description": "소스 맵이 활성화된 경우 생성된 코드가 이 디렉터리에 있을 것입니다. 사용 중단: 'outFiles' 특성을 대신 사용하십시오.",
 	"outDir.deprecationMessage": "특성 'outDir'은(는) 사용되지 않습니다. 대신 'outFiles'를 사용하세요.",
 	"node.outFiles.description": "소스 맵이 사용되는 경우 이러한 GLOB 패턴은 생성된 JavaScript 파일을 지정합니다. 패턴이 '!'로 시작하면 파일이 제외됩니다. 지정하지 않으면 생성된 코드가 소스와 동일한 디렉터리에 필요합니다.",
 	"node.stopOnEntry.description": "시작한 후 자동으로 프로그램을 중지합니다.",
@@ -38,5 +37,12 @@
 	"node.attach.remoteRoot.description": "원격 호스트의 소스 루트입니다.",
 	"node.attach.config.name": "연결",
 	"node.processattach.config.name": "프로세스에 연결",
-	"toggle.skipping.this.file": "이 파일에 대한 건너뛰기 토글"
+	"toggle.skipping.this.file": "이 파일에 대한 건너뛰기 토글",
+	"extensionHost.label": "VS Code 확장 개발",
+	"extensionHost.launch.runtimeExecutable.description": "VS Code의 절대 경로입니다.",
+	"extensionHost.launch.stopOnEntry.description": "시작한 후 자동으로 확장 호스트를 중지합니다.",
+	"extensionHost.launch.env.description": "확장 호스트에 전달된 환경 변수입니다.",
+	"extensionHost.snippet.launch.label": "VS Code 확장 개발",
+	"extensionHost.snippet.launch.description": "디버그 모드에서 VS Code 확장 시작",
+	"extensionHost.launch.config.name": "확장 시작"
 }
