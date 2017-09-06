@@ -4,15 +4,22 @@
     "configurations": [
         {
             "name": "launch as server",
-            "type": "node2",
-            "request": "launch",
+            "type": "node",
+			"request": "launch",
+			"protocol": "inspector",
             "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/out/src/nodeDebug.js",
-            "stopOnEntry": false,
             "args": [ "--server=4712" ],
-            "sourceMaps": true,
-            "outDir": "${workspaceRoot}/out"
-        },
+            "outFiles": ["${workspaceRoot}/out/**/*.js"]
+		},
+		{
+			"name": "run file",
+			"type": "node",
+			"request": "launch",
+			"protocol": "inspector",
+			"cwd": "${workspaceRoot}",
+			"program": "${file}"
+		},
         {
 			"name": "Run Tests",
 			"type": "node",
