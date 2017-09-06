@@ -159,12 +159,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             const runtimeArgs = args.runtimeArgs || [];
             const programArgs = args.args || [];
 
+            const debugArgs = detectSupportedDebugArgsForLaunch(args);
             let launchArgs = [runtimeExecutable];
             if (!args.noDebug && !args.port) {
-                launchArgs.push(`--inspect=${port}`);
-
                 // Always stop on entry to set breakpoints
-                launchArgs.push('--debug-brk');
+                if (debugArgs === DebugArgs.Inspect_DebugBrk) {
+                    launchArgs.push(`--inspect=${port}`);
+                    launchArgs.push('--debug-brk');
+                } else {
+                    launchArgs.push(`--inspect-brk=${port}`);
+                }
             }
 
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
@@ -749,4 +753,46 @@ function resolveCwdPattern(cwd: string, sourceMapPathOverrides: ISourceMapPathOv
     }
 
     return resolvedOverrides;
+}
+
+export enum DebugArgs {
+    InspectBrk,
+    Inspect_DebugBrk
+}
+
+const defaultDebugArgs = DebugArgs.Inspect_DebugBrk;
+function detectSupportedDebugArgsForLaunch(config: any): DebugArgs {
+    if (config.__nodeVersion) {
+        return getSupportedDebugArgsForVersion(config.__nodeVersion);
+    } else if (config.runtimeExecutable) {
+        logger.log('Using --inspect --debug-brk because a runtimeExecutable is set');
+        return defaultDebugArgs;
+    } else {
+        // only determine version if no runtimeExecutable is set (and 'node' on PATH is used)
+        logger.log('Spawning `node --version` to determine supported debug args');
+        let result: cp.SpawnSyncReturns<string>;
+        try {
+            result = cp.spawnSync('node', ['--version']);
+        } catch (e) {
+            logger.error('Node version detection failed: ' + (e && e.message));
+        }
+
+        const semVerString = result.stdout ? result.stdout.toString().trim() : undefined;
+        if (semVerString) {
+            return getSupportedDebugArgsForVersion(semVerString);
+        } else {
+            logger.log('Using --inspect --debug-brk because we couldn\'t get a version from node');
+            return defaultDebugArgs;
+        }
+    }
+}
+
+function getSupportedDebugArgsForVersion(semVerString): DebugArgs {
+    if (utils.compareSemver(semVerString, 'v7.6.0') >= 0) {
+        logger.log(`Using --inspect-brk, Node version ${semVerString} detected`);
+        return DebugArgs.InspectBrk;
+    } else {
+        logger.log(`Using --inspect --debug-brk, Node version ${semVerString} detected`);
+        return DebugArgs.Inspect_DebugBrk;
+    }
 }

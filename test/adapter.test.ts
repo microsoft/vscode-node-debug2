@@ -9,6 +9,7 @@ import * as path from 'path';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
+import * as utils from '../src/utils';
 import * as testSetup from './testSetup';
 
 const DATA_ROOT = testSetup.DATA_ROOT;
@@ -58,7 +59,7 @@ suite('Node Debug Adapter etc', () => {
 
     suite('launch', () => {
         test('should run program to the end', () => {
-            if (testSetup.compareSemver(process.version, 'v8.0.0') < 0) {
+            if (utils.compareSemver(process.version, 'v8.0.0') < 0) {
                 // Skip test if the node version doesn't emit the Runtime.executionContextDestroyed event
                 return Promise.resolve();
             }
@@ -367,7 +368,7 @@ suite('Node Debug Adapter etc', () => {
         async function stepOverNativeAwait(fromLine: number, afterBp = false) {
             const toLine = fromLine + 1;
 
-            if (testSetup.compareSemver(process.version, 'v8.0.0') < 0 || testSetup.compareSemver(process.version, 'v8.4.0') >= 0) {
+            if (utils.compareSemver(process.version, 'v8.0.0') < 0 || utils.compareSemver(process.version, 'v8.4.0') >= 0) {
                 // In pre-8, must always step twice over await lines
                 await dc.nextTo('step', { line: fromLine });
                 await dc.nextTo('step', { line: fromLine });
@@ -380,7 +381,7 @@ suite('Node Debug Adapter etc', () => {
         }
 
         test('shows async stacks and steps correctly for native async/await', async () => {
-            if (testSetup.compareSemver(process.version, 'v7.6.0') < 0) {
+            if (utils.compareSemver(process.version, 'v7.6.0') < 0) {
                 // Skip test if the node version doesn't support native async/await
                 return Promise.resolve();
             }

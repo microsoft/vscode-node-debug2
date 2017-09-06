@@ -75,3 +75,20 @@ export function stripBOM(s: string): string {
     }
     return s;
 }
+
+const semverRegex = /v?(\d+)\.(\d+)\.(\d+)/;
+export function compareSemver(a: string, b: string): number {
+    const aNum = versionStringToNumber(a);
+    const bNum = versionStringToNumber(b);
+
+    return aNum - bNum;
+}
+
+function versionStringToNumber(str: string): number {
+    const match = str.match(semverRegex);
+    if (!match) {
+        throw new Error('Invalid node version string: ' + str);
+    }
+
+    return parseInt(match[1], 10) * 10000 + parseInt(match[2], 10) * 100 + parseInt(match[3], 10);
+}
