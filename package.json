@@ -339,6 +339,11 @@
                 "type": "boolean",
                 "description": "%node.showAsyncStacks.description%",
                 "default": true
+              },
+              "useWSL": {
+                "type": "boolean",
+                "description": "%node.launch.useWSL.description%",
+                "default": false
               }
             }
           },

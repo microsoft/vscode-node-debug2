@@ -37,6 +37,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
+    private _useSubsystemLinux: boolean;
 
     // Flags relevant during init
     private _continueAfterConfigDone = true;
@@ -67,8 +68,41 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const port = args.port || utils.random(3000, 50000);
 
+        // bash.exe path when running from this process (32 or 64 bit)
+        let wslInternalBashPath;
+        // bash.exe path when running from external console (64 bit)
+        let wslExternalBashPath;
+        if (args.useWSL && process.platform === 'win32') {
+            // Test if bash is installed
+            this._useSubsystemLinux = true;
+            if (process.arch === 'x64') {
+                const bashPath = path.join(process.env['SystemRoot'], 'System32', 'bash.exe');
+                wslInternalBashPath = pathUtils.findExecutable(bashPath);
+                if (wslInternalBashPath) {
+                    wslExternalBashPath = wslInternalBashPath;
+                    logger.verbose('Using Windows Susbystem Linux Bash: ' + wslInternalBashPath);
+                } else {
+                    return this.getWindowsSubsystemLinuxNotFound(bashPath);
+                }
+            } else {
+                const bashPath = path.join(process.env['SystemRoot'], 'Sysnative', 'bash.exe');
+                wslInternalBashPath = pathUtils.findExecutable(bashPath);
+                if (wslInternalBashPath) {
+                    wslExternalBashPath = path.join(process.env['SystemRoot'], 'System32', 'bash.exe');
+                    logger.verbose('Using Windows Susbystem Linux Bash: ' + wslInternalBashPath);
+                    logger.verbose('Assuming 64-bit version is in ' + wslExternalBashPath);
+                } else {
+                    return this.getWindowsSubsystemLinuxNotFound(bashPath);
+                }
+            }
+        } else {
+            this._useSubsystemLinux = false;
+        }
+
         let runtimeExecutable = args.runtimeExecutable;
-        if (runtimeExecutable) {
+        if (this._useSubsystemLinux) {
+            runtimeExecutable = runtimeExecutable || NodeDebugAdapter.NODE;
+        } else if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
                 const re = pathUtils.findOnPath(runtimeExecutable);
                 if (!re) {
@@ -97,22 +131,25 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         if (this.isExtensionHost()) {
             // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
-            let launchArgs = [];
+            let runtimeArgs = [];
             if (!args.noDebug) {
-                launchArgs.push(`--debugBrkPluginHost=${port}`);
+                runtimeArgs.push(`--debugBrkPluginHost=${port}`);
 
                 // pass the debug session ID to the EH so that broadcast events know where they come from
                 if (args.__sessionId) {
-                    launchArgs.push(`--debugId=${args.__sessionId}`);
+                    runtimeArgs.push(`--debugId=${args.__sessionId}`);
                 }
             }
-
-            const runtimeArgs = args.runtimeArgs || [];
-            const programArgs = args.args || [];
-            launchArgs = launchArgs.concat(runtimeArgs, programArgs);
-
+            runtimeArgs = runtimeArgs.concat(args.runtimeArgs);
+            const launchArgs = makeLaunchArgs(wslInternalBashPath, runtimeExecutable, runtimeArgs, undefined, undefined, args.args);
+            if (launchArgs.localRoot) {
+                this._pathTransformer.attach(<IAttachRequestArguments>{
+                    remoteRoot: launchArgs.remoteRoot,
+                    localRoot: launchArgs.localRoot
+                });
+            }
             const envArgs = this.collectEnvFileArgs(args) || args.env;
-            return this.launchInInternalConsole(runtimeExecutable, launchArgs, envArgs);
+            return this.launchInInternalConsole(launchArgs.executable, launchArgs.args, envArgs);
         }
 
         let programPath = args.program;
@@ -156,32 +193,38 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 program = path.basename(resolvedProgramPath);
             }
 
-            const runtimeArgs = args.runtimeArgs || [];
-            const programArgs = args.args || [];
-
-            let launchArgs = [runtimeExecutable];
+            let runtimeArgs = [];
             if (!args.noDebug && !args.port) {
-                launchArgs.push(`--inspect=${port}`);
+                runtimeArgs.push(`--inspect=${port}`);
 
                 // Always stop on entry to set breakpoints
-                launchArgs.push('--debug-brk');
+                runtimeArgs.push('--debug-brk');
             }
+            runtimeArgs = runtimeArgs.concat(args.runtimeArgs);
 
-            launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
+            const internalLaunchArgs = makeLaunchArgs(wslInternalBashPath, runtimeExecutable, runtimeArgs, cwd, program, args.args);
+            const externalLaunchArgs = makeLaunchArgs(wslInternalBashPath, runtimeExecutable, runtimeArgs, cwd, program, args.args);
+            if (internalLaunchArgs.localRoot) {
+                this._pathTransformer.attach(<IAttachRequestArguments>{
+                    remoteRoot: internalLaunchArgs.remoteRoot,
+                    localRoot: internalLaunchArgs.localRoot
+                });
+            }
 
             const envArgs = this.collectEnvFileArgs(args) || args.env;
             let launchP: Promise<void>;
             if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
+                const useLaunchArgs = args.console === 'integratedTerminal' ? internalLaunchArgs : externalLaunchArgs;
                 const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
                     kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
                     title: localize('node.console.title', "Node Debug Console"),
                     cwd,
-                    args: launchArgs,
+                    args: [useLaunchArgs.executable].concat(useLaunchArgs.args),
                     env: envArgs
                 };
                 launchP = this.launchInTerminal(termArgs);
             } else if (!args.console || args.console === 'internalConsole') {
-                launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), envArgs, cwd);
+                launchP = this.launchInInternalConsole(internalLaunchArgs.executable, internalLaunchArgs.args, envArgs, cwd );
             } else {
                 return Promise.reject(errors.unknownConsoleType(args.console));
             }
@@ -249,7 +292,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 if (response.success) {
                     // since node starts in a terminal, we cannot track it with an 'exit' handler
                     // plan for polling after we have gotten the process pid.
-                    this._pollForNodeProcess = true;
+                    // This however won't work on WSL
+                    if (!this._useSubsystemLinux) {
+                        this._pollForNodeProcess = true;
+                    }
                     resolve();
                 } else {
                     reject(errors.cannotLaunchInTerminal(response.message));
@@ -637,6 +683,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
+    private getWindowsSubsystemLinuxNotFound(path: string): Promise<void> {
+        return Promise.reject(<DebugProtocol.Message>{
+            id: 2007,
+            format: localize('attribute.wsl.not.exist', "Cannot find Windows Subsystem Linux installation in '{0}'.", {path}),
+            variables: { path }
+        });
+    }
+
     /**
      * 'Path not absolute' error with 'More Information' link.
      */
@@ -694,6 +748,46 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private isExtensionHost(): boolean {
         return this._adapterID === 'extensionHost2' || this._adapterID === 'extensionHost';
+    }
+}
+
+interface ILaunchArgs {
+    executable: string;
+    args: string[];
+    localRoot?: string;
+    remoteRoot?: string;
+}
+
+function windowsPathToWSLPath(path: string): string {
+    if (!path) {
+        return undefined;
+    } else if (pathUtils.isAbsolutePath(path)) {
+        return `/mnt/${path.substr(0,1).toLowerCase()}/${path.substr(3).replace(/\\/g, '/')}`;
+    } else {
+        return path.replace(/\\/g, '/');
+    }
+}
+
+function makeLaunchArgs(wslBashPath: string, executable: string, runtimeArgs: string[], cwd: string, program: string, programArgs: string[]): ILaunchArgs {
+    const args = (runtimeArgs || []).concat(program ? [program] : [], programArgs ? programArgs : []);
+    if (wslBashPath) {
+        let bashCommand = [executable].concat(runtimeArgs || [],
+                                              program ? [`'${windowsPathToWSLPath(program)}'`] : [],
+                                              programArgs ? programArgs : []).join(' ');
+        if (cwd) {
+            bashCommand = `cd '${windowsPathToWSLPath(cwd)}' && ${bashCommand}`;
+        }
+        return <ILaunchArgs>{
+            executable: wslBashPath,
+            args: ['-c', bashCommand],
+            localRoot: cwd,
+            remoteRoot: windowsPathToWSLPath(cwd)
+        };
+    } else {
+        return <ILaunchArgs>{
+            executable: executable,
+            args: args
+        };
     }
 }
 
