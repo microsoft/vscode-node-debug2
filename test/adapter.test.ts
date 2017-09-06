@@ -246,11 +246,11 @@ suite('Node Debug Adapter etc', () => {
     });
 
     suite('hit condition bps', () => {
+        const PROGRAM = path.join(DATA_ROOT, 'programWithFunction.js');
         function continueAndStop(line: number): Promise<any> {
             return dc.continueTo('breakpoint', { path: PROGRAM, line });
         }
 
-        const PROGRAM = path.join(DATA_ROOT, 'programWithFunction.js');
         test('Works for =', () => {
             const noCondBpLine = 15;
             const condBpLine = 14;
@@ -367,7 +367,7 @@ suite('Node Debug Adapter etc', () => {
         async function stepOverNativeAwait(fromLine: number, afterBp = false) {
             const toLine = fromLine + 1;
 
-            if (testSetup.compareSemver(process.version, 'v8.0.0') < 0) {
+            if (testSetup.compareSemver(process.version, 'v8.0.0') < 0 || testSetup.compareSemver(process.version, 'v8.4.0') >= 0) {
                 // In pre-8, must always step twice over await lines
                 await dc.nextTo('step', { line: fromLine });
                 await dc.nextTo('step', { line: fromLine });

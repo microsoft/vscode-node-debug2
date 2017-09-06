@@ -1,10 +1,8 @@
 environment:
   matrix:
     - nodejs_version: 6.2
-    - nodejs_version: 6.3
-    # --inspect crashes in .4 and .5. https://github.com/nodejs/node/issues/8155
-    - nodejs_version: 6.6
-    - nodejs_version: 6.10
+    # Note: --inspect crashes in .4 and .5, and in x64 before 6.8. https://github.com/nodejs/node/issues/8155
+    - nodejs_version: 6.11
     - nodejs_version: 7.0
     - nodejs_version: 7.3
     - nodejs_version: 7.10.0
@@ -15,9 +13,6 @@ environment:
 matrix:
   allow_failures:
     - nodejs_version: 6.2
-    - nodejs_version: 6.3
-    - nodejs_version: 6.6
-    - nodejs_version: 6.7
 
 install:
   - ps: >
@@ -26,8 +21,7 @@ install:
         npm i -g node-nightly
         node-nightly
       } else {
-        # --inspect crashes in x64 https://github.com/nodejs/node/issues/8155
-        Install-Product node $env:nodejs_version x86
+        Install-Product node $env:nodejs_version x64
       }
 
 build_script:
