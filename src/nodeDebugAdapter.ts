@@ -527,20 +527,18 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.addBreakpoints(url, breakpoints).then(responses => {
             if (this._entryPauseEvent && !this._finishedConfig) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;
-                if (this._continueAfterConfigDone) {
-                    const bpAtEntryLocation = responses.some(response => {
-                        // Don't compare column location, because you can have a bp at col 0, then break at some other column
-                        return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
-                            response.actualLocation.scriptId === entryLocation.scriptId;
-                    });
+                const bpAtEntryLocation = responses.some(response => {
+                    // Don't compare column location, because you can have a bp at col 0, then break at some other column
+                    return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
+                        response.actualLocation.scriptId === entryLocation.scriptId;
+                });
 
-                    if (bpAtEntryLocation) {
-                        // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
-                        // the stopOnEntry flag is not set
-                        logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
-                        this._continueAfterConfigDone = false;
-                        this._expectingStopReason = 'breakpoint';
-                    }
+                if (bpAtEntryLocation) {
+                    // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
+                    // the stopOnEntry flag is not set
+                    logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
+                    this._continueAfterConfigDone = false;
+                    this._expectingStopReason = 'breakpoint';
                 }
             }
 
