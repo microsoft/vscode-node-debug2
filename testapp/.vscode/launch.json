@@ -2,13 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "debugServer": 4712,
+            "type": "node",
+            "request": "launch",
+            "name": "Launch script",
+            "protocol": "inspector",
+            "stopOnEntry": true,
+            "program": "${workspaceRoot}/test.js",
+            // "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v8.4.0/bin/node",
+            "trace": true
+        },
+        {
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
             "name": "Launch Program",
             "program": "${workspaceRoot}/out/app.js",
             "outFiles": ["${workspaceRoot}/out/**/*.js"],
+            "skipFiles": [
+                "<eval>/**"
+            ],
             "trace": true
         },
         {
