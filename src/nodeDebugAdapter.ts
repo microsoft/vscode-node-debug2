@@ -44,6 +44,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _waitingForEntryPauseEvent = true;
     private _finishedConfig = false;
     private _handlingEarlyNodeMsgs = true;
+    private _captureFromStd: boolean = false;
 
     private _supportsRunInTerminalRequest: boolean;
     private _restartMode: boolean;
@@ -133,6 +134,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 logger.warn(localize('program.path.case.mismatch.warning', "Program path uses differently cased character as file on disk; this might result in breakpoints not being hit."));
             }
         }
+
+        this._captureFromStd = args.outputCapture === 'std';
 
         return this.resolveProgramPath(programPath, args.sourceMaps).then<void>(resolvedProgramPath => {
             let program: string;
@@ -295,8 +298,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             // Must attach a listener to stdout or process will hang on Windows
             nodeProcess.stdout.on('data', (data: string) => {
-                // If only running, use stdout/stderr instead of debug protocol logs
-                if (noDebugMode) {
+                if (noDebugMode || this._captureFromStd) {
                     let msg = data.toString();
                     this._session.sendEvent(new OutputEvent(msg, 'stdout'));
                 }
@@ -335,7 +337,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 msg = msg.replace(helpMsg, '');
             }
 
-            if (this._handlingEarlyNodeMsgs || noDebugMode) {
+            if (this._handlingEarlyNodeMsgs || noDebugMode || this._captureFromStd) {
                 this._session.sendEvent(new OutputEvent(msg, 'stderr'));
             }
 
@@ -348,6 +350,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
         // Once any console API message is received, we are done listening to initial stderr output
         this._handlingEarlyNodeMsgs = false;
+
+        if (this._captureFromStd) {
+            return;
+        }
 
         // Strip the --debug-brk deprecation message which is printed at startup
         if (!params.args || params.args.length !== 1 || typeof params.args[0].value !== 'string' || !params.args[0].value.match(NodeDebugAdapter.DEBUG_BRK_DEP_MSG)) {

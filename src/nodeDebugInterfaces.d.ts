@@ -7,6 +7,8 @@ import * as Core from 'vscode-chrome-debug-core';
 
 type ConsoleType = "internalConsole" | "integratedTerminal" | "externalTerminal";
 
+type OutputCaptureType = "console" | "std";
+
 export interface ICommonRequestArgs extends Core.ICommonRequestArgs {
     stopOnEntry?: boolean;
     address?: string;
@@ -38,6 +40,8 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
     console?: ConsoleType;
     /** Manually selected debugging port */
     port?: number;
+    /** Source of the debug output */
+    outputCapture?: OutputCaptureType;
 
     /** Logging options */
     diagnosticLogging?: boolean;

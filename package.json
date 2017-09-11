@@ -339,6 +339,14 @@
                 "type": "boolean",
                 "description": "%node.showAsyncStacks.description%",
                 "default": true
+              },
+              "outputCapture": {
+                "enum": [
+                  "console",
+                  "std"
+                ],
+                "description": "%node.launch.outputCapture.description%",
+                "default": "console"
               }
             }
           },
