@@ -8,6 +8,8 @@ tslint.json
 testapp/**
 testdata/**
 out/test/**
+.travis.yml
+appveyor.yml
 
 node_modules/.bin/**
 node_modules/bufferutil/**
