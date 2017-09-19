@@ -51,6 +51,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _isTerminated: boolean;
     private _adapterID: string;
 
+    /**
+     * Returns whether this is a non-EH attach scenario
+     */
+    private get normalAttachMode(): boolean {
+        return this._attachMode && !this.isExtensionHost();
+    }
+
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         this._adapterID = args.adapterID;
         this._promiseRejectExceptionFilterEnabled = this.isExtensionHost();
@@ -205,10 +212,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public async attach(args: IAttachRequestArguments): Promise<void> {
         try {
             await super.attach(args);
-
-            if (this.isExtensionHost()) {
-                this._attachMode = false;
-            }
         } catch (err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
@@ -417,7 +420,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private killNodeProcess(): void {
-        if (this._nodeProcessId && !this._attachMode) {
+        if (this._nodeProcessId && !this.normalAttachMode) {
             logger.log('Killing process with id: ' + this._nodeProcessId);
             utils.killTree(this._nodeProcessId);
             this._nodeProcessId = 0;
@@ -442,7 +445,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._entryPauseEvent = notification;
             this._waitingForEntryPauseEvent = false;
 
-            if (this._attachMode) {
+            if (this.normalAttachMode) {
                 // In attach mode, and we did pause right away,
                 // so assume --debug-brk was set and we should show paused
                 this._continueAfterConfigDone = false;
