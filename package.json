@@ -88,10 +88,10 @@
               "name": "%extensionHost.launch.config.name%",
               "runtimeExecutable": "^\"\\${execPath}\"",
               "args": [
-                "^\"--extensionDevelopmentPath=\\${workspaceRoot}\""
+                "^\"--extensionDevelopmentPath=\\${workspaceDir}\""
               ],
               "outFiles": [
-                "^\"\\${workspaceRoot}/out/**/*.js\""
+                "^\"\\${workspaceDir}/out/**/*.js\""
               ],
               "preLaunchTask": "npm"
             }
@@ -119,7 +119,7 @@
                   "type": "string"
                 },
                 "default": [
-                  "--extensionDevelopmentPath=${workspaceRoot}"
+                  "--extensionDevelopmentPath=${workspaceDir}"
                 ]
               },
               "env": {
@@ -146,7 +146,7 @@
                   "null"
                 ],
                 "deprecationMessage": "%outDir.deprecationMessage%",
-                "default": "${workspaceRoot}/out"
+                "default": "${workspaceDir}/out"
               },
               "outFiles": {
                 "type": "array",
@@ -155,7 +155,7 @@
                   "type": "string"
                 },
                 "default": [
-                  "${workspaceRoot}/out/**/*.js"
+                  "${workspaceDir}/out/**/*.js"
                 ]
               },
               "smartStep": {
@@ -229,7 +229,7 @@
               "cwd": {
                 "type": "string",
                 "description": "%node.launch.cwd.description%",
-                "default": "${workspaceRoot}"
+                "default": "${workspaceDir}"
               },
               "runtimeExecutable": {
                 "type": [
@@ -333,7 +333,7 @@
               "envFile": {
                 "type": "string",
                 "description": "%node.launch.envFile.description%",
-                "default": "${workspaceRoot}/.env"
+                "default": "${workspaceDir}/.env"
               },
               "showAsyncStacks": {
                 "type": "boolean",

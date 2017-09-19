@@ -8,8 +8,8 @@
             "name": "Launch Program",
             "type": "node2",
             "request": "launch",
-            "program": "${workspaceRoot}/out/bundle.js",
-            "cwd": "${workspaceRoot}",
+            "program": "${workspaceDir}/out/bundle.js",
+            "cwd": "${workspaceDir}",
             "outFiles": [],
             "sourceMaps": true
         }

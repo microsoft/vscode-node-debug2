@@ -7,7 +7,7 @@
             "name": "Launch script",
             "protocol": "inspector",
             "stopOnEntry": true,
-            "program": "${workspaceRoot}/test.js",
+            "program": "${workspaceDir}/test.js",
             // "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v8.4.0/bin/node",
             "trace": true
         },
@@ -16,8 +16,8 @@
             "request": "launch",
             "protocol": "inspector",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/out/app.js",
-            "outFiles": ["${workspaceRoot}/out/**/*.js"],
+            "program": "${workspaceDir}/out/app.js",
+            "outFiles": ["${workspaceDir}/out/**/*.js"],
             "skipFiles": [
                 "<eval>/**"
             ],
@@ -29,10 +29,10 @@
             "request": "launch",
             "name": "Launch Program nodemon",
             "runtimeArgs": [
-                "${workspaceRoot}/node_modules/nodemon/bin/nodemon.js",
+                "${workspaceDir}/node_modules/nodemon/bin/nodemon.js",
                 "--inspect=12346"
             ],
-            "program": "${workspaceRoot}/out/app.js",
+            "program": "${workspaceDir}/out/app.js",
             "protocol": "inspector",
             "restart": true,
             "port": 12346
@@ -43,9 +43,9 @@
             "type": "node",
             "protocol": "inspector",
             "request": "launch",
-            "program": "${workspaceRoot}/out/eval.js",
-            "cwd": "${workspaceRoot}",
-            "outFiles": ["${workspaceRoot}/out/**/*.js"]
+            "program": "${workspaceDir}/out/eval.js",
+            "cwd": "${workspaceDir}",
+            "outFiles": ["${workspaceDir}/out/**/*.js"]
         },
         {
             "name": "Launch Async/await",
@@ -53,19 +53,19 @@
             "request": "launch",
             "protocol": "inspector",
             "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v7.7.1/bin/node",
-            "program": "${workspaceRoot}/async/app.js",
-            "cwd": "${workspaceRoot}"
+            "program": "${workspaceDir}/async/app.js",
+            "cwd": "${workspaceDir}"
         },
         {
             "name": "Launch Promise",
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
-            "program": "${workspaceRoot}/out/async/promise.js",
-            "cwd": "${workspaceRoot}",
+            "program": "${workspaceDir}/out/async/promise.js",
+            "cwd": "${workspaceDir}",
             "smartStep": true,
             "outFiles": [
-                "${workspaceRoot}/out/**/*.js"
+                "${workspaceDir}/out/**/*.js"
             ]
         },
         {
@@ -75,8 +75,8 @@
             "port": 9229,
             "address": "localhost",
             // "sourceMaps": true,
-            "outFiles": [ "${workspaceRoot}/out/**/*.js" ],
-            // "localRoot": "${workspaceRoot}",
+            "outFiles": [ "${workspaceDir}/out/**/*.js" ],
+            // "localRoot": "${workspaceDir}",
             // "remoteRoot": "/Users/roblou/Downloads/testapp",
             // "trace": "all"
             // "verboseDiagnosticLogging": true
@@ -90,7 +90,7 @@
             "request": "attach",
             "protocol": "inspector",
             "port": 9229,
-            "localRoot": "${workspaceRoot}",
+            "localRoot": "${workspaceDir}",
             "remoteRoot": "/Users/roblou/tmp/remote-debug"
         },
         {
@@ -102,12 +102,12 @@
             "runtimeArgs": [
                 "--debug=5858"
             ],
-            "program": "${workspaceRoot}/out/app.js",
+            "program": "${workspaceDir}/out/app.js",
             "restart": true,
             "port": 5858,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "outFiles": [ "${workspaceRoot}/out/**/*.js" ]
+            "outFiles": [ "${workspaceDir}/out/**/*.js" ]
         }
     ]
 }

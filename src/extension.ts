@@ -13,8 +13,8 @@ const initialConfigurations = [
         name: "Launch Program",
         type: "node2",
         request: "launch",
-        program: "${workspaceRoot}/app.js",
-        cwd: "${workspaceRoot}"
+        program: "${workspaceDir}/app.js",
+        cwd: "${workspaceDir}"
     },
     {
         name: "Attach to Process",
@@ -36,7 +36,7 @@ function provideInitialConfigurations(): string {
     let program = getProgram();
 
     if (program) {
-        program = path.isAbsolute(program) ? program : path.join('${workspaceRoot}', program);
+        program = path.isAbsolute(program) ? program : path.join('${workspaceDir}', program);
         initialConfigurations.forEach(config => {
             if (config['program']) {
                 config['program'] = program;
