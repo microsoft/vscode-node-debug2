@@ -652,7 +652,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * 'Path not absolute' error with 'More Information' link.
      */
     private getRelativePathErrorResponse(attribute: string, path: string): Promise<void> {
-        const format = localize('attribute.path.not.absolute', "Attribute '{0}' is not absolute ('{1}'); consider adding '{2}' as a prefix to make it absolute.", attribute, '{path}', '${workspaceDir}/');
+        const format = localize('attribute.path.not.absolute', "Attribute '{0}' is not absolute ('{1}'); consider adding '{2}' as a prefix to make it absolute.", attribute, '{path}', '${workspaceFolder}/');
         return this.getErrorResponseWithInfoLink(2008, format, { path }, 20003);
     }
 

@@ -7,17 +7,17 @@
             "type": "node",
 			"request": "launch",
 			"protocol": "inspector",
-            "cwd": "${workspaceDir}",
-            "program": "${workspaceDir}/out/src/nodeDebug.js",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/out/src/nodeDebug.js",
             "args": [ "--server=4712" ],
-            "outFiles": ["${workspaceDir}/out/**/*.js"]
+            "outFiles": ["${workspaceFolder}/out/**/*.js"]
 		},
 		{
 			"name": "run file",
 			"type": "node",
 			"request": "launch",
 			"protocol": "inspector",
-			"cwd": "${workspaceDir}",
+			"cwd": "${workspaceFolder}",
 			"program": "${file}"
 		},
         {
@@ -25,8 +25,8 @@
 			"type": "node",
 			"protocol": "auto",
 			"request": "launch",
-			"cwd": "${workspaceDir}",
-			"program": "${workspaceDir}/node_modules/.bin/_mocha",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/.bin/_mocha",
 			"args": [
 				"-u", "tdd",
 				"--timeout", "180000000",
@@ -34,7 +34,7 @@
 				"./out/test",
                 "-R", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js"
 			],
-			"outFiles": [ "${workspaceDir}/out/test/**/*.js" ],
+			"outFiles": [ "${workspaceFolder}/out/test/**/*.js" ],
 			"internalConsoleOptions": "openOnSessionStart"
 		},
         {
@@ -43,10 +43,10 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceDir}"
+				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"sourceMaps": true,
-			"outFiles": [ "${workspaceDir}/out/**/*.js" ]
+			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
 		}
     ]
 }

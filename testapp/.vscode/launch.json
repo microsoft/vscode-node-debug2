@@ -2,12 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "debugServer": 4712,
             "type": "node",
             "request": "launch",
             "name": "Launch script",
             "protocol": "inspector",
             "stopOnEntry": true,
-            "program": "${workspaceDir}/test.js",
+            "program": "${workspaceFolder}/test.js",
             // "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v8.4.0/bin/node",
             "trace": true
         },
@@ -16,10 +17,10 @@
             "request": "launch",
             "protocol": "inspector",
             "name": "Launch Program",
-            "program": "${workspaceDir}/out/app.js",
-            "outFiles": ["${workspaceDir}/out/**/*.js"],
+            "program": "${workspaceFolder}/out/app.js",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
             "skipFiles": [
-                "<eval>/**"
+                "<node_internals>/**"
             ],
             "trace": true
         },
@@ -29,10 +30,10 @@
             "request": "launch",
             "name": "Launch Program nodemon",
             "runtimeArgs": [
-                "${workspaceDir}/node_modules/nodemon/bin/nodemon.js",
+                "${workspaceFolder}/node_modules/nodemon/bin/nodemon.js",
                 "--inspect=12346"
             ],
-            "program": "${workspaceDir}/out/app.js",
+            "program": "${workspaceFolder}/out/app.js",
             "protocol": "inspector",
             "restart": true,
             "port": 12346
@@ -43,9 +44,9 @@
             "type": "node",
             "protocol": "inspector",
             "request": "launch",
-            "program": "${workspaceDir}/out/eval.js",
-            "cwd": "${workspaceDir}",
-            "outFiles": ["${workspaceDir}/out/**/*.js"]
+            "program": "${workspaceFolder}/out/eval.js",
+            "cwd": "${workspaceFolder}",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"]
         },
         {
             "name": "Launch Async/await",
@@ -53,19 +54,19 @@
             "request": "launch",
             "protocol": "inspector",
             "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v7.7.1/bin/node",
-            "program": "${workspaceDir}/async/app.js",
-            "cwd": "${workspaceDir}"
+            "program": "${workspaceFolder}/async/app.js",
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Launch Promise",
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
-            "program": "${workspaceDir}/out/async/promise.js",
-            "cwd": "${workspaceDir}",
+            "program": "${workspaceFolder}/out/async/promise.js",
+            "cwd": "${workspaceFolder}",
             "smartStep": true,
             "outFiles": [
-                "${workspaceDir}/out/**/*.js"
+                "${workspaceFolder}/out/**/*.js"
             ]
         },
         {
@@ -75,8 +76,8 @@
             "port": 9229,
             "address": "localhost",
             // "sourceMaps": true,
-            "outFiles": [ "${workspaceDir}/out/**/*.js" ],
-            // "localRoot": "${workspaceDir}",
+            "outFiles": [ "${workspaceFolder}/out/**/*.js" ],
+            // "localRoot": "${workspaceFolder}",
             // "remoteRoot": "/Users/roblou/Downloads/testapp",
             // "trace": "all"
             // "verboseDiagnosticLogging": true
@@ -90,7 +91,7 @@
             "request": "attach",
             "protocol": "inspector",
             "port": 9229,
-            "localRoot": "${workspaceDir}",
+            "localRoot": "${workspaceFolder}",
             "remoteRoot": "/Users/roblou/tmp/remote-debug"
         },
         {
@@ -102,12 +103,12 @@
             "runtimeArgs": [
                 "--debug=5858"
             ],
-            "program": "${workspaceDir}/out/app.js",
+            "program": "${workspaceFolder}/out/app.js",
             "restart": true,
             "port": 5858,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "outFiles": [ "${workspaceDir}/out/**/*.js" ]
+            "outFiles": [ "${workspaceFolder}/out/**/*.js" ]
         }
     ]
 }

@@ -20,7 +20,7 @@ Typically it should work with any version of Node greater than 6.3. But there is
 
 ## When breakpoints don't bind (turn gray when debugging)
 Typically this is because of an issue with sourcemaps. VS Code needs to be able to map the sources in your sourcemap file to the source files in your workspace.
-* Ensure that `outFiles` is set correctly in your launch config, so that VS Code can find your scripts and its sourcemaps before they're loaded in Node. Example: `"outFiles": ["${workspaceDir}/out/**/*.js"]`. (This may not be possible if your scripts are built in-memory or on demand.)
+* Ensure that `outFiles` is set correctly in your launch config, so that VS Code can find your scripts and its sourcemaps before they're loaded in Node. Example: `"outFiles": ["${workspaceFolder}/out/**/*.js"]`. (This may not be possible if your scripts are built in-memory or on demand.)
 * Type `.scripts` into the Debug Console to see information about the scripts loaded in Node, and their sourcemaps. (Details below). Check the output for correctness.
 * If the local paths of sources have been inferred incorrectly, you can correct it with the `sourceMapPathOverrides` option. See details below.
 * You can set the `diagnosticLogging` or `verboseDiagnosticLogging` options to see the details of the sourcemap resolving process.
@@ -49,7 +49,7 @@ The `sourceMapPathOverrides` option lets you set a mapping of source paths from 
     "meteor://💻app/*": "${cwd}/*"  // Example: "meteor://💻app/main.ts" -> "c:/code/main.ts"
 }
 ```
-If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceDir}` and `${cwd}` can be used here. If you aren't sure what the left side should be, you can use the `.scripts` command (details below). You can also use the `diagnosticLogging`/`verboseDiagnosticLogging` options to see the contents of the sourcemap, or look at the paths of the sources in Chrome DevTools, or open your `.js.map` file and check the values manually.
+If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceFolder}` and `${cwd}` can be used here. If you aren't sure what the left side should be, you can use the `.scripts` command (details below). You can also use the `diagnosticLogging`/`verboseDiagnosticLogging` options to see the contents of the sourcemap, or look at the paths of the sources in Chrome DevTools, or open your `.js.map` file and check the values manually.
 
 ## Skipping "library code"/"blackboxed scripts"
 The `skipFiles` option allows you to specify an array of names of folders/files to skip when debugging. For example, if you set `"skipFiles": ["lib.js"]`, then you will skip any file named 'lib.js' when stepping through your code. You also won't break on exceptions thrown from 'lib.js'. This works the same as "blackboxing scripts" in Chrome DevTools. Note that this is just an experiment at the moment. The supported formats are:

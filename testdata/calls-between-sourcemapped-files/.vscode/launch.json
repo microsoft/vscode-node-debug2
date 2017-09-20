@@ -5,11 +5,11 @@
             "type": "node2",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceDir}/src/sourceA.ts",
+            "program": "${workspaceFolder}/src/sourceA.ts",
             "outFiles": [
-                "${workspaceDir}/out/**/*.js"
+                "${workspaceFolder}/out/**/*.js"
             ],
-            "cwd": "${workspaceDir}"
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
