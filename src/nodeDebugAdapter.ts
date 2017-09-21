@@ -592,6 +592,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
                 this._loggedTargetVersion = true;
                 logger.log(`Target node version: ${version} ${arch}`);
+                /* __GDPR__
+                   "nodeVersion" : {
+                      "version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
+                   }
+                 */
                 telemetry.reportEvent('nodeVersion', { version });
             }
         },
