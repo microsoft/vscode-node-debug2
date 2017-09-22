@@ -31,6 +31,7 @@
 	"node.launch.runtimeArgs.description": "A futtatókörnyezet számára átadott kiegészítő argumentumok.",
 	"node.launch.env.description": "A program számára átadott környezeti változók.",
 	"node.launch.envFile.description": "A környezetiváltozó-definíciókat tartalmazó fájl abszolút elérési útja.",
+	"node.launch.outputCapture.description": "Honnan legyenek rögzítve a kimeneti üzenetek: a hibakeresési API-ról vagy stdout/stderr streamekről.",
 	"node.launch.config.name": "Indítás",
 	"node.attach.processId.description": "Annak a folyamatnak az azonosítója, amelyhez csatlakozás történik",
 	"node.attach.localRoot.description": "A helyi forráskönyvtár, ami megfelel a 'remoteRoot'-nak.",

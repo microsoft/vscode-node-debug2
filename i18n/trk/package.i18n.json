@@ -31,6 +31,7 @@
 	"node.launch.runtimeArgs.description": "Çalışma zamanı yürütülebilir dosyasına iletilecek isteğe bağlı argümanlar.",
 	"node.launch.env.description": "Programa iletilecek ortam değişkenleri.",
 	"node.launch.envFile.description": "Ortam değişkenleri tanımlamalarını içeren bir dosyanın mutlak yolu.",
+	"node.launch.outputCapture.description": "Çıktı mesajları nereden yakalanacak: Hata ayıklama API'si veya stdout/stderr akışları.",
 	"node.launch.config.name": "Başlat",
 	"node.attach.processId.description": "Bağlanacak işlem Id'si.",
 	"node.attach.localRoot.description": "'remoteRoot' ögesine karşılık gelen yerel kaynak kökü.",

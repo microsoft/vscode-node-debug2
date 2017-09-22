@@ -31,6 +31,7 @@
 	"node.launch.runtimeArgs.description": "Argumentos opcionales pasados al ejecutable del entorno de ejecución.",
 	"node.launch.env.description": "Variables de entorno pasadas al programa.",
 	"node.launch.envFile.description": "Ruta de acceso absoluta a un archivo que contiene definiciones de variables de entorno.",
+	"node.launch.outputCapture.description": "Capturar los mensajes de salida desde el API de depuración o desde los canales stdout/stderr.",
 	"node.launch.config.name": "Iniciar",
 	"node.attach.processId.description": "Id. de proceso para asociar.",
 	"node.attach.localRoot.description": "La raíz de origen local que corresponde con la 'remoteRoot'.",
