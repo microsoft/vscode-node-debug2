@@ -503,11 +503,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     /**
-     * Wait 500ms for the entry pause event, and if it doesn't come, move on with life.
+     * Wait 500-1000ms for the entry pause event, and if it doesn't come, move on with life.
      * During attach, we don't know whether it's paused when attaching.
      */
     private beginWaitingForDebuggerPaused(): void {
-        let count = 10;
+        // Wait longer in launch mode - it definitely should be paused.
+        let count = this._attachMode ? 10 : 20;
         const id = setInterval(() => {
             if (this._entryPauseEvent || this._isTerminated) {
                 // Got the entry pause, stop waiting
