@@ -492,7 +492,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
                 return this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath).then(generatedPath => {
                     if (!generatedPath) { // cannot find generated file
-                        return Promise.reject<string>(errors.cannotLaunchBecauseOutFiles(programPath));
+                        if (this._launchAttachArgs.outFiles || this._launchAttachArgs.outDir) {
+                            return Promise.reject<string>(errors.cannotLaunchBecauseJsNotFound(programPath));
+                        } else {
+                            return Promise.reject<string>(errors.cannotLaunchBecauseOutFiles(programPath));
+                        }
                     }
 
                     logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);

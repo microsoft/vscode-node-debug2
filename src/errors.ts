@@ -51,7 +51,15 @@ export function cannotLaunchBecauseSourceMaps(programPath: string): DebugProtoco
 export function cannotLaunchBecauseOutFiles(programPath: string): DebugProtocol.Message {
     return {
         id: 2003,
-        format: localize('VSND2003', "Cannot launch program '{0}'; setting the '{1}' attribute might help.", '{path}', 'outDir or outFiles'),
+        format: localize('VSND2003', "Cannot launch program '{0}'; setting the '{1}' attribute might help.", '{path}', 'outFiles'),
+        variables: { path: programPath }
+    };
+}
+
+export function cannotLaunchBecauseJsNotFound(programPath: string): DebugProtocol.Message {
+    return {
+        id: 2009,
+        format: localize('VSND2009', "Cannot launch program '{0}' because corresponding JavaScript cannot be found.", '{path}'),
         variables: { path: programPath }
     };
 }
