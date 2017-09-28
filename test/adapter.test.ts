@@ -305,27 +305,27 @@ suite('Node Debug Adapter etc', () => {
     });
 
     suite('get loaded scripts', () => {
-        function assertHasScript(loadedScripts: string[], expectedPath: string): void {
-            assert(loadedScripts.find(script => script === expectedPath));
+        function assertHasSource(loadedSources: DebugProtocol.Source[], expectedPath: string): void {
+            assert(loadedSources.find(source => source.path === expectedPath));
         }
 
         test('returns all scripts', async () => {
             const PROGRAM = path.join(DATA_ROOT, 'simple-eval/index.js');
             await dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: 3 });
-            const { paths } = await dc.getLoadedScripts();
+            const { sources } = await dc.loadedSources({ });
 
-            assert(!!paths);
-            assert(paths.length > 10);
+            assert(!!sources);
+            assert(sources.length > 10);
 
             // Has the program
-            assertHasScript(paths, PROGRAM);
+            assertHasSource(sources, PROGRAM);
 
             // Has some node_internals script
             const nodeInternalsScript = '<node_internals>/timers.js';
-            assertHasScript(paths, nodeInternalsScript);
+            assertHasSource(sources, nodeInternalsScript);
 
             // Has the eval script
-            assert(paths.filter(script => script.match(/VM\d+/)).length >= 1);
+            assert(sources.filter(source => source.path.match(/VM\d+/)).length >= 1);
         });
     });
 
