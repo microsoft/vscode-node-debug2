@@ -180,7 +180,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             const programArgs = args.args || [];
 
             const debugArgs = detectSupportedDebugArgsForLaunch(args);
-            let launchArgs = [runtimeExecutable];
+            let launchArgs = [];
             if (!args.noDebug && !args.port) {
                 // Always stop on entry to set breakpoints
                 if (debugArgs === DebugArgs.Inspect_DebugBrk) {
@@ -193,15 +193,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
 
-            const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, launchArgs[0], launchArgs.slice(1));
+            const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs);
             // if using subsystem for linux, we will trick the debugger to map source files
-            if (args.useWSL && !args.localRoot) {
+            if (args.useWSL && !args.localRoot && !args.remoteRoot) {
                 this._pathTransformer.attach(<IAttachRequestArguments>{
                     remoteRoot: wslLaunchArgs.remoteRoot,
                     localRoot: wslLaunchArgs.localRoot
                 });
             }
-
 
             const envArgs = this.collectEnvFileArgs(args) || args.env;
             let launchP: Promise<void>;
