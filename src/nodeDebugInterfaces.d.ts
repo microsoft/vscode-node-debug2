@@ -42,6 +42,8 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
     port?: number;
     /** Source of the debug output */
     outputCapture?: OutputCaptureType;
+    /** Use Windows Subsystem Linux */
+    useWSL?: boolean;
 
     /** Logging options */
     diagnosticLogging?: boolean;

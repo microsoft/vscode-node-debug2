@@ -16,6 +16,7 @@ import {ILaunchRequestArguments, IAttachRequestArguments, ICommonRequestArgs} fr
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import * as errors from './errors';
+import * as wsl from './subsystemLinux';
 
 import * as nls from 'vscode-nls';
 const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
@@ -75,8 +76,17 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const port = args.port || utils.random(3000, 50000);
 
+        if (args.useWSL && !wsl.subsystemLinuxPresent()) {
+            return Promise.reject(<DebugProtocol.Message>{
+                id: 2007,
+                format: localize('attribute.wsl.not.exist', "Cannot find Windows Subsystem Linux installation.")
+            });
+        }
+
         let runtimeExecutable = args.runtimeExecutable;
-        if (runtimeExecutable) {
+        if (args.useWSL) {
+            runtimeExecutable = runtimeExecutable || NodeDebugAdapter.NODE;
+        } else if (runtimeExecutable) {
             if (!path.isAbsolute(runtimeExecutable)) {
                 const re = pathUtils.findOnPath(runtimeExecutable);
                 if (!re) {
@@ -183,6 +193,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
 
+            const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, launchArgs[0], launchArgs.slice(1));
+            // if using subsystem linux, we will trick the debugger to map source files
+            if (args.useWSL && !args.localRoot) {
+                this._pathTransformer.attach(<IAttachRequestArguments>{
+                    remoteRoot: wslLaunchArgs.remoteRoot,
+                    localRoot: wslLaunchArgs.localRoot
+                });
+            }
+
+
             const envArgs = this.collectEnvFileArgs(args) || args.env;
             let launchP: Promise<void>;
             if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
@@ -190,12 +210,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
                     title: localize('node.console.title', "Node Debug Console"),
                     cwd,
-                    args: launchArgs,
+                    args: wslLaunchArgs.combined,
                     env: envArgs
                 };
                 launchP = this.launchInTerminal(termArgs);
             } else if (!args.console || args.console === 'internalConsole') {
-                launchP = this.launchInInternalConsole(runtimeExecutable, launchArgs.slice(1), envArgs, cwd);
+                launchP = this.launchInInternalConsole(wslLaunchArgs.executable, wslLaunchArgs.args, envArgs, cwd);
             } else {
                 return Promise.reject(errors.unknownConsoleType(args.console));
             }
