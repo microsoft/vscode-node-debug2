@@ -193,7 +193,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             launchArgs = launchArgs.concat(runtimeArgs, program ? [program] : [], programArgs);
 
-            const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs);
+            const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs, program);
             // if using subsystem for linux, we will trick the debugger to map source files
             if (args.useWSL && !args.localRoot && !args.remoteRoot) {
                 this._pathTransformer.attach(<IAttachRequestArguments>{

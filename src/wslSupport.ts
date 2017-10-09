@@ -35,7 +35,7 @@ export interface ILaunchArgs {
     remoteRoot?: string;
 }
 
-export function createLaunchArg(useSubsytemLinux: boolean, useExternalConsole: boolean, cwd: string | undefined, executable: string, args?: string[]): ILaunchArgs {
+export function createLaunchArg(useSubsytemLinux: boolean | undefined, useExternalConsole: boolean, cwd: string | undefined, executable: string, args?: string[], program?: string): ILaunchArgs {
     if (useSubsytemLinux && subsystemForLinuxPresent()) {
         const bashPath32bitApp = path.join(process.env['SystemRoot'], 'Sysnative', 'bash.exe');
         const bashPath64bitApp = path.join(process.env['SystemRoot'], 'System32', 'bash.exe');
@@ -43,6 +43,9 @@ export function createLaunchArg(useSubsytemLinux: boolean, useExternalConsole: b
         const subsystemLinuxPath = useExternalConsole ? bashPath64bitApp : bashPathHost;
 
         const bashCommand = [executable].concat(args || []).map(element => {
+            if (element === program) {	// workaround for issue #35249
+                element = element.replace(/\\/g, '/');
+            }
             return element.indexOf(' ') > 0 ? `'${element}'` : element;
         }).join(' ');
         return <ILaunchArgs>{
