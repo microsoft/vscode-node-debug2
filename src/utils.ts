@@ -10,7 +10,7 @@ const NODE_SHEBANG_MATCHER = new RegExp('#! */usr/bin/env +node');
 
 export function isJavaScript(aPath: string): boolean {
     const name = path.basename(aPath).toLowerCase();
-    if (name.endsWith('.js')) {
+    if (name.endsWith('.js') || name.endsWith('.mjs')) {
         return true;
     }
 
