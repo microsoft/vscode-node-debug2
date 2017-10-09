@@ -16,7 +16,7 @@ import {ILaunchRequestArguments, IAttachRequestArguments, ICommonRequestArgs} fr
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import * as errors from './errors';
-import * as wsl from './subsystemLiunux';
+import * as wsl from './subsystemLinux';
 
 import * as nls from 'vscode-nls';
 const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
@@ -69,7 +69,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const port = args.port || utils.random(3000, 50000);
 
-        if (args.useWSL && !wsl.subsystemLinuxPresent) {
+        if (args.useWSL && !wsl.subsystemLinuxPresent()) {
             return Promise.reject(<DebugProtocol.Message>{
                 id: 2007,
                 format: localize('attribute.wsl.not.exist', "Cannot find Windows Subsystem Linux installation.")
