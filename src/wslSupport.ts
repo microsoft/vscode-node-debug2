@@ -9,7 +9,7 @@ const bashPath32bitApp = path.join(process.env['SystemRoot'], 'Sysnative', 'bash
 const bashPath64bitApp = path.join(process.env['SystemRoot'], 'System32', 'bash.exe');
 const bashPathHost = is64bit ? bashPath64bitApp : bashPath32bitApp;
 
-export function subsystemLinuxPresent() : boolean {
+export function subsystemForLinuxPresent() : boolean {
     const bashPath = is64bit ? bashPath64bitApp : bashPath32bitApp;
     if (!isWindows) {
         return false;
