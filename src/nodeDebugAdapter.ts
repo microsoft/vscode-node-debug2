@@ -459,7 +459,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: stoppedEvent.ReasonType): void {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
-            logger.log('Paused on entry');
+            logger.log(Date.now() / 1000 + ': Paused on entry');
             this._expectingStopReason = 'entry';
             this._entryPauseEvent = notification;
             this._waitingForEntryPauseEvent = false;
@@ -526,19 +526,20 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     /**
-     * Wait 500-1000ms for the entry pause event, and if it doesn't come, move on with life.
+     * Wait 500-5000ms for the entry pause event, and if it doesn't come, move on with life.
      * During attach, we don't know whether it's paused when attaching.
      */
     private beginWaitingForDebuggerPaused(): void {
         // Wait longer in launch mode - it definitely should be paused.
-        let count = this._attachMode ? 10 : 20;
+        let count = this._attachMode ? 10 : 100;
+        logger.log(Date.now() / 1000 + ': Waiting for initial debugger pause');
         const id = setInterval(() => {
             if (this._entryPauseEvent || this._isTerminated) {
                 // Got the entry pause, stop waiting
                 clearInterval(id);
             } else if (--count <= 0) {
                 // No entry event, so fake it and continue
-                logger.log('Did not get a pause event 500ms after starting, so continuing');
+                logger.log(Date.now() / 1000 + ': Did not get a pause event after starting, so continuing');
                 clearInterval(id);
                 this._continueAfterConfigDone = false;
                 this._waitingForEntryPauseEvent = false;
