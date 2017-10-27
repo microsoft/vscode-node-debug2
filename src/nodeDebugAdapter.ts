@@ -204,7 +204,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             const envArgs = this.collectEnvFileArgs(args) || args.env;
             let launchP: Promise<void>;
-            if (args.console === 'integratedTerminal' || args.console === 'externalTerminal') {
+            if ((args.console === 'integratedTerminal' || args.console === 'externalTerminal') && this._supportsRunInTerminalRequest) {
                 const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
                     kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
                     title: localize('node.console.title', "Node Debug Console"),
