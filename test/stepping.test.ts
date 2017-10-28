@@ -263,7 +263,7 @@ suite('Stepping', () => {
             const stackTraceResponse = await dc.stackTraceRequest();
 
             // Assert that there are at least a few frames with paths marked with <node_internals>, and they are deemphasized
-            const internalsFrames = stackTraceResponse.body.stackFrames.filter(frame => frame.source.path.startsWith('<node_internals>/'));
+            const internalsFrames = stackTraceResponse.body.stackFrames.filter(frame => frame.source && frame.source.path && frame.source.path.startsWith('<node_internals>/'));
             assert(internalsFrames.length > 1);
             internalsFrames.forEach(frame => assert.equal((<any>frame.source).presentationHint, 'deemphasize'));
 
