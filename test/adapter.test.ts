@@ -368,11 +368,11 @@ suite('Node Debug Adapter etc', () => {
         async function stepOverNativeAwait(fromLine: number, afterBp = false) {
             const toLine = fromLine + 1;
 
-            if (utils.compareSemver(process.version, 'v8.0.0') < 0 || utils.compareSemver(process.version, 'v8.4.0') >= 0) {
+            if (utils.compareSemver(process.version, 'v8.0.0') < 0 || (utils.compareSemver(process.version, 'v8.4.0') >= 0 && utils.compareSemver(process.version, 'v8.7.0') < 0)) {
                 // In pre-8, must always step twice over await lines
                 await dc.nextTo('step', { line: fromLine });
                 await dc.nextTo('step', { line: fromLine });
-            } else if (!afterBp) {
+            } else if (!afterBp && utils.compareSemver(process.version, 'v8.7.0') < 0) {
                 // In 8, must step an extra time if a BP on this line didn't cause the break
                 await dc.nextTo('step', { line: fromLine });
             }
@@ -386,32 +386,56 @@ suite('Node Debug Adapter etc', () => {
                 return Promise.resolve();
             }
 
+            const isAfter87 = utils.compareSemver(process.version, 'v8.7.0') >= 0;
+
             const PROGRAM = path.join(DATA_ROOT, 'native-async-await/main.js');
 
-            await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true }, { path: PROGRAM, line: 8 });
+            await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true, skipFiles: ['<node_internals>/**'] }, { path: PROGRAM, line: 8 });
 
             await stepOverNativeAwait(8, /*afterBp=*/true);
             let stackTrace = await dc.stepInTo('step', { line: 13 });
-            assertStackFrame(stackTrace, 3, PROGRAM, 7);
-            assertStackFrame(stackTrace, 4, PROGRAM, 40);
+            if (isAfter87) {
+                // After node 8.7, there are two async_hooks frames to count.
+                // Also, a stackframe before an async call is on the first line of the calling function, not the function decl line
+                assertStackFrame(stackTrace, 5, PROGRAM, 8);
+                assertStackFrame(stackTrace, 6, PROGRAM, 40);
+            } else {
+                assertStackFrame(stackTrace, 3, PROGRAM, 7);
+                assertStackFrame(stackTrace, 4, PROGRAM, 40);
+            }
             assertAsyncLabelCount(stackTrace, 1);
 
             await stepOverNativeAwait(13);
             stackTrace = await dc.stepInTo('step', { line: 18 });
-            assertStackFrame(stackTrace, 3, PROGRAM, 12);
-            assertStackFrame(stackTrace, 4, PROGRAM, 9);
+            if (isAfter87) {
+                assertStackFrame(stackTrace, 5, PROGRAM, 13);
+                assertStackFrame(stackTrace, 6, PROGRAM, 9);
+            } else {
+                assertStackFrame(stackTrace, 3, PROGRAM, 12);
+                assertStackFrame(stackTrace, 4, PROGRAM, 9);
+            }
             assertAsyncLabelCount(stackTrace, 2);
 
             await stepOverNativeAwait(18);
             stackTrace = await dc.stepInTo('step', { line: 23 });
-            assertStackFrame(stackTrace, 3, PROGRAM, 17);
-            assertStackFrame(stackTrace, 4, PROGRAM, 14);
+            if (isAfter87) {
+                assertStackFrame(stackTrace, 5, PROGRAM, 18);
+                assertStackFrame(stackTrace, 6, PROGRAM, 14);
+            } else {
+                assertStackFrame(stackTrace, 3, PROGRAM, 17);
+                assertStackFrame(stackTrace, 4, PROGRAM, 14);
+            }
             assertAsyncLabelCount(stackTrace, 3);
 
             await stepOverNativeAwait(23);
             stackTrace = await dc.stepInTo('step', { line: 28 });
-            assertStackFrame(stackTrace, 3, PROGRAM, 22);
-            assertStackFrame(stackTrace, 4, PROGRAM, 19);
+            if (isAfter87) {
+                assertStackFrame(stackTrace, 5, PROGRAM, 23);
+                assertStackFrame(stackTrace, 6, PROGRAM, 19);
+            } else {
+                assertStackFrame(stackTrace, 3, PROGRAM, 22);
+                assertStackFrame(stackTrace, 4, PROGRAM, 19);
+            }
             assertAsyncLabelCount(stackTrace, 4);
         });
     });
