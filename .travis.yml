@@ -13,6 +13,7 @@ node_js:
   - "8.1.2"
   - "8.4.0"
   - "8.7.0"
+  - "8.8.1"
 
 matrix:
   allow_failures:
