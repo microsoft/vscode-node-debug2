@@ -23,7 +23,7 @@
         {
 			"name": "Run Tests",
 			"type": "node",
-			"protocol": "auto",
+			"protocol": "inspector",
 			"request": "launch",
 			"cwd": "${workspaceFolder}",
 			"program": "${workspaceFolder}/node_modules/.bin/_mocha",

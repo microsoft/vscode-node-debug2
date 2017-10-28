@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "debugServer": 4712,
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v8.7.0/bin/node",
+            "trace": true,
+            "program": "${file}"
+        }
+    ]
+}
