@@ -446,14 +446,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
-    public terminateSession(reason: string, args?: DebugProtocol.DisconnectArguments): void {
+    public async terminateSession(reason: string, args?: DebugProtocol.DisconnectArguments): Promise<void> {
         if (this.isExtensionHost() && args && typeof (<any>args).restart === 'boolean' && (<any>args).restart) {
             this._nodeProcessId = 0;
         }
 
         this.killNodeProcess();
         const restartArgs = this._restartMode && !this._inShutdown ? { port: this._port } : undefined;
-        super.terminateSession(reason, undefined, restartArgs);
+        return super.terminateSession(reason, undefined, restartArgs);
     }
 
     protected onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason?: stoppedEvent.ReasonType): void {
