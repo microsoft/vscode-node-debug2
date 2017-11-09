@@ -440,8 +440,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private killNodeProcess(): void {
         if (this._nodeProcessId && !this.normalAttachMode) {
-            logger.log('Killing process with id: ' + this._nodeProcessId);
-            utils.killTree(this._nodeProcessId);
+            if (this._nodeProcessId === 1) {
+                logger.log('Not killing launched process. It has PID=1');
+            } else {
+                logger.log('Killing process with id: ' + this._nodeProcessId);
+                utils.killTree(this._nodeProcessId);
+            }
+
             this._nodeProcessId = 0;
         }
     }
@@ -610,7 +615,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 }
             } else {
                 const [pid, version, arch] = response.result.value;
-                this._nodeProcessId = pid;
+                if (!this._nodeProcessId) {
+                    this._nodeProcessId = pid;
+                }
+
                 if (this._pollForNodeProcess) {
                     this.startPollingForNodeTermination();
                 }
