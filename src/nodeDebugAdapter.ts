@@ -22,6 +22,7 @@ import * as nls from 'vscode-nls';
 const localize = nls.config(process.env.VSCODE_NLS_CONFIG)();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
+    'webpack:///./~/*': '${cwd}/node_modules/*',
     'webpack:///./*': '${cwd}/*',
     'webpack:///*': '*',
     'meteor://💻app/*': '${cwd}/*',
