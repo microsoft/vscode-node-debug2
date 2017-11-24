@@ -125,7 +125,7 @@
               "env": {
                 "type": "object",
                 "additionalProperties": {
-                  "type": "string"
+                  "type": [ "string", "null" ]
                 },
                 "description": "%extensionHost.launch.env.description%",
                 "default": {}

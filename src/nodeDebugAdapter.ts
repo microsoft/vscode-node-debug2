@@ -292,6 +292,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private launchInInternalConsole(runtimeExecutable: string, launchArgs: string[], envArgs?: any, cwd?: string): Promise<void> {
         // merge environment variables into a copy of the process.env
         const env = Object.assign({}, process.env, envArgs);
+        Object.keys(env).filter(k => env[k] === null).forEach(key => delete env[key]);
+
         const spawnOpts: cp.SpawnOptions = { cwd, env };
 
         this.logLaunchCommand(runtimeExecutable, launchArgs);
