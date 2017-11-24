@@ -141,8 +141,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             if (!fs.existsSync(programPath)) {
-                programPath += '.js';
-                if (!fs.existsSync(programPath)) {
+                if (fs.existsSync(programPath + '.js')) {
+                    programPath += '.js';
+                } else {
                     return this.getNotExistErrorResponse('program', programPath);
                 }
             }
