@@ -458,6 +458,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public async terminateSession(reason: string, args?: DebugProtocol.DisconnectArguments): Promise<void> {
         if (this.isExtensionHost() && args && typeof (<any>args).restart === 'boolean' && (<any>args).restart) {
             this._nodeProcessId = 0;
+        } else if (this._restartMode && !args)  {
+            // If restart: true, only kill the process when the client has disconnected. 'args' present implies that a Disconnect request was received
+            this._nodeProcessId = 0;
         }
 
         this.killNodeProcess();
