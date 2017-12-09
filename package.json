@@ -24,6 +24,7 @@
     "@types/source-map": "^0.1.27",
     "del": "^2.2.2",
     "event-stream": "^3.3.4",
+    "find-free-port": "^1.0.2",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^2.2.0",
     "gulp-tslint": "^8.1.2",
@@ -35,7 +36,7 @@
     "typescript": "^2.6.2",
     "vsce": "^1.33.2",
     "vscode": "^1.1.9",
-    "vscode-chrome-debug-core-testsupport": "^3.17.1",
+    "vscode-chrome-debug-core-testsupport": "^3.20.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
     "vscode-debugprotocol": "^1.25.0",
     "vscode-nls-dev": "^2.1.6"
