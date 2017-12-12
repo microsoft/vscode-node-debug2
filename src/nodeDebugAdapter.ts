@@ -476,9 +476,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._entryPauseEvent = notification;
             this._waitingForEntryPauseEvent = false;
 
-            if (this.normalAttachMode) {
-                // In attach mode, and we did pause right away,
-                // so assume --debug-brk was set and we should show paused
+            if (this.normalAttachMode && (<ICommonRequestArgs>this._launchAttachArgs).stopOnEntry !== false) {
+                // In attach mode, and we did pause right away, so assume --debug-brk was set and we should show paused.
+                // Unless stopOnEntry is explicitly disabled.
                 this._continueAfterConfigDone = false;
             }
 
