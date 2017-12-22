@@ -353,6 +353,32 @@ suite('Breakpoints', () => {
         });
     });
 
+    suite('exception scope', () => {
+        const PROGRAM = path.join(DATA_ROOT, 'programWithException.js');
+
+        test('should only show exception scope in the first frame', () => {
+            const EXCEPTION_LINE = 6;
+
+            return Promise.all([
+                dc.waitForEvent('initialized')
+                    .then(event =>  dc.setExceptionBreakpointsRequest({ filters: ['all'] }))
+                    .then(response =>  dc.configurationDoneRequest()),
+
+                dc.launch({ program: PROGRAM }),
+
+                dc.assertStoppedLocation('exception', { path: PROGRAM, line: EXCEPTION_LINE }).then(async response => {
+                    const frame0Id = response.body.stackFrames[0].id;
+                    const frame0Scopes = await dc.scopesRequest({ frameId: frame0Id });
+                    assert.equal(frame0Scopes.body.scopes[0].name, 'Exception', "First frame should be named Exception");
+
+                    const frame1Id = response.body.stackFrames[1].id;
+                    const frame1Scopes = await dc.scopesRequest({ frameId: frame1Id });
+                    assert.notEqual(frame1Scopes.body.scopes[0].name, 'Exception', 'First frame should not be named Exception');
+                })
+            ]);
+        });
+    });
+
     suite('setBreakpoints using Webpack', () => {
         test('webpack', () => {
             const TS_SOURCE = path.join(DATA_ROOT, 'webpack/app.ts');
