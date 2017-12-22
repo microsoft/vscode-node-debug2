@@ -2,27 +2,39 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "debugServer": 4712,
+            // "debugServer": 4712,
             "type": "node",
             "request": "launch",
-            "name": "Launch script",
+            "name": "Run",
             "protocol": "inspector",
-            "stopOnEntry": true,
-            "program": "${workspaceFolder}/test.js",
-            // "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v8.4.0/bin/node",
+            "program": "${file}",
+            "skipFiles": [
+                "${workspaceFolder}/a.js"
+            ],
+            "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v9.2.1/bin/node",
             "trace": true
         },
         {
+            // "debugServer": 4712,
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
             "name": "Launch Program",
             "program": "${workspaceFolder}/out/app.js",
             "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            // "runtimeExecutable": "/Users/roblou/.nvm/versions/node/v7.3.0/bin/node",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "trace": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Cluster",
+            "program": "${workspaceFolder}/cluster.ts",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "autoAttachChildProcesses": true
         },
         {
             "debugServer": 4712,
@@ -74,6 +86,7 @@
             "type": "node",
             "request": "attach",
             "port": 9229,
+            "processId": "40745",
             "address": "localhost",
             // "sourceMaps": true,
             "outFiles": [ "${workspaceFolder}/out/**/*.js" ],
