@@ -98,17 +98,31 @@ suite('Node Debug Adapter etc', () => {
     });
 
 
-    // verbose logging...
-    suite.skip('output events', () => {
-        const PROGRAM = path.join(DATA_ROOT, 'programWithOutput.js');
+    suite('output events', () => {
+        const PROGRAM = path.join(DATA_ROOT, 'programWithConsoleLogging.js');
 
-        test('stdout and stderr events should be complete and in correct order', () => {
-            return Promise.all([
+        // https://github.com/Microsoft/vscode/issues/37770
+        test('get output events in correct order', async () => {
+            await Promise.all([
                 dc.configurationSequence(),
-                dc.launch({ program: PROGRAM }),
-                dc.assertOutput('stdout', 'Hello stdout 0\nHello stdout 1\nHello stdout 2\n'),
-                // dc.assertOutput('stderr', 'Hello stderr 0\nHello stderr 1\nHello stderr 2\n') // "debugger listening on port # ..." message
-            ]);
+                dc.launch({ program: PROGRAM })]);
+
+            let lastEventType: string;
+            return new Promise((resolve, reject) => {
+                dc.on('output', outputEvent => {
+                    const msg: string = outputEvent.body.output.trim();
+                    if (msg.startsWith('log:') || msg.startsWith('error:')) {
+                        const type: string = outputEvent.body.category;
+                        if (type === lastEventType) {
+                            return reject(new Error(`Got two messages in a row of type ${type}`));
+                        } else if (msg === 'error: 9') {
+                            return resolve();
+                        }
+
+                        lastEventType = type;
+                    }
+                });
+            });
         });
     });
 
