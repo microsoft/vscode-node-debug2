@@ -99,10 +99,9 @@ suite('Node Debug Adapter etc', () => {
 
 
     suite('output events', () => {
-        const PROGRAM = path.join(DATA_ROOT, 'programWithConsoleLogging.js');
-
         // https://github.com/Microsoft/vscode/issues/37770
         test('get output events in correct order', async () => {
+            const PROGRAM = path.join(DATA_ROOT, 'programWithConsoleLogging.js');
             await Promise.all([
                 dc.configurationSequence(),
                 dc.launch({ program: PROGRAM })]);
@@ -120,6 +119,31 @@ suite('Node Debug Adapter etc', () => {
                         }
 
                         lastEventType = type;
+                    }
+                });
+            });
+        });
+
+        // https://github.com/Microsoft/vscode-node-debug2/issues/156
+        test("don't lose error output at the end of the program", async () => {
+            const PROGRAM = path.join(DATA_ROOT, 'programWithUncaughtException.js');
+            await Promise.all([
+                dc.configurationSequence(),
+                dc.launch({ program: PROGRAM })]);
+
+            let gotOutput = false;
+            return new Promise((resolve, reject) => {
+                dc.on('output', outputEvent => {
+                    const msg: string = outputEvent.body.output.trim();
+                    if (msg.startsWith('Error: uncaught exception')) {
+                        gotOutput = true;
+                        resolve();
+                    }
+                });
+
+                dc.on('terminated', () => {
+                    if (!gotOutput) {
+                        reject(new Error('Terminated before exception output received'));
                     }
                 });
             });
