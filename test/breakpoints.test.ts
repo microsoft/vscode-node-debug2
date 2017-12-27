@@ -7,6 +7,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
+import * as utils from '../src/utils';
 
 import * as testSetup from './testSetup';
 
@@ -299,8 +300,12 @@ suite('Breakpoints', () => {
     suite('setExceptionBreakpoints', () => {
         const PROGRAM = path.join(DATA_ROOT, 'programWithException.js');
 
-        // Terminate at end
-        test.skip('should not stop on an exception', () => {
+        test('should not stop on an exception', () => {
+            if (utils.compareSemver(process.version, 'v8.0.0') < 0) {
+                // Terminating at program end only works after Node 8
+                return Promise.resolve();
+            }
+
             return Promise.all<DebugProtocol.ProtocolMessage>([
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setExceptionBreakpointsRequest({
