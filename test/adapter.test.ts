@@ -125,7 +125,12 @@ suite('Node Debug Adapter etc', () => {
         });
 
         // https://github.com/Microsoft/vscode-node-debug2/issues/156
-        test("don't lose error output at the end of the program", async () => {
+        test(`don't lose error output at the end of the program`, async () => {
+            // It's possible for some Node versions to exit and never report the exception
+            if (utils.compareSemver(process.version, 'v8.5.0') < 0) {
+                return Promise.resolve();
+            }
+
             const PROGRAM = path.join(DATA_ROOT, 'programWithUncaughtException.js');
             await Promise.all([
                 dc.configurationSequence(),
