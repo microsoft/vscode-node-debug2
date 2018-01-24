@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug 2",
-  "version": "1.20.0",
+  "version": "1.20.1",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -14,14 +14,13 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "^3.21.2",
-    "vscode-debugadapter": "^1.25.0",
+    "vscode-chrome-debug-core": "^3.22.1",
+    "vscode-debugadapter": "^1.26.0-pre.1",
     "vscode-nls": "^2.0.2"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.52",
-    "@types/source-map": "^0.1.27",
     "del": "^2.2.2",
     "event-stream": "^3.3.4",
     "find-free-port": "^1.0.2",
@@ -38,7 +37,7 @@
     "vscode": "^1.1.9",
     "vscode-chrome-debug-core-testsupport": "^3.20.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
-    "vscode-debugprotocol": "^1.25.0",
+    "vscode-debugprotocol": "^1.25.0-pre.3",
     "vscode-nls-dev": "^2.1.6"
   },
   "main": "./out/src/extension",
@@ -56,7 +55,7 @@
     "package": "gulp package"
   },
   "engines": {
-    "vscode": "^1.14.0",
+    "vscode": "^1.19.0",
     "node": "^6.3.0"
   },
   "repository": {
