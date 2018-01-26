@@ -240,11 +240,17 @@ suite('Breakpoints', () => {
             const BP_LINE = 10;
             const outFiles = [path.join(projectRoot, 'dist/*.js')];
 
+            let bpChangedEventCount = 0;
             return Promise.all<DebugProtocol.ProtocolMessage>([
                 dc.waitForEvent('initialized').then(event => {
                     return dc.setBreakpointsRequest({ source: { path: BP_PROGRAM }, breakpoints: [{ line: BP_LINE }]}).then(response => {
                         assert.equal(response.body.breakpoints.length, 1);
                         assert(!response.body.breakpoints[0].verified, 'Expected bp to not be verified yet');
+
+                        dc.on('breakpoint', e => {
+                            bpChangedEventCount++;
+                        });
+
                         return dc.configurationDoneRequest();
                     });
                 }),
@@ -254,18 +260,23 @@ suite('Breakpoints', () => {
                     return null;
                 }),
 
-                dc.assertStoppedLocation('breakpoint', { path: BP_PROGRAM, line: BP_LINE } )
+                dc.assertStoppedLocation('breakpoint', { path: BP_PROGRAM, line: BP_LINE } ).then(() => {
+                    if (bpChangedEventCount > 1) {
+                        // Test that we didn't unnecessarily reset the BP when the script loaded
+                        throw new Error('Too many BP changed events');
+                    }
+                })
             ]);
         });
 
         // Microsoft/vscode-chrome-debug-core#38
-        test.skip('should stop on a breakpoint in source even if program\'s entry point is in JavaScript', () => {
+        test('should stop on a breakpoint in source even if program\'s entry point is in JavaScript', () => {
             const PROGRAM = path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/out/entry.js');
             const OUT_DIR = path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/out');
             const TS_SOURCE = path.join(DATA_ROOT, 'sourcemaps-js-entrypoint/src/classes.ts');
             const TS_LINE = 17;
 
-            return dc.hitBreakpoint({
+            return dc.hitBreakpointUnverified({
                 program: PROGRAM,
                 sourceMaps: true,
                 outDir: OUT_DIR,
