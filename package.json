@@ -52,7 +52,7 @@
     "vscode:prepublish": "gulp verify-no-linked-modules && gulp build",
     "tslint": "gulp tslint",
     "publish": "gulp publish",
-    "bump": "npm version patch -m 'Bump to %s'",
+    "bump": "npm version patch -m '%s'",
     "package": "gulp package"
   },
   "engines": {
