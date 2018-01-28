@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, IGetTTDTraceWriteURIResponseBody, IGetTTDReplayConfigurationResponseBody, IIsTTDLiveModeResponseBody, IIsTTDReplayModeResponseBody, Crdp} from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -52,6 +52,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _restartMode: boolean;
     private _isTerminated: boolean;
     private _adapterID: string;
+
+    private _runtimeArgsForTTD: string[];
+    private _runtimeExecutableForTTD: string;
+    private _programPathForTTD: string;
 
     /**
      * Returns whether this is a non-EH attach scenario
@@ -155,6 +159,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         this._captureFromStd = args.outputCapture === 'std';
+
+        this._runtimeArgsForTTD = args.runtimeArgs || [];
+        this._runtimeExecutableForTTD = args.runtimeExecutable;
+        this._programPathForTTD = programPath;
 
         return this.resolveProgramPath(programPath, args.sourceMaps).then<void>(resolvedProgramPath => {
             let program: string;
@@ -272,6 +280,53 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     private supportsStepBack(): boolean {
         return this._domains.has(<keyof Crdp.CrdpClient>'TimeTravel');
+    }
+
+    public getTTDTraceWriteURI(): Promise<IGetTTDTraceWriteURIResponseBody> {
+        //
+        //TODO: it would be nice to have a 'tmp' like setup so we can create a unique
+        //      temp directory per debug host so we (1) don't clobber if there are multiple
+        //      and (s) can cleanup the log files on disconnect as well
+        //
+        const uri = path.join(path.dirname(this._programPathForTTD), "_ttd_log_");
+        return Promise.resolve({ uri: uri });
+    }
+
+    public getTTDReplayConfiguration(args: any): Promise<IGetTTDReplayConfigurationResponseBody> {
+        const replayConfig = {
+            "type": "node",
+            "request": "launch",
+            "name": "TTDReplay",
+            "protocol": "inspector",
+            "runtimeArgs": [
+                `--replay-debug=${args["uri"]}`
+            ],
+            "console": "internalConsole"
+        };
+
+        if (this._runtimeExecutableForTTD) {
+            replayConfig["runtimeExecutable"] = this._runtimeExecutableForTTD;
+        }
+
+        //
+        //TODO: this is a temp thing for dev-mode
+        //
+        //replayConfig["debugServer"] = 4712;
+
+        return Promise.resolve({ jsonLaunchConfig: JSON.stringify(replayConfig) });
+    }
+    ////
+
+    public isTTDLiveMode(): Promise<IIsTTDLiveModeResponseBody> {
+        const liveFlag = this._runtimeArgsForTTD.some((param) => param.startsWith("--tt-debug"));
+        const replayFlag = this._runtimeArgsForTTD.every((param) => param.startsWith("--replay-debug"))
+        return Promise.resolve({ isInLiveMode: this._runtimeExecutableForTTD && liveFlag && !replayFlag });
+    }
+
+    public isTTDReplayMode(): Promise<IIsTTDReplayModeResponseBody> {
+        const liveFlag = this._runtimeArgsForTTD.some((param) => param.startsWith("--tt-debug"));
+        const replayFlag = this._runtimeArgsForTTD.every((param) => param.startsWith("--replay-debug"))
+        return Promise.resolve({ isInReplayMode: this._runtimeExecutableForTTD && !liveFlag && replayFlag });
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
