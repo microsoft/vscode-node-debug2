@@ -382,7 +382,10 @@ suite('Node Debug Adapter etc', () => {
 
             assert(!!frame);
             assert.equal(frame.source && frame.source.path, sourcePath);
-            assert.equal(frame.line, line);
+
+            // Before node 8.7, a stackframe before an async call is on the first line of the calling function, not the function decl line.
+            // Same with 8.9.4 exactly. So just check for either one.
+            assert(frame.line === line || frame.line === line - 1);
         }
 
         /**
@@ -438,34 +441,30 @@ suite('Node Debug Adapter etc', () => {
                 return Promise.resolve();
             }
 
-            // A stackframe before an async call is on the first line of the calling function, not the function decl line.
-            // So adjust line numbers per version
-            const isAfter87 = utils.compareSemver(process.version, 'v8.7.0') >= 0;
-
             const PROGRAM = path.join(DATA_ROOT, 'native-async-await/main.js');
             await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true, skipFiles: ['<node_internals>/**'] }, { path: PROGRAM, line: 8 });
 
             await stepOverNativeAwait(8, /*afterBp=*/true);
             let stackTrace = await dc.stepInTo('step', { line: 13 });
-            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 8 : 7);
+            assertStackFrame(stackTrace, 3, PROGRAM, 8);
             assertStackFrame(stackTrace, 4, PROGRAM, 40);
             assertAsyncLabelCount(stackTrace, 1);
 
             await stepOverNativeAwait(13);
             stackTrace = await dc.stepInTo('step', { line: 18 });
-            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 13 : 12);
+            assertStackFrame(stackTrace, 3, PROGRAM, 13);
             assertStackFrame(stackTrace, 4, PROGRAM, 9);
             assertAsyncLabelCount(stackTrace, 2);
 
             await stepOverNativeAwait(18);
             stackTrace = await dc.stepInTo('step', { line: 23 });
-            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 18 : 17);
+            assertStackFrame(stackTrace, 3, PROGRAM, 18);
             assertStackFrame(stackTrace, 4, PROGRAM, 14);
             assertAsyncLabelCount(stackTrace, 3);
 
             await stepOverNativeAwait(23);
             stackTrace = await dc.stepInTo('step', { line: 28 });
-            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 23 : 22);
+            assertStackFrame(stackTrace, 3, PROGRAM, 23);
             assertStackFrame(stackTrace, 4, PROGRAM, 19);
             assertAsyncLabelCount(stackTrace, 4);
         });
