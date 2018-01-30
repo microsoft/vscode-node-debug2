@@ -16,7 +16,7 @@
   "dependencies": {
     "vscode-chrome-debug-core": "^3.22.4",
     "vscode-debugadapter": "^1.26.0-pre.2",
-    "vscode-nls": "^2.0.2"
+    "vscode-nls": "^3.2.1"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.47",
@@ -38,7 +38,7 @@
     "vscode-chrome-debug-core-testsupport": "^3.21.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
     "vscode-debugprotocol": "^1.25.0-pre.3",
-    "vscode-nls-dev": "^2.1.6"
+    "vscode-nls-dev": "^3.0.7"
   },
   "main": "./out/src/extension",
   "activationEvents": [

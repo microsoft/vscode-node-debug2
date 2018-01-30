@@ -22,20 +22,26 @@ const transifexApiName = 'api';
 const transifexApiToken = process.env.TRANSIFEX_API_TOKEN;
 const transifexProjectName = 'vscode-extensions';
 const transifexExtensionName = 'vscode-node-debug2';
-const vscodeLanguages = [
-    'zh-hans',
-    'zh-hant',
-    'ja',
-    'ko',
-    'de',
-    'fr',
-    'es',
-    'ru',
-    'it',
-    'pt-br',
-    'hu',
-    'tr'
+
+const defaultLanguages = [
+	{ id: 'zh-tw', folderName: 'cht', transifexId: 'zh-hant' },
+	{ id: 'zh-cn', folderName: 'chs', transifexId: 'zh-hans' },
+	{ id: 'ja', folderName: 'jpn' },
+	{ id: 'ko', folderName: 'kor' },
+	{ id: 'de', folderName: 'deu' },
+	{ id: 'fr', folderName: 'fra' },
+	{ id: 'es', folderName: 'esn' },
+	{ id: 'ru', folderName: 'rus' },
+	{ id: 'it', folderName: 'ita' }
 ];
+
+const extraLanguages = [
+	{ id: 'pt-br', folderName: 'ptb' },
+	{ id: 'hu', folderName: 'hun' },
+	{ id: 'tr', folderName: 'trk' }
+];
+
+const allLanguages = defaultLanguages.concat(extraLanguages);
 
 const watchedSources = [
 	'src/**/*',
@@ -62,7 +68,9 @@ function doBuild(buildNls, failOnError) {
 
     return tsResult.js
         .pipe(buildNls ? nls.rewriteLocalizeCalls() : es.through())
-        .pipe(buildNls ? nls.createAdditionalLanguageFiles(nls.coreLanguages, 'i18n', 'out') : es.through())
+        .pipe(buildNls ? nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n', 'out') : es.through())
+		.pipe(buildNls ? nls.bundleMetaDataFiles('ms-vscode.node-debug2', 'out') : es.through())
+		.pipe(buildNls ? nls.bundleLanguageFiles() : es.through())
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '..' })) // .. to compensate for TS returning paths from 'out'
         .pipe(gulp.dest('out'))
         .once('error', () => {
@@ -148,20 +156,28 @@ gulp.task('package', function(callback) {
 });
 
 gulp.task('add-i18n', function () {
-    return gulp.src(['package.nls.json'])
-        .pipe(nls.createAdditionalLanguageFiles(nls.coreLanguages, 'i18n'))
-        .pipe(gulp.dest('.'));
+	return gulp.src(['package.nls.json'])
+		.pipe(nls.createAdditionalLanguageFiles(defaultLanguages, 'i18n'))
+		.pipe(gulp.dest('.'));
 });
 
 gulp.task('transifex-push', function () {
-    return gulp.src('**/*.nls.json')
-        .pipe(nls.prepareXlfFiles(transifexProjectName, transifexExtensionName))
-        .pipe(nls.pushXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken));
+	return gulp.src(['package.nls.json', 'out/nls.metadata.header.json','out/nls.metadata.json'])
+		.pipe(nls.createXlfFiles(transifexProjectName, transifexExtensionName))
+		.pipe(nls.pushXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken));
+});
+
+gulp.task('transifex-push-test', function() {
+	return gulp.src(['package.nls.json', 'out/nls.metadata.header.json','out/nls.metadata.json'])
+		.pipe(nls.createXlfFiles(transifexProjectName, transifexExtensionName))
+		.pipe(gulp.dest(path.join('..', `${transifexExtensionName}-push-test`)));
 });
 
 gulp.task('transifex-pull', function () {
-    return nls.pullXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken, vscodeLanguages, [{ name: transifexExtensionName, project: transifexProjectName }])
-        .pipe(gulp.dest(`../${transifexExtensionName}-localization`));
+	return es.merge(allLanguages.map(function(language) {
+		return nls.pullXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken, language, [{ name: transifexExtensionName, project: transifexProjectName }]).
+			pipe(gulp.dest(`../${transifexExtensionName}-localization/${language.folderName}`));
+	}));
 });
 
 gulp.task('i18n-import', function () {
