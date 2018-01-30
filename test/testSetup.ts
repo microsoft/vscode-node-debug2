@@ -33,8 +33,14 @@ async function patchLaunchArgs(launchArgs: any): Promise<void> {
     }
 }
 
-export function setup(port?: number) {
-    return ts.setup('./out/src/nodeDebug.js', 'node2', patchLaunchArgs, port);
+export function setup(_opts?: { port?: number, alwaysDumpLogs?: boolean }) {
+    const opts = Object.assign(<ts.ISetupOpts>{
+        entryPoint: './out/src/nodeDebug.js',
+        type: 'node2',
+        patchLaunchArgs
+    }, _opts);
+
+    return ts.setup(opts);
 }
 
 export function teardown() {

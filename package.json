@@ -35,7 +35,7 @@
     "typescript": "^2.6.2",
     "vsce": "^1.33.2",
     "vscode": "^1.1.9",
-    "vscode-chrome-debug-core-testsupport": "^3.21.0",
+    "vscode-chrome-debug-core-testsupport": "^4.0.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
     "vscode-debugprotocol": "^1.25.0-pre.3",
     "vscode-nls-dev": "^3.0.7"
