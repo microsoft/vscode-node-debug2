@@ -378,10 +378,19 @@ suite('Node Debug Adapter etc', () => {
         }
 
         function assertStackFrame(stackTrace: DebugProtocol.StackTraceResponse, i: number, sourcePath: string, line: number): void {
-            const frame = stackTrace.body.stackFrames[i];
+            const frame = stripAsyncHookFrames(stackTrace)[i];
+
             assert(!!frame);
             assert.equal(frame.source && frame.source.path, sourcePath);
             assert.equal(frame.line, line);
+        }
+
+        /**
+         * After node 8.7, there are two async_hooks frames to count. In 8.9.4 exactly, the async_hook frames don't show up in the stack.
+         * Then in later versions they show up again. Easier to just remove them to use the same stack trace indexes for all versions.
+         */
+        function stripAsyncHookFrames(stackTrace: DebugProtocol.StackTraceResponse): DebugProtocol.StackFrame[] {
+            return stackTrace.body.stackFrames.filter(frame => !frame.source || frame.source.path.indexOf('async_hook') < 0);
         }
 
         test('shows async stacks for promise resolution', async () => {
@@ -429,56 +438,35 @@ suite('Node Debug Adapter etc', () => {
                 return Promise.resolve();
             }
 
+            // A stackframe before an async call is on the first line of the calling function, not the function decl line.
+            // So adjust line numbers per version
             const isAfter87 = utils.compareSemver(process.version, 'v8.7.0') >= 0;
 
             const PROGRAM = path.join(DATA_ROOT, 'native-async-await/main.js');
-
             await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true, skipFiles: ['<node_internals>/**'] }, { path: PROGRAM, line: 8 });
 
             await stepOverNativeAwait(8, /*afterBp=*/true);
             let stackTrace = await dc.stepInTo('step', { line: 13 });
-            if (isAfter87) {
-                // After node 8.7, there are two async_hooks frames to count.
-                // Also, a stackframe before an async call is on the first line of the calling function, not the function decl line
-                assertStackFrame(stackTrace, 5, PROGRAM, 8);
-                assertStackFrame(stackTrace, 6, PROGRAM, 40);
-            } else {
-                assertStackFrame(stackTrace, 3, PROGRAM, 7);
-                assertStackFrame(stackTrace, 4, PROGRAM, 40);
-            }
+            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 8 : 7);
+            assertStackFrame(stackTrace, 4, PROGRAM, 40);
             assertAsyncLabelCount(stackTrace, 1);
 
             await stepOverNativeAwait(13);
             stackTrace = await dc.stepInTo('step', { line: 18 });
-            if (isAfter87) {
-                assertStackFrame(stackTrace, 5, PROGRAM, 13);
-                assertStackFrame(stackTrace, 6, PROGRAM, 9);
-            } else {
-                assertStackFrame(stackTrace, 3, PROGRAM, 12);
-                assertStackFrame(stackTrace, 4, PROGRAM, 9);
-            }
+            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 13 : 12);
+            assertStackFrame(stackTrace, 4, PROGRAM, 9);
             assertAsyncLabelCount(stackTrace, 2);
 
             await stepOverNativeAwait(18);
             stackTrace = await dc.stepInTo('step', { line: 23 });
-            if (isAfter87) {
-                assertStackFrame(stackTrace, 5, PROGRAM, 18);
-                assertStackFrame(stackTrace, 6, PROGRAM, 14);
-            } else {
-                assertStackFrame(stackTrace, 3, PROGRAM, 17);
-                assertStackFrame(stackTrace, 4, PROGRAM, 14);
-            }
+            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 18 : 17);
+            assertStackFrame(stackTrace, 4, PROGRAM, 14);
             assertAsyncLabelCount(stackTrace, 3);
 
             await stepOverNativeAwait(23);
             stackTrace = await dc.stepInTo('step', { line: 28 });
-            if (isAfter87) {
-                assertStackFrame(stackTrace, 5, PROGRAM, 23);
-                assertStackFrame(stackTrace, 6, PROGRAM, 19);
-            } else {
-                assertStackFrame(stackTrace, 3, PROGRAM, 22);
-                assertStackFrame(stackTrace, 4, PROGRAM, 19);
-            }
+            assertStackFrame(stackTrace, 3, PROGRAM, isAfter87 ? 23 : 22);
+            assertStackFrame(stackTrace, 4, PROGRAM, 19);
             assertAsyncLabelCount(stackTrace, 4);
         });
     });
