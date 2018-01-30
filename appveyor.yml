@@ -11,6 +11,11 @@ environment:
     - nodejs_version: 8.4
     - nodejs_version: 8.7
     - nodejs_version: 8.8
+    - nodejs_version: 8.9
+    - nodejs_version: 9.0
+    - nodejs_version: 9.1
+    - nodejs_version: 9.2
+    - nodejs_version: 9.3
 
 matrix:
   allow_failures:
