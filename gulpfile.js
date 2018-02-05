@@ -35,14 +35,6 @@ const defaultLanguages = [
 	{ id: 'it', folderName: 'ita' }
 ];
 
-const extraLanguages = [
-	{ id: 'pt-br', folderName: 'ptb' },
-	{ id: 'hu', folderName: 'hun' },
-	{ id: 'tr', folderName: 'trk' }
-];
-
-const allLanguages = defaultLanguages.concat(extraLanguages);
-
 const watchedSources = [
 	'src/**/*',
     'test/**/*'
@@ -161,27 +153,29 @@ gulp.task('add-i18n', function () {
 		.pipe(gulp.dest('.'));
 });
 
-gulp.task('transifex-push', function () {
+gulp.task('transifex-push', ['build'], function () {
 	return gulp.src(['package.nls.json', 'out/nls.metadata.header.json','out/nls.metadata.json'])
 		.pipe(nls.createXlfFiles(transifexProjectName, transifexExtensionName))
 		.pipe(nls.pushXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken));
 });
 
-gulp.task('transifex-push-test', function() {
+gulp.task('transifex-push-test', ['build'], function() {
 	return gulp.src(['package.nls.json', 'out/nls.metadata.header.json','out/nls.metadata.json'])
 		.pipe(nls.createXlfFiles(transifexProjectName, transifexExtensionName))
 		.pipe(gulp.dest(path.join('..', `${transifexExtensionName}-push-test`)));
 });
 
 gulp.task('transifex-pull', function () {
-	return es.merge(allLanguages.map(function(language) {
+	return es.merge(defaultLanguages.map(function(language) {
 		return nls.pullXlfFiles(transifexApiHostname, transifexApiName, transifexApiToken, language, [{ name: transifexExtensionName, project: transifexProjectName }]).
 			pipe(gulp.dest(`../${transifexExtensionName}-localization/${language.folderName}`));
 	}));
 });
 
-gulp.task('i18n-import', function () {
-    return gulp.src(`../${transifexExtensionName}-localization/**/*.xlf`)
-        .pipe(nls.prepareJsonFiles())
-        .pipe(gulp.dest('./i18n'));
+gulp.task('i18n-import', function() {
+	return es.merge(defaultLanguages.map(function(language) {
+		return gulp.src(`../${transifexExtensionName}-localization/${language.folderName}/**/*.xlf`)
+			.pipe(nls.prepareJsonFiles())
+			.pipe(gulp.dest(path.join('./i18n', language.folderName)));
+	}));
 });
