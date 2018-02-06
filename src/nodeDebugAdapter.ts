@@ -232,7 +232,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public async attach(args: IAttachRequestArguments): Promise<void> {
         try {
-            await super.attach(args);
+            return await super.attach(args);
         } catch (err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
