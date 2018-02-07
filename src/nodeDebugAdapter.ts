@@ -68,7 +68,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.initialize(args);
     }
 
-    public async launch(args: ILaunchRequestArguments): Promise<void> {
+    public async launch(args: ILaunchRequestArguments): Promise<DebugProtocol.Capabilities|void> {
         await super.launch(args);
 
         if (args.__restart && typeof args.__restart.port === 'number') {
@@ -156,7 +156,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         this._captureFromStd = args.outputCapture === 'std';
 
-        return this.resolveProgramPath(programPath, args.sourceMaps).then<void>(resolvedProgramPath => {
+        return this.resolveProgramPath(programPath, args.sourceMaps).then(resolvedProgramPath => {
             let program: string;
             let cwd = args.cwd;
             if (cwd) {
@@ -230,9 +230,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    public async attach(args: IAttachRequestArguments): Promise<void> {
+    public async attach(args: IAttachRequestArguments): Promise<DebugProtocol.Capabilities|void> {
         try {
-            return await super.attach(args);
+            return super.attach(args);
         } catch (err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {
                 // hack -core error msg
@@ -262,7 +262,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<any> {
+    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<DebugProtocol.Capabilities|void> {
         await super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort);
         this.beginWaitingForDebuggerPaused();
         this.getNodeProcessDetailsIfNeeded();
@@ -417,9 +417,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * Override so that -core's call on attach will be ignored, and we can wait until the first break when ready to set BPs.
      */
-    protected sendInitializedEvent(): void {
+    protected async sendInitializedEvent(): Promise<void> {
         if (!this._waitingForEntryPauseEvent) {
-            super.sendInitializedEvent();
+            return super.sendInitializedEvent();
         }
     }
 
