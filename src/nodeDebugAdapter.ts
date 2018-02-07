@@ -36,6 +36,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public static NODE_INTERNALS = '<node_internals>';
 
+    protected _launchAttachArgs: ICommonRequestArgs;
+
     private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
@@ -476,9 +478,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._entryPauseEvent = notification;
             this._waitingForEntryPauseEvent = false;
 
-            if (this.normalAttachMode && (<ICommonRequestArgs>this._launchAttachArgs).stopOnEntry !== false) {
+            if ((this.normalAttachMode && this._launchAttachArgs.stopOnEntry !== false) ||
+                (this.isExtensionHost() && this._launchAttachArgs.stopOnEntry)) {
                 // In attach mode, and we did pause right away, so assume --debug-brk was set and we should show paused.
-                // Unless stopOnEntry is explicitly disabled.
+                // In normal attach mode, assume stopOnEntry unless explicitly disabled.
+                // In extensionhost mode, only when stopOnEntry is explicitly enabled
                 this._continueAfterConfigDone = false;
             }
 
