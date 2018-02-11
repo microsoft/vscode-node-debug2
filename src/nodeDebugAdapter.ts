@@ -546,8 +546,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * During attach, we don't know whether it's paused when attaching.
      */
     private beginWaitingForDebuggerPaused(): void {
+        const checkPausedInterval = 50;
+        const timeout = this._launchAttachArgs.timeout;
+
         // Wait longer in launch mode - it definitely should be paused.
-        let count = this._attachMode ? 10 : 100;
+        let count = this._attachMode ?
+            10 :
+            (typeof timeout === 'number' ?
+                Math.floor(timeout / checkPausedInterval) :
+                100);
         logger.log(Date.now() / 1000 + ': Waiting for initial debugger pause');
         const id = setInterval(() => {
             if (this._entryPauseEvent || this._isTerminated) {
@@ -563,7 +570,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this.getNodeProcessDetailsIfNeeded()
                     .then(() => this.sendInitializedEvent());
             }
-        }, 50);
+        }, checkPausedInterval);
     }
 
     protected threadName(): string {
