@@ -1,5 +1,5 @@
 {
-	"extension.description": "Visual Studio Code debugger extension for Node.js v6.3+, using the new Inspector Protocol",
+	"extension.description": "Node.js debugging support",
 
 	"node.label": "Node.js v6.3+ via Inspector Protocol",
 

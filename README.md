@@ -1,12 +1,15 @@
-# VS Code Node Debug 2
+# Node Debug
 [![build status](https://travis-ci.org/Microsoft/vscode-node-debug2.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-node-debug2)
 [![Build status](https://ci.appveyor.com/api/projects/status/qrr2hff3eagw5k05?svg=true)](https://ci.appveyor.com/project/roblourens/vscode-node-debug2)
 
-This repository contains a debug extension for [node.js](https://nodejs.org) that ships with [VS Code](https://code.visualstudio.com) and uses the [Chrome Debugging Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/), which Node now exposes via the `--inspect` flag, only in Node versions 6.3+. It's built on the [vscode-chrome-debug-core](https://github.com/Microsoft/vscode-chrome-debug-core) library.
+This extension is bundled with Visual Studio Code and together with **Node Debug (legacy)** forms the [Node.js](https://nodejs.org) debugging experience.
 
-This extension has essentially reached feature-parity with vscode-node-debug. You can see the remaining issues in the [vscode-node-debug2](https://github.com/Microsoft/vscode-node-debug2/issues) repo and the [vscode-chrome-debug-core](https://github.com/microsoft/vscode-chrome-debug-core/issues) repo. You should be able to set `"type": "node2"` in your existing Node launch config and have things work the same, as long as it's running in Node v6.3+.
+**Node debug** is the debugger for Node.js versions >= 6.3 that support the [Chrome Debugging Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/), which Node.js exposes via the `--inspect` flag. It's built on the [vscode-chrome-debug-core](https://github.com/Microsoft/vscode-chrome-debug-core) library.
 
-See an overview of debugging Node.js in VS Code [here](https://code.visualstudio.com/docs/editor/debugging).
+See a general overview of debugging in VS Code [here](https://code.visualstudio.com/docs/editor/debugging).
+Documentation for Node.js specific debugging can be found [here](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
+
+Please submit bugs and feature requests to the [VS Code repository](https://github.com/microsoft/vscode/issues).
 
 ## Node version compatibility
 Typically it should work with any version of Node greater than 6.3. But there is some instability in Node with this option before 6.8, especially in Windows. Due to [nodejs/node#8155](https://github.com/nodejs/node/issues/8155), I recommend using at least 6.8 in Windows.
