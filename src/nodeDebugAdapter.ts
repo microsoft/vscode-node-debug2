@@ -216,7 +216,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     args: wslLaunchArgs.combined,
                     env: envArgs
                 };
-                launchP = this.launchInTerminal(termArgs);
+                launchP = this.launchInTerminal(termArgs).then(() => {
+                    if (args.noDebug) {
+                        this.terminateSession('cannot track process');
+                    }
+                });
             } else if (!args.console || args.console === 'internalConsole') {
                 launchP = this.launchInInternalConsole(wslLaunchArgs.executable, wslLaunchArgs.args, envArgs, cwd);
             } else {
