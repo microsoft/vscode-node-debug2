@@ -106,12 +106,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 runtimeExecutable = re;
             }
         } else {
-            if (!pathUtils.findOnPath(NodeDebugAdapter.NODE, args.env)) {
+            const re = pathUtils.findOnPath(NodeDebugAdapter.NODE, args.env);
+            if (!re) {
                 return Promise.reject(errors.runtimeNotFound(NodeDebugAdapter.NODE));
             }
 
             // use node from PATH
-            runtimeExecutable = NodeDebugAdapter.NODE;
+            runtimeExecutable = re;
         }
 
         this._continueAfterConfigDone = !args.stopOnEntry;
