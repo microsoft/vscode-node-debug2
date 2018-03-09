@@ -47,6 +47,18 @@
 			],
 			"sourceMaps": true,
 			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
+		},
+		{
+			"name": "Debug gulpfile",
+			"type": "node",
+			"request": "launch",
+			"protocol": "inspector",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/.bin/gulp",
+			"args": [
+				"transifex-push-test"
+			],
+			"internalConsoleOptions": "openOnSessionStart"
 		}
     ]
 }
