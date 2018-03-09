@@ -6,7 +6,7 @@ import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreU
 const telemetry = CoreTelemetry.telemetry;
 
 import {DebugProtocol} from 'vscode-debugprotocol';
-import {OutputEvent} from 'vscode-debugadapter';
+import {OutputEvent, CapabilitiesEvent} from 'vscode-debugadapter';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -70,7 +70,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.initialize(args);
     }
 
-    public async launch(args: ILaunchRequestArguments): Promise<DebugProtocol.Capabilities|void> {
+    public async launch(args: ILaunchRequestArguments): Promise<void> {
         await super.launch(args);
 
         if (args.__restart && typeof args.__restart.port === 'number') {
@@ -237,7 +237,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    public async attach(args: IAttachRequestArguments): Promise<DebugProtocol.Capabilities|void> {
+    public async attach(args: IAttachRequestArguments): Promise<void> {
         try {
             return super.attach(args);
         } catch (err) {
@@ -269,12 +269,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<DebugProtocol.Capabilities|void> {
+    protected async doAttach(port: number, targetUrl?: string, address?: string, timeout?: number, websocketUrl?: string, extraCRDPChannelPort?: number): Promise<void> {
         await super.doAttach(port, targetUrl, address, timeout, websocketUrl, extraCRDPChannelPort);
         this.beginWaitingForDebuggerPaused();
         this.getNodeProcessDetailsIfNeeded();
 
-        return { supportsStepBack: this.supportsStepBack() };
+        this._session.sendEvent(new CapabilitiesEvent({ supportsStepBack: this.supportsStepBack() }));
     }
 
     private supportsStepBack(): boolean {
