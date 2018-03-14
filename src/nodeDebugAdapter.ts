@@ -19,7 +19,7 @@ import * as errors from './errors';
 import * as wsl from './wslSupport';
 
 import * as nls from 'vscode-nls';
-const localize = nls.loadMessageBundle();
+let localize = nls.loadMessageBundle();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
     'webpack:///./~/*': '${cwd}/node_modules/*',
@@ -67,12 +67,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         this._promiseRejectExceptionFilterEnabled = this.isExtensionHost();
         this._supportsRunInTerminalRequest = args.supportsRunInTerminalRequest;
 
+        if (args.locale) {
+            localize = nls.config({ locale: args.locale })();
+        }
+
         return super.initialize(args);
     }
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
         await super.launch(args);
-
         if (args.__restart && typeof args.__restart.port === 'number') {
             return this.doAttach(args.__restart.port, undefined, args.address, args.timeout);
         }
