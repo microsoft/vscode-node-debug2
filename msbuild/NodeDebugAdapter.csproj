@@ -13,6 +13,7 @@
     <RootFilesToCopy Include="..\.gitignore;..\.travis.yml;..\appveyor.yml;..\CONTRIBUTING.md;..\LICENSE.txt;..\package.json;..\package.nls.de.json;..\package.nls.es.json;..\package.nls.fr.json;..\package.nls.it.json;..\package.nls.ja.json;..\package.nls.json;..\package.nls.ko.json;..\package.nls.ru.json;..\package.nls.zh-cn.json;..\package.nls.zh-tw.json;..\README.md;..\ThirdPartyNotices.txt" />
   </ItemGroup>
 
+
   <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">
     <Copy SourceFiles="@(LocFilesToCopy)" 
           DestinationFiles="@(LocFilesToCopy->'$(OutDir)\i18n\%(RecursiveDir)%(Filename)%(Extension)')" /> 
