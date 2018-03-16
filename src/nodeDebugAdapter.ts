@@ -309,6 +309,28 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const spawnOpts: cp.SpawnOptions = { cwd, env };
 
+        // Workaround for bug Microsoft/vscode#45832
+        if (process.platform === 'win32' && runtimeExecutable.indexOf(' ') > 0) {
+            let foundArgWithSpace = false;
+
+            // check whether there is one arg with a space
+            const args: string[] = [];
+            for (const a of args) {
+                if (a.indexOf(' ') > 0) {
+                    args.push(`"${a}"`);
+                    foundArgWithSpace = true;
+                } else {
+                    args.push(a);
+                }
+            }
+
+            if (foundArgWithSpace) {
+                launchArgs = args;
+                runtimeExecutable = `"${runtimeExecutable}"`;
+                spawnOpts.shell = true;
+            }
+        }
+
         this.logLaunchCommand(runtimeExecutable, launchArgs);
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
         return new Promise<void>((resolve, reject) => {
