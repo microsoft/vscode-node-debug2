@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint} from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -71,7 +71,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             localize = nls.config({ locale: args.locale })();
         }
 
-        return super.initialize(args);
+        const capabilities = super.initialize(args);
+        capabilities.supportsLogPoints = true;
+        return capabilities;
     }
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
@@ -588,7 +590,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
-    protected addBreakpoints(url: string, breakpoints: DebugProtocol.SourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
+    protected addBreakpoints(url: string, breakpoints: InternalSourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
         return super.addBreakpoints(url, breakpoints).then(responses => {
             if (this._entryPauseEvent && !this._finishedConfig) {
                 const entryLocation = this._entryPauseEvent.callFrames[0].location;
