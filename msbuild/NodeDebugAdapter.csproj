@@ -8,6 +8,7 @@
     <ExtensionFilesToCopy Include="..\vsix\extension\**\*" />
   </ItemGroup>
 
+
   <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">
     <Copy SourceFiles="@(ExtensionFilesToCopy)"
           DestinationFiles="@(ExtensionFilesToCopy->'$(OutDir)\ziproot\%(RecursiveDir)%(Filename)%(Extension)')" />
