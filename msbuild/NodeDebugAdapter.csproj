@@ -5,39 +5,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <LocFilesToCopy Include="..\i18n\**\*" /> 
-    <ImagesToCopy Include="..\images\**\*" />
-    <NodeModulesToCopy Include="..\node_modules\**\*" />
-    <SrcToCopy Include="..\out\src\**\*" />
-    <TerminateProcessToCopy Include="..\src\terminateProcess.sh" />
-    <RootFilesToCopy Include="..\.gitignore;..\.travis.yml;..\appveyor.yml;..\CONTRIBUTING.md;..\LICENSE.txt;..\package.json;..\package.nls.de.json;..\package.nls.es.json;..\package.nls.fr.json;..\package.nls.it.json;..\package.nls.ja.json;..\package.nls.json;..\package.nls.ko.json;..\package.nls.ru.json;..\package.nls.zh-cn.json;..\package.nls.zh-tw.json;..\README.md;..\ThirdPartyNotices.txt" />
+    <ExtensionFilesToCopy Include="..\vsix\extension\**\*" />
   </ItemGroup>
 
-  <Target Name="CopyFilesToSign" BeforeTargets="GetFilesToSign">
-    <Copy SourceFiles="@(LocFilesToCopy)" 
-          DestinationFiles="@(LocFilesToCopy->'$(OutDir)\i18n\%(RecursiveDir)%(Filename)%(Extension)')" /> 
-    <Copy SourceFiles="@(ImagesToCopy)"
-          DestinationFiles="@(ImagesToCopy->'$(OutDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(NodeModulesToCopy)" 
-          DestinationFiles="@(NodeModulesToCopy->'$(OutDir)\node_modules\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(SrcToCopy)"
-          DestinationFiles="@(SrcToCopy->'$(OutDir)\out\src\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(TerminateProcessToCopy)"
-          DestinationFiles="@(TerminateProcessToCopy->'$(OutDir)\src\%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(RootFilesToCopy)"
-          DestinationFolder="$(OutDir)" />
+
+  <Target Name="CopyFilesToSign" BeforeTargets="DeleteUnwantedFiles">
+    <Copy SourceFiles="@(ExtensionFilesToCopy)"
+          DestinationFiles="@(ExtensionFilesToCopy->'$(OutDir)\ziproot\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
-  <Target Name="GetFilesToSign" DependsOnTargets="CopyFilesToSign" BeforeTargets="SignFiles">
+  <Target Name="DeleteUnwantedFiles" DependsOnTargets="CopyFilesToSign" BeforeTargets="GetFilesToSign">
+    <Delete Files="$(OutDir)NodeDebugAdapter.dll;
+                   $(OutDir)NodeDebugAdapter.pdb;
+                   $(OutDir)NodeDebugAdapter.deps.json;"/>
+  </Target>
+
+  <Target Name="GetFilesToSign" DependsOnTargets="DeleteUnwantedFiles" BeforeTargets="SignFiles">
     <ItemGroup>
-      <FilesToSign Include="$(OutDir)\**\*.js" Exclude="$(OutDir)\node_modules\globule\test\fixtures\expand\js\foo.js;
-                                                        $(OutDir)\node_modules\globule\test\fixtures\expand\js\bar.js;
-                                                        $(OutDir)\node_modules\resolve\test\resolver\other_path\root.js;
-                                                        $(OutDir)\node_modules\resolve\test\pathfilter\deep_ref\main.js;
-                                                        $(OutDir)\node_modules\resolve\test\resolver\baz\doom.js;
-                                                        $(OutDir)\node_modules\tmp\test\symlinkme\file.js;
-                                                        $(OutDir)\node_modules\resolve\test\resolver\mug.js;
-                                                        $(OutDir)\node_modules\resolve\test\resolver\other_path\lib\other-lib.js;">
+      <FilesToSign Include="$(OutDir)ziproot\**\*.js">
         <Authenticode>Microsoft400</Authenticode>
       </FilesToSign>
     </ItemGroup>
