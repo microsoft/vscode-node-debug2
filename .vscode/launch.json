@@ -59,6 +59,15 @@
 				"transifex-push-test"
 			],
 			"internalConsoleOptions": "openOnSessionStart"
-		}
+		},
+        {
+            "name": "attach node-debug",
+            "type": "node",
+            "request": "attach",
+            "protocol": "inspector",
+            "port": 1235,
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "internalConsoleOptions": "openOnSessionStart",
+        }
     ]
 }

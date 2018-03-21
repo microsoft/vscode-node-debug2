@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint} from 'vscode-chrome-debug-core';
+import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession} from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -457,10 +457,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
-    public configurationDone(): Promise<void> {
+    public async configurationDone(): Promise<void> {
         if (!this.chrome) {
             // It's possible to get this request after we've detached, see #21973
-            return super.configurationDone();
+            await super.configurationDone();
+            return;
         }
 
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
@@ -468,12 +469,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         this._finishedConfig = true;
         if (this._continueAfterConfigDone) {
             this._expectingStopReason = undefined;
-            this.continue(/*internal=*/true);
+            await this.continue(/*internal=*/true);
         } else if (this._entryPauseEvent) {
-            this.onPaused(this._entryPauseEvent);
+            await this.onPaused(this._entryPauseEvent);
         }
 
-        return super.configurationDone();
+        await super.configurationDone();
+
+        this.events.emit(ChromeDebugSession.FinishedStartingUpEventName);
     }
 
     private killNodeProcess(): void {
@@ -682,6 +685,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                    }
                  */
                 telemetry.reportEvent('nodeVersion', { version });
+                telemetry.addCustomGlobalProperty({ "Versions.Target.Version": version });
             }
         },
         error => logger.error('Error evaluating `process.pid`: ' + error.message));
