@@ -53,7 +53,7 @@
 				"--grep", ".*" ],
 			"cwd": "${workspaceFolder}",
 			"skipFiles": [
-                "<node_internals>/**/*.js"
+				"<node_internals>/**/*.js"
 			],
 			"sourceMaps": true,
 			"outFiles": ["${workspaceFolder}/out/**/*.js"]
