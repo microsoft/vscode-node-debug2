@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import * as path from 'path';
-import {DebugProtocol} from 'vscode-debugprotocol';
+import { DebugProtocol } from 'vscode-debugprotocol';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 import * as utils from '../src/utils';
 

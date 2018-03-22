@@ -2,11 +2,11 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugSession, logger} from 'vscode-chrome-debug-core';
+import { ChromeDebugSession, logger } from 'vscode-chrome-debug-core';
 import * as path from 'path';
 import * as os from 'os';
 
-import {NodeDebugAdapter} from './nodeDebugAdapter';
+import { NodeDebugAdapter } from './nodeDebugAdapter';
 
 ChromeDebugSession.run(ChromeDebugSession.getSession(
     {
