@@ -44,7 +44,7 @@ suite('Stepping', () => {
             const program = path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
             const programSource = path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
 
-            await dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 })
+            await dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 });
             await dc.stepInAndStop();
             const stackTraceResponse = await dc.stackTraceRequest();
             const firstFrame = stackTraceResponse.body.stackFrames[0];
@@ -79,7 +79,7 @@ suite('Stepping', () => {
 
             const skipFiles = ['unmapped'];
 
-            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 })
+            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programSource, line: 7 });
             await dc.stepInAndStop();
             const stackTraceResponse = await dc.stackTraceRequest();
             const firstFrame = stackTraceResponse.body.stackFrames[0];
@@ -129,7 +129,7 @@ suite('Stepping', () => {
             const skipFiles = ['calls-between-sourcemapped-*/*B'];
 
             const bpLineB = 2;
-            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programASource, line: 8 })
+            await dc.hitBreakpoint({ program, sourceMaps: true, skipFiles }, { path: programASource, line: 8 });
             await dc.setBreakpointsRequest({ source: { path: programBSource }, breakpoints: [{ line: bpLineB }]});
             await dc.stepInTo('breakpoint', { path: programBSource, line: bpLineB });
         });
@@ -154,7 +154,7 @@ suite('Stepping', () => {
             ]);
 
             // Step into sourceB, set it to be skipped
-            await dc.stepInTo('step', { path: programBSource, line: 2 })
+            await dc.stepInTo('step', { path: programBSource, line: 2 });
             await dc.toggleSkipFileStatus(programBSource);
 
             // Continue back to sourceA, step through B, back to A
@@ -164,7 +164,7 @@ suite('Stepping', () => {
             // Toggle B back to not being skipped, continue to A, step in to B
             await dc.toggleSkipFileStatus(programBSource);
             await dc.continueTo('breakpoint', { path: programASource, line: bpLineA });
-            await dc.stepInTo('step', { path: programBSource, line: 2 })
+            await dc.stepInTo('step', { path: programBSource, line: 2 });
         });
 
         test('when generated script is skipped via regex, the source can be un-skipped', async () => {
@@ -259,7 +259,7 @@ suite('Stepping', () => {
             const timersSource = '<node_internals>/timers.js';
 
             const skipFiles = ['<node_internals>/*'];
-            await dc.hitBreakpoint({ program, skipFiles }, { path: programSource, line: 8 })
+            await dc.hitBreakpoint({ program, skipFiles }, { path: programSource, line: 8 });
             const stackTraceResponse = await dc.stackTraceRequest();
 
             // Assert that there are at least a few frames with paths marked with <node_internals>, and they are deemphasized

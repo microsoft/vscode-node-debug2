@@ -385,7 +385,7 @@ suite('Breakpoints', () => {
                 dc.assertStoppedLocation('exception', { path: PROGRAM, line: EXCEPTION_LINE }).then(async response => {
                     const frame0Id = response.body.stackFrames[0].id;
                     const frame0Scopes = await dc.scopesRequest({ frameId: frame0Id });
-                    assert.equal(frame0Scopes.body.scopes[0].name, 'Exception', "First frame should be named Exception");
+                    assert.equal(frame0Scopes.body.scopes[0].name, 'Exception', 'First frame should be named Exception');
 
                     const frame1Id = response.body.stackFrames[1].id;
                     const frame1Scopes = await dc.scopesRequest({ frameId: frame1Id });

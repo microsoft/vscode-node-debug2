@@ -18,7 +18,7 @@ export function runtimeNotFound(_runtime: string): DebugProtocol.Message {
 export function cannotLaunchInTerminal(_error: string): DebugProtocol.Message {
     return {
         id: 2011,
-        format: localize('VSND2011', "Cannot launch debug target in terminal ({0}).", '{_error}'),
+        format: localize('VSND2011', 'Cannot launch debug target in terminal ({0}).', '{_error}'),
         variables: { _error }
     };
 }
@@ -26,7 +26,7 @@ export function cannotLaunchInTerminal(_error: string): DebugProtocol.Message {
 export function cannotLaunchDebugTarget(_error: string): DebugProtocol.Message {
     return {
         id: 2017,
-        format: localize('VSND2017', "Cannot launch debug target ({0}).", '{_error}'),
+        format: localize('VSND2017', 'Cannot launch debug target ({0}).', '{_error}'),
         variables: { _error },
         showUser: true,
         sendTelemetry: true

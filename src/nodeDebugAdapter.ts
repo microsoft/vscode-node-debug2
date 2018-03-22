@@ -87,7 +87,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         if (args.useWSL && !wsl.subsystemForLinuxPresent()) {
             return Promise.reject(<DebugProtocol.Message>{
                 id: 2007,
-                format: localize('attribute.wsl.not.exist', "Cannot find Windows Subsystem for Linux installation.")
+                format: localize('attribute.wsl.not.exist', 'Cannot find Windows Subsystem for Linux installation.')
             });
         }
 
@@ -158,7 +158,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             programPath = path.normalize(programPath);
             if (pathUtils.normalizeDriveLetter(programPath) !== pathUtils.realPath(programPath)) {
-                logger.warn(localize('program.path.case.mismatch.warning', "Program path uses differently cased character as file on disk; this might result in breakpoints not being hit."));
+                logger.warn(localize('program.path.case.mismatch.warning', 'Program path uses differently cased character as file on disk; this might result in breakpoints not being hit.'));
             }
         }
 
@@ -217,7 +217,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             if ((args.console === 'integratedTerminal' || args.console === 'externalTerminal') && this._supportsRunInTerminalRequest) {
                 const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
                     kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
-                    title: localize('node.console.title', "Node Debug Console"),
+                    title: localize('node.console.title', 'Node Debug Console'),
                     cwd,
                     args: wslLaunchArgs.combined,
                     env: envArgs
@@ -763,14 +763,14 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             variables,
             showUser: true,
             url: 'http://go.microsoft.com/fwlink/?linkID=534832#_' + infoId.toString(),
-            urlLabel: localize('more.information', "More Information")
+            urlLabel: localize('more.information', 'More Information')
         });
     }
 
     protected getReadonlyOrigin(aPath: string): string {
         return path.isAbsolute(aPath) || aPath.startsWith(ChromeDebugAdapter.EVAL_NAME_PREFIX) ?
-            localize('origin.from.node', "read-only content from Node.js") :
-            localize('origin.core.module', "read-only core module");
+            localize('origin.from.node', 'read-only content from Node.js') :
+            localize('origin.core.module', 'read-only core module');
     }
 
     /**
