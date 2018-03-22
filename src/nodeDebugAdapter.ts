@@ -460,8 +460,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     public async configurationDone(): Promise<void> {
         if (!this.chrome) {
             // It's possible to get this request after we've detached, see #21973
-            await super.configurationDone();
-            return;
+            return super.configurationDone();
         }
 
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
@@ -474,9 +473,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             await this.onPaused(this._entryPauseEvent);
         }
 
-        await super.configurationDone();
-
         this.events.emit(ChromeDebugSession.FinishedStartingUpEventName);
+        await super.configurationDone();
     }
 
     private killNodeProcess(): void {
