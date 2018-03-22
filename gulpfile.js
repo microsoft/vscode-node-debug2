@@ -33,6 +33,8 @@ const defaultLanguages = [
 	{ id: 'es', folderName: 'esn' },
 	{ id: 'ru', folderName: 'rus' },
     { id: 'it', folderName: 'ita' },
+
+    // These language-pack languages are included for VS but excluded from the vscode package
     { id: 'cs', folderName: 'csy' },
     { id: 'tr', folderName: 'trk' },
     { id: 'pt-br', folderName: 'ptb', transifexId: 'pt_BR' },
