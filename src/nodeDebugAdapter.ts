@@ -526,6 +526,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private resolveProgramPath(programPath: string, sourceMaps: boolean): Promise<string> {
+        logger.verbose(`Launch: Resolving programPath: ${programPath}`);
         return Promise.resolve().then(() => {
             if (!programPath) {
                 return programPath;
