@@ -106,7 +106,7 @@ gulp.task('tslint', function() {
         .pipe(tslint({
             formatter: "verbose"
         }))
-        .pipe(tslint.report({ emitError: false }));
+        .pipe(tslint.report());
 });
 
 gulp.task('clean', function() {
