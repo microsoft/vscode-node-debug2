@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { ChromeDebugSession, logger } from 'vscode-chrome-debug-core';
+import { ChromeDebugSession, logger, telemetry } from 'vscode-chrome-debug-core';
 import * as path from 'path';
 import * as os from 'os';
 
@@ -17,4 +17,6 @@ ChromeDebugSession.run(ChromeDebugSession.getSession(
     }));
 
 /* tslint:disable:no-var-requires */
-logger.log('node-debug2: ' + require('../../package.json').version);
+const debugAdapterVersion = require('../../package.json').version;
+logger.log('node-debug2: ' + debugAdapterVersion);
+telemetry.telemetry.addCustomGlobalProperty({"Versions.DebugAdapter": debugAdapterVersion});

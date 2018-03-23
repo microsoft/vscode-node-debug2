@@ -38,6 +38,27 @@
 			"internalConsoleOptions": "openOnSessionStart"
 		},
         {
+			"name": "Grepped Tests",
+			"type": "node",
+			"request": "launch",
+			"protocol": "inspector",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+			"args": [ "--no-timeouts",
+				"-s", "2000",
+				"--colors",
+				"--reporter", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js",
+				"./out/test",
+				"-u", "tdd",
+                "-R", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js",
+				"--grep", ".*" ],
+			"cwd": "${workspaceFolder}",
+			"skipFiles": [
+				"<node_internals>/**/*.js"
+			],
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/**/*.js"]
+        },
+        {
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
@@ -59,6 +80,15 @@
 				"transifex-push-test"
 			],
 			"internalConsoleOptions": "openOnSessionStart"
-		}
+		},
+        {
+            "name": "attach node-debug",
+            "type": "node",
+            "request": "attach",
+            "protocol": "inspector",
+            "port": 1235,
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "internalConsoleOptions": "openOnSessionStart",
+        }
     ]
 }
