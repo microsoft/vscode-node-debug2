@@ -7,19 +7,9 @@ language: node_js
 node_js:
   - "6.2" # will actually use nightly here
   - "6.11"
-  - "7.0"
   - "7.10"
-  - "8.0"
-  - "8.1"
-  - "8.4"
-  - "8.7"
-  - "8.8"
-  - "8.9"
-  - "9.0"
-  - "9.1"
-  - "9.2"
-  - "9.3"
-  - "9.4"
+  - "8.10"
+  - "9.9"
 
 matrix:
   allow_failures:

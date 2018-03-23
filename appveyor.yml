@@ -3,19 +3,9 @@ environment:
     - nodejs_version: 6.2
     # Note: --inspect crashes in .4 and .5, and in x64 before 6.8. https://github.com/nodejs/node/issues/8155
     - nodejs_version: 6.11
-    - nodejs_version: 7.0
-    - nodejs_version: 7.3
     - nodejs_version: 7.10
-    - nodejs_version: 8.0
-    - nodejs_version: 8.1
-    - nodejs_version: 8.4
-    - nodejs_version: 8.7
-    - nodejs_version: 8.8
-    - nodejs_version: 8.9
-    - nodejs_version: 9.0
-    - nodejs_version: 9.1
-    - nodejs_version: 9.2
-    - nodejs_version: 9.3
+    - nodejs_version: 8.10
+    - nodejs_version: 9.8
 
 matrix:
   allow_failures:

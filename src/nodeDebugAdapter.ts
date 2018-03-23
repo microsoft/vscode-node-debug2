@@ -2,17 +2,17 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession} from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession } from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
-import {DebugProtocol} from 'vscode-debugprotocol';
-import {OutputEvent, CapabilitiesEvent} from 'vscode-debugadapter';
+import { DebugProtocol } from 'vscode-debugprotocol';
+import { OutputEvent, CapabilitiesEvent } from 'vscode-debugadapter';
 
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
-import {ILaunchRequestArguments, IAttachRequestArguments, ICommonRequestArgs} from './nodeDebugInterfaces';
+import { ILaunchRequestArguments, IAttachRequestArguments, ICommonRequestArgs } from './nodeDebugInterfaces';
 import * as pathUtils from './pathUtils';
 import * as utils from './utils';
 import * as errors from './errors';
