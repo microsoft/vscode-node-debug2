@@ -683,7 +683,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                    }
                  */
                 telemetry.reportEvent('nodeVersion', { version });
-                telemetry.addCustomGlobalProperty({ "Versions.Target.Version": version });
+                telemetry.addCustomGlobalProperty({ 'Versions.Target.Version': version });
             }
         },
         error => logger.error('Error evaluating `process.pid`: ' + error.message));

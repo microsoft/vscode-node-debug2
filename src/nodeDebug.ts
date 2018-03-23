@@ -19,4 +19,4 @@ ChromeDebugSession.run(ChromeDebugSession.getSession(
 /* tslint:disable:no-var-requires */
 const debugAdapterVersion = require('../../package.json').version;
 logger.log('node-debug2: ' + debugAdapterVersion);
-telemetry.telemetry.addCustomGlobalProperty({"Versions.DebugAdapter": debugAdapterVersion});
+telemetry.telemetry.addCustomGlobalProperty({'Versions.DebugAdapter': debugAdapterVersion});

@@ -2,12 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {DebugProtocol} from 'vscode-debugprotocol';
+import { DebugProtocol } from 'vscode-debugprotocol';
 import * as Core from 'vscode-chrome-debug-core';
 
-type ConsoleType = "internalConsole" | "integratedTerminal" | "externalTerminal";
+type ConsoleType = 'internalConsole' | 'integratedTerminal' | 'externalTerminal';
 
-type OutputCaptureType = "console" | "std";
+type OutputCaptureType = 'console' | 'std';
 
 export interface ICommonRequestArgs extends Core.ICommonRequestArgs {
     stopOnEntry?: boolean;
