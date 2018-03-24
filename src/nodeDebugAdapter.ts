@@ -858,12 +858,12 @@ export enum DebugArgs {
     Inspect_DebugBrk
 }
 
-const defaultDebugArgs = DebugArgs.Inspect_DebugBrk;
+const defaultDebugArgs = DebugArgs.InspectBrk;
 function detectSupportedDebugArgsForLaunch(config: any): DebugArgs {
     if (config.__nodeVersion) {
         return getSupportedDebugArgsForVersion(config.__nodeVersion);
     } else if (config.runtimeExecutable) {
-        logger.log('Using --inspect --debug-brk because a runtimeExecutable is set');
+        logger.log('Using --inspect-brk because a runtimeExecutable is set');
         return defaultDebugArgs;
     } else {
         // only determine version if no runtimeExecutable is set (and 'node' on PATH is used)
@@ -879,7 +879,7 @@ function detectSupportedDebugArgsForLaunch(config: any): DebugArgs {
         if (semVerString) {
             return getSupportedDebugArgsForVersion(semVerString);
         } else {
-            logger.log('Using --inspect --debug-brk because we couldn\'t get a version from node');
+            logger.log('Using --inspect-brk because we couldn\'t get a version from node');
             return defaultDebugArgs;
         }
     }
