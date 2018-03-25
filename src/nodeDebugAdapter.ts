@@ -123,23 +123,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         this._continueAfterConfigDone = !args.stopOnEntry;
 
         if (this.isExtensionHost()) {
-            // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
-            let launchArgs = [];
-            if (!args.noDebug) {
-                launchArgs.push(`--debugBrkPluginHost=${port}`);
-
-                // pass the debug session ID to the EH so that broadcast events know where they come from
-                if (args.__sessionId) {
-                    launchArgs.push(`--debugId=${args.__sessionId}`);
-                }
-            }
-
-            const runtimeArgs = args.runtimeArgs || [];
-            const programArgs = args.args || [];
-            launchArgs = launchArgs.concat(runtimeArgs, programArgs);
-
-            const envArgs = this.collectEnvFileArgs(args) || args.env;
-            return this.launchInInternalConsole(runtimeExecutable, launchArgs, envArgs);
+            return this.extensionHostLaunch(args, runtimeExecutable, port);
         }
 
         let programPath = args.program;
@@ -189,7 +173,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const runtimeArgs = args.runtimeArgs || [];
         const programArgs = args.args || [];
 
-        const debugArgs = detectSupportedDebugArgsForLaunch(args);
+        const debugArgs = detectSupportedDebugArgsForLaunch(args, runtimeExecutable, args.env);
         let launchArgs = [];
         if (!args.noDebug && !args.port) {
             // Always stop on entry to set breakpoints
@@ -234,6 +218,26 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         if (!args.noDebug) {
             await this.doAttach(port, undefined, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
         }
+    }
+
+    private extensionHostLaunch(args: ILaunchRequestArguments, runtimeExecutable: string, port: number): Promise<void> {
+        // we always launch in 'debug-brk' mode, but we only show the break event if 'stopOnEntry' attribute is true.
+        let launchArgs = [];
+        if (!args.noDebug) {
+            launchArgs.push(`--debugBrkPluginHost=${port}`);
+
+            // pass the debug session ID to the EH so that broadcast events know where they come from
+            if (args.__sessionId) {
+                launchArgs.push(`--debugId=${args.__sessionId}`);
+            }
+        }
+
+        const runtimeArgs = args.runtimeArgs || [];
+        const programArgs = args.args || [];
+        launchArgs = launchArgs.concat(runtimeArgs, programArgs);
+
+        const envArgs = this.collectEnvFileArgs(args) || args.env;
+        return this.launchInInternalConsole(runtimeExecutable, launchArgs, envArgs);
     }
 
     public async attach(args: IAttachRequestArguments): Promise<void> {
@@ -852,7 +856,7 @@ export enum DebugArgs {
 }
 
 const defaultDebugArgs = DebugArgs.InspectBrk;
-function detectSupportedDebugArgsForLaunch(config: any): DebugArgs {
+function detectSupportedDebugArgsForLaunch(config: ILaunchRequestArguments, runtimeExecutable: string, env: any): DebugArgs {
     if (config.__nodeVersion) {
         return getSupportedDebugArgsForVersion(config.__nodeVersion);
     } else if (config.runtimeExecutable) {
@@ -863,7 +867,7 @@ function detectSupportedDebugArgsForLaunch(config: any): DebugArgs {
         logger.log('Spawning `node --version` to determine supported debug args');
         let result: cp.SpawnSyncReturns<string>;
         try {
-            result = cp.spawnSync('node', ['--version']);
+            result = cp.spawnSync(runtimeExecutable, ['--version']);
         } catch (e) {
             logger.error('Node version detection failed: ' + (e && e.message));
         }

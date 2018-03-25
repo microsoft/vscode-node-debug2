@@ -51,6 +51,9 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
 
     // extensionHost option
     __sessionId?: number;
+
+    // When node version is detected by node-debug
+    __nodeVersion?: string;
 }
 
 /**
