@@ -95,17 +95,17 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         if (args.useWSL) {
             runtimeExecutable = runtimeExecutable || NodeDebugAdapter.NODE;
         } else if (runtimeExecutable) {
-            if (!path.isAbsolute(runtimeExecutable)) {
-                const re = pathUtils.findOnPath(runtimeExecutable, args.env);
+            if (path.isAbsolute(runtimeExecutable)) {
+                const re = pathUtils.findExecutable(runtimeExecutable, args.env);
                 if (!re) {
-                    return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
+                    return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
                 }
 
                 runtimeExecutable = re;
             } else {
-                const re = pathUtils.findExecutable(runtimeExecutable, args.env);
+                const re = pathUtils.findOnPath(runtimeExecutable, args.env);
                 if (!re) {
-                    return this.getNotExistErrorResponse('runtimeExecutable', runtimeExecutable);
+                    return this.getRuntimeNotOnPathErrorResponse(runtimeExecutable);
                 }
 
                 runtimeExecutable = re;
@@ -164,82 +164,76 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         this._captureFromStd = args.outputCapture === 'std';
 
-        return this.resolveProgramPath(programPath, args.sourceMaps).then(resolvedProgramPath => {
-            let program: string;
-            let cwd = args.cwd;
-            if (cwd) {
-                if (!path.isAbsolute(cwd)) {
-                    return this.getRelativePathErrorResponse('cwd', cwd);
-                }
-
-                if (!fs.existsSync(cwd)) {
-                    return this.getNotExistErrorResponse('cwd', cwd);
-                }
-
-                // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
-                if (resolvedProgramPath) {
-                    program = path.relative(cwd, resolvedProgramPath);
-                }
-            } else if (resolvedProgramPath) {
-                // if no working dir given, we use the direct folder of the executable
-                cwd = path.dirname(resolvedProgramPath);
-                program = path.basename(resolvedProgramPath);
+        const resolvedProgramPath = await this.resolveProgramPath(programPath, args.sourceMaps);
+        let program: string;
+        let cwd = args.cwd;
+        if (cwd) {
+            if (!path.isAbsolute(cwd)) {
+                return this.getRelativePathErrorResponse('cwd', cwd);
             }
 
-            const runtimeArgs = args.runtimeArgs || [];
-            const programArgs = args.args || [];
-
-            const debugArgs = detectSupportedDebugArgsForLaunch(args);
-            let launchArgs = [];
-            if (!args.noDebug && !args.port) {
-                // Always stop on entry to set breakpoints
-                if (debugArgs === DebugArgs.Inspect_DebugBrk) {
-                    launchArgs.push(`--inspect=${port}`);
-                    launchArgs.push('--debug-brk');
-                } else {
-                    launchArgs.push(`--inspect-brk=${port}`);
-                }
+            if (!fs.existsSync(cwd)) {
+                return this.getNotExistErrorResponse('cwd', cwd);
             }
 
-            launchArgs = runtimeArgs.concat(launchArgs, program ? [program] : [], programArgs);
-
-            const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs, program);
-            // if using subsystem for linux, we will trick the debugger to map source files
-            if (args.useWSL && !args.localRoot && !args.remoteRoot) {
-                this._pathTransformer.attach(<IAttachRequestArguments>{
-                    remoteRoot: wslLaunchArgs.remoteRoot,
-                    localRoot: wslLaunchArgs.localRoot
-                });
+            // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
+            if (resolvedProgramPath) {
+                program = path.relative(cwd, resolvedProgramPath);
             }
+        } else if (resolvedProgramPath) {
+            // if no working dir given, we use the direct folder of the executable
+            cwd = path.dirname(resolvedProgramPath);
+            program = path.basename(resolvedProgramPath);
+        }
 
-            const envArgs = this.collectEnvFileArgs(args) || args.env;
-            let launchP: Promise<void>;
-            if ((args.console === 'integratedTerminal' || args.console === 'externalTerminal') && this._supportsRunInTerminalRequest) {
-                const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
-                    kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
-                    title: localize('node.console.title', 'Node Debug Console'),
-                    cwd,
-                    args: wslLaunchArgs.combined,
-                    env: envArgs
-                };
-                launchP = this.launchInTerminal(termArgs).then(() => {
-                    if (args.noDebug) {
-                        this.terminateSession('cannot track process');
-                    }
-                });
-            } else if (!args.console || args.console === 'internalConsole') {
-                launchP = this.launchInInternalConsole(wslLaunchArgs.executable, wslLaunchArgs.args, envArgs, cwd);
+        const runtimeArgs = args.runtimeArgs || [];
+        const programArgs = args.args || [];
+
+        const debugArgs = detectSupportedDebugArgsForLaunch(args);
+        let launchArgs = [];
+        if (!args.noDebug && !args.port) {
+            // Always stop on entry to set breakpoints
+            if (debugArgs === DebugArgs.Inspect_DebugBrk) {
+                launchArgs.push(`--inspect=${port}`);
+                launchArgs.push('--debug-brk');
             } else {
-                return Promise.reject(errors.unknownConsoleType(args.console));
+                launchArgs.push(`--inspect-brk=${port}`);
             }
+        }
 
-            return launchP
-                .then(() => {
-                    return args.noDebug ?
-                        Promise.resolve() :
-                        this.doAttach(port, undefined, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
-                });
-        });
+        launchArgs = runtimeArgs.concat(launchArgs, program ? [program] : [], programArgs);
+
+        const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs, program);
+        // if using subsystem for linux, we will trick the debugger to map source files
+        if (args.useWSL && !args.localRoot && !args.remoteRoot) {
+            this._pathTransformer.attach(<IAttachRequestArguments>{
+                remoteRoot: wslLaunchArgs.remoteRoot,
+                localRoot: wslLaunchArgs.localRoot
+            });
+        }
+
+        const envArgs = this.collectEnvFileArgs(args) || args.env;
+        if ((args.console === 'integratedTerminal' || args.console === 'externalTerminal') && this._supportsRunInTerminalRequest) {
+            const termArgs: DebugProtocol.RunInTerminalRequestArguments = {
+                kind: args.console === 'integratedTerminal' ? 'integrated' : 'external',
+                title: localize('node.console.title', 'Node Debug Console'),
+                cwd,
+                args: wslLaunchArgs.combined,
+                env: envArgs
+            };
+            await this.launchInTerminal(termArgs);
+            if (args.noDebug) {
+                this.terminateSession('cannot track process');
+            }
+        } else if (!args.console || args.console === 'internalConsole') {
+            await this.launchInInternalConsole(wslLaunchArgs.executable, wslLaunchArgs.args, envArgs, cwd);
+        } else {
+            throw errors.unknownConsoleType(args.console);
+        }
+
+        if (!args.noDebug) {
+            await this.doAttach(port, undefined, args.address, args.timeout, undefined, args.extraCRDPChannelPort);
+        }
     }
 
     public async attach(args: IAttachRequestArguments): Promise<void> {
@@ -519,60 +513,56 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 this._continueAfterConfigDone = false;
             }
 
-            return this.getNodeProcessDetailsIfNeeded()
-                .then(() => this.sendInitializedEvent());
+            await this.getNodeProcessDetailsIfNeeded();
+            return this.sendInitializedEvent();
         } else {
             return super.onPaused(notification, expectingStopReason);
         }
     }
 
-    private resolveProgramPath(programPath: string, sourceMaps: boolean): Promise<string> {
+    private async resolveProgramPath(programPath: string, sourceMaps: boolean): Promise<string> {
         logger.verbose(`Launch: Resolving programPath: ${programPath}`);
-        return Promise.resolve().then(() => {
-            if (!programPath) {
+        if (!programPath) {
+            return programPath;
+        }
+
+        if (utils.isJavaScript(programPath)) {
+            if (!sourceMaps) {
                 return programPath;
             }
 
-            if (utils.isJavaScript(programPath)) {
-                if (!sourceMaps) {
-                    return programPath;
-                }
-
-                // if programPath is a JavaScript file and sourceMaps are enabled, we don't know whether
-                // programPath is the generated file or whether it is the source (and we need source mapping).
-                // Typically this happens if a tool like 'babel' or 'uglify' is used (because they both transpile js to js).
-                // We use the source maps to find a 'source' file for the given js file.
-                return this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath).then(generatedPath => {
-                    if (generatedPath && generatedPath !== programPath) {
-                        // programPath must be source because there seems to be a generated file for it
-                        logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
-                        programPath = generatedPath;
-                    } else {
-                        logger.log(`Launch: program '${programPath}' seems to be the generated file`);
-                    }
-
-                    return programPath;
-                });
+            // if programPath is a JavaScript file and sourceMaps are enabled, we don't know whether
+            // programPath is the generated file or whether it is the source (and we need source mapping).
+            // Typically this happens if a tool like 'babel' or 'uglify' is used (because they both transpile js to js).
+            // We use the source maps to find a 'source' file for the given js file.
+            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
+            if (generatedPath && generatedPath !== programPath) {
+                // programPath must be source because there seems to be a generated file for it
+                logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
+                programPath = generatedPath;
             } else {
-                // node cannot execute the program directly
-                if (!sourceMaps) {
-                    return Promise.reject<string>(errors.cannotLaunchBecauseSourceMaps(programPath));
-                }
-
-                return this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath).then(generatedPath => {
-                    if (!generatedPath) { // cannot find generated file
-                        if (this._launchAttachArgs.outFiles || this._launchAttachArgs.outDir) {
-                            return Promise.reject<string>(errors.cannotLaunchBecauseJsNotFound(programPath));
-                        } else {
-                            return Promise.reject<string>(errors.cannotLaunchBecauseOutFiles(programPath));
-                        }
-                    }
-
-                    logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
-                    return generatedPath;
-                });
+                logger.log(`Launch: program '${programPath}' seems to be the generated file`);
             }
-        });
+
+            return programPath;
+        } else {
+            // node cannot execute the program directly
+            if (!sourceMaps) {
+                return Promise.reject<string>(errors.cannotLaunchBecauseSourceMaps(programPath));
+            }
+
+            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
+            if (!generatedPath) { // cannot find generated file
+                if (this._launchAttachArgs.outFiles || this._launchAttachArgs.outDir) {
+                    return Promise.reject<string>(errors.cannotLaunchBecauseJsNotFound(programPath));
+                } else {
+                    return Promise.reject<string>(errors.cannotLaunchBecauseOutFiles(programPath));
+                }
+            }
+
+            logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
+            return generatedPath;
+        }
     }
 
     /**
@@ -614,27 +604,26 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
      */
-    protected addBreakpoints(url: string, breakpoints: InternalSourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
-        return super.addBreakpoints(url, breakpoints).then(responses => {
-            if (this._entryPauseEvent && !this._finishedConfig) {
-                const entryLocation = this._entryPauseEvent.callFrames[0].location;
-                const bpAtEntryLocation = responses.some(response => {
-                    // Don't compare column location, because you can have a bp at col 0, then break at some other column
-                    return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
-                        response.actualLocation.scriptId === entryLocation.scriptId;
-                });
+    protected async addBreakpoints(url: string, breakpoints: InternalSourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
+        const responses = await super.addBreakpoints(url, breakpoints);
+        if (this._entryPauseEvent && !this._finishedConfig) {
+            const entryLocation = this._entryPauseEvent.callFrames[0].location;
+            const bpAtEntryLocation = responses.some(response => {
+                // Don't compare column location, because you can have a bp at col 0, then break at some other column
+                return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
+                    response.actualLocation.scriptId === entryLocation.scriptId;
+            });
 
-                if (bpAtEntryLocation) {
-                    // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
-                    // the stopOnEntry flag is not set
-                    logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
-                    this._continueAfterConfigDone = false;
-                    this._expectingStopReason = 'breakpoint';
-                }
+            if (bpAtEntryLocation) {
+                // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
+                // the stopOnEntry flag is not set
+                logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
+                this._continueAfterConfigDone = false;
+                this._expectingStopReason = 'breakpoint';
             }
+        }
 
-            return responses;
-        });
+        return responses;
     }
 
     protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
@@ -647,46 +636,50 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    private getNodeProcessDetailsIfNeeded(): Promise<void> {
+    private async getNodeProcessDetailsIfNeeded(): Promise<void> {
         if (this._loggedTargetVersion || !this.chrome) {
             return Promise.resolve();
         }
 
-        return this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 }).then(response => {
-            if (this._loggedTargetVersion) {
-                // Possible to get two of these requests going simultaneously
-                return;
-            }
+        const response = await this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 })
+            .catch(error => logger.error('Error evaluating `process.pid`: ' + error.message));
 
-            if (response.exceptionDetails) {
-                const description = chromeUtils.errorMessageFromExceptionDetails(response.exceptionDetails);
-                if (description.startsWith('ReferenceError: process is not defined')) {
-                    logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
-                } else {
-                    logger.log('Exception evaluating `process.pid`: ' + description + '. Will try again later.');
-                }
+        if (!response) {
+            return;
+        }
+
+        if (this._loggedTargetVersion) {
+            // Possible to get two of these requests going simultaneously
+            return;
+        }
+
+        if (response.exceptionDetails) {
+            const description = chromeUtils.errorMessageFromExceptionDetails(response.exceptionDetails);
+            if (description.startsWith('ReferenceError: process is not defined')) {
+                logger.verbose('Got expected exception: `process is not defined`. Will try again later.');
             } else {
-                const [pid, version, arch] = response.result.value;
-                if (!this._nodeProcessId) {
-                    this._nodeProcessId = pid;
-                }
-
-                if (this._pollForNodeProcess) {
-                    this.startPollingForNodeTermination();
-                }
-
-                this._loggedTargetVersion = true;
-                logger.log(`Target node version: ${version} ${arch}`);
-                /* __GDPR__
-                   "nodeVersion" : {
-                      "version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
-                   }
-                 */
-                telemetry.reportEvent('nodeVersion', { version });
-                telemetry.addCustomGlobalProperty({ 'Versions.Target.Version': version });
+                logger.log('Exception evaluating `process.pid`: ' + description + '. Will try again later.');
             }
-        },
-        error => logger.error('Error evaluating `process.pid`: ' + error.message));
+        } else {
+            const [pid, version, arch] = response.result.value;
+            if (!this._nodeProcessId) {
+                this._nodeProcessId = pid;
+            }
+
+            if (this._pollForNodeProcess) {
+                this.startPollingForNodeTermination();
+            }
+
+            this._loggedTargetVersion = true;
+            logger.log(`Target node version: ${version} ${arch}`);
+            /* __GDPR__
+                "nodeVersion" : {
+                    "version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
+                }
+                */
+            telemetry.reportEvent('nodeVersion', { version });
+            telemetry.addCustomGlobalProperty({ 'Versions.Target.Version': version });
+        }
     }
 
     private startPollingForNodeTermination(): void {
