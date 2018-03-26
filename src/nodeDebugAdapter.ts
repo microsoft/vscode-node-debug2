@@ -19,6 +19,7 @@ import * as errors from './errors';
 import * as wsl from './wslSupport';
 
 import * as nls from 'vscode-nls';
+import { FinishedStartingUpEventArguments } from 'vscode-chrome-debug-core/lib/src/executionTimingsReporter';
 let localize = nls.loadMessageBundle();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
@@ -471,7 +472,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             await this.onPaused(this._entryPauseEvent);
         }
 
-        this.events.emit(ChromeDebugSession.FinishedStartingUpEventName);
+        this.events.emit(ChromeDebugSession.FinishedStartingUpEventName, { requestedContentWasDetected: true } as FinishedStartingUpEventArguments);
         await super.configurationDone();
     }
 
