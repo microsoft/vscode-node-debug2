@@ -78,6 +78,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
+        if (args.console && args.console !== 'internalConsole' && typeof args._suppressConsoleOutput === 'undefined') {
+            args._suppressConsoleOutput = true;
+        }
+
         await super.launch(args);
         if (args.__restart && typeof args.__restart.port === 'number') {
             return this.doAttach(args.__restart.port, undefined, args.address, args.timeout);
@@ -357,7 +361,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             // Must attach a listener to stdout or process will hang on Windows
             nodeProcess.stdout.on('data', (data: string) => {
-                if (noDebugMode || this._captureFromStd) {
+                if ((noDebugMode || this._captureFromStd) && !this._launchAttachArgs._suppressConsoleOutput) {
                     let msg = data.toString();
                     this._session.sendEvent(new OutputEvent(msg, 'stdout'));
                 }
@@ -396,7 +400,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 msg = msg.replace(helpMsg, '');
             }
 
-            if (this._handlingEarlyNodeMsgs || noDebugMode || this._captureFromStd) {
+            if ((this._handlingEarlyNodeMsgs || noDebugMode || this._captureFromStd) && !this._launchAttachArgs._suppressConsoleOutput) {
                 this._session.sendEvent(new OutputEvent(msg, 'stderr'));
             }
 
