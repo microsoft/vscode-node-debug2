@@ -871,8 +871,8 @@ export enum DebugArgs {
 
 const defaultDebugArgs = DebugArgs.InspectBrk;
 function detectSupportedDebugArgsForLaunch(config: ILaunchRequestArguments, runtimeExecutable: string, env: any): DebugArgs {
-    if (config.__nodeVersion) {
-        return getSupportedDebugArgsForVersion(config.__nodeVersion);
+    if (config.__nodeVersion || config.runtimeVersion) {
+        return getSupportedDebugArgsForVersion(config.__nodeVersion || config.runtimeVersion);
     } else if (config.runtimeExecutable) {
         logger.log('Using --inspect-brk because a runtimeExecutable is set');
         return defaultDebugArgs;

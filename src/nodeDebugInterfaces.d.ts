@@ -44,6 +44,7 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
     outputCapture?: OutputCaptureType;
     /** Use Windows Subsystem for Linux */
     useWSL?: boolean;
+    runtimeVersion?: string;
 
     /** Logging options */
     diagnosticLogging?: boolean;
