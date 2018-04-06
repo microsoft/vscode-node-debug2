@@ -7,6 +7,7 @@ const telemetry = CoreTelemetry.telemetry;
 
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { OutputEvent, CapabilitiesEvent } from 'vscode-debugadapter';
+import { ErrorWithMessage } from 'vscode-chrome-debug-core/out/src/errors';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -90,10 +91,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const port = args.port || utils.random(3000, 50000);
 
         if (args.useWSL && !wsl.subsystemForLinuxPresent()) {
-            return Promise.reject(<DebugProtocol.Message>{
+            return Promise.reject(new ErrorWithMessage(<DebugProtocol.Message>{
                 id: 2007,
                 format: localize('attribute.wsl.not.exist', 'Cannot find Windows Subsystem for Linux installation.')
-            });
+            }));
         }
 
         let runtimeExecutable = args.runtimeExecutable;
@@ -747,11 +748,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
      * 'Path does not exist' error
      */
     private getNotExistErrorResponse(attribute: string, path: string): Promise<void> {
-        return Promise.reject(<DebugProtocol.Message>{
+        return Promise.reject(new ErrorWithMessage(<DebugProtocol.Message>{
             id: 2007,
             format: localize('attribute.path.not.exist', "Attribute '{0}' does not exist ('{1}').", attribute, '{path}'),
             variables: { path }
-        });
+        }));
     }
 
     /**
@@ -763,25 +764,25 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private getRuntimeNotOnPathErrorResponse(runtime: string): Promise<void> {
-        return Promise.reject(<DebugProtocol.Message>{
+        return Promise.reject(new ErrorWithMessage(<DebugProtocol.Message>{
             id: 2001,
             format: localize('VSND2001', "Cannot find runtime '{0}' on PATH. Make sure to have '{0}' installed.", '{_runtime}'),
             variables: { _runtime: runtime }
-        });
+        }));
     }
 
     /**
      * Send error response with 'More Information' link.
      */
     private getErrorResponseWithInfoLink(code: number, format: string, variables: any, infoId: number): Promise<void> {
-        return Promise.reject(<DebugProtocol.Message>{
+        return Promise.reject(new ErrorWithMessage(<DebugProtocol.Message>{
             id: code,
             format,
             variables,
             showUser: true,
             url: 'http://go.microsoft.com/fwlink/?linkID=534832#_' + infoId.toString(),
             urlLabel: localize('more.information', 'More Information')
-        });
+        }));
     }
 
     protected getReadonlyOrigin(aPath: string): string {
