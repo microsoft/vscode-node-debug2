@@ -240,6 +240,18 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const runtimeArgs = args.runtimeArgs || [];
         const programArgs = args.args || [];
+
+        // if VS Code runs out of source, add the path to the VS Code workspace as a first argument so that Electron turns into VS Code
+        const ix = args.runtimeExecutable.indexOf(process.platform === 'win32' ? '\\.build\\electron\\' : '/.build/electron/');
+        if (ix > 0 && programArgs.length > 0) {
+            // guess the VS Code workspace path
+            const vscode_workspace_path = args.runtimeExecutable.substr(0, ix);
+            // only add path if user hasn't already added path
+            if (!programArgs[0].startsWith(vscode_workspace_path)) {
+                programArgs.unshift(vscode_workspace_path);
+            }
+        }
+
         launchArgs = launchArgs.concat(runtimeArgs, programArgs);
 
         const envArgs = this.collectEnvFileArgs(args) || args.env;
