@@ -707,12 +707,17 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             logger.log(`Target node version: ${version} ${arch}`);
             /* __GDPR__
                 "nodeVersion" : {
-                    "version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
+                    "version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" },
+                    "${include}": [ "${DebugCommonProperties}" ]
                 }
              */
             telemetry.reportEvent('nodeVersion', { version });
 
-            // __GDPR__COMMON__ "Versions.Target.Version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
+            /* __GDPR__FRAGMENT__
+                "DebugCommonProperties" : {
+                    "Versions.Target.Version" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" }
+                }
+            */
             telemetry.addCustomGlobalProperty({ 'Versions.Target.Version': version });
         }
     }
