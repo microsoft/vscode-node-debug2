@@ -368,7 +368,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             nodeProcess.on('close', (code) => {
                 const msg = 'Target closed';
                 logger.log(msg);
-                this.terminateSession(msg);
+                if (!this.isExtensionHost) {
+                    this.terminateSession(msg);
+                }
             });
 
             const noDebugMode = (<ILaunchRequestArguments>this._launchAttachArgs).noDebug;
