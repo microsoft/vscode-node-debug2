@@ -58,7 +58,7 @@
   },
   "engines": {
     "vscode": "^1.19.0",
-    "node": "^6.3.0"
+    "node": ">=6.3.0"
   },
   "repository": {
     "type": "git",
