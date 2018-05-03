@@ -34,7 +34,7 @@
     "tslint": "^5.7.0",
     "typescript": "^2.6.2",
     "vsce": "^1.33.2",
-    "vscode": "^1.1.9",
+    "vscode": "^1.1.17",
     "vscode-chrome-debug-core-testsupport": "^4.0.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
     "vscode-debugprotocol": "^1.28.0-pre.1",
