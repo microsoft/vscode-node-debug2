@@ -284,7 +284,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected hookConnectionEvents(): void {
         super.hookConnectionEvents();
 
-        this.chrome.Runtime.onExecutionContextDestroyed(params => {
+        this.chrome.Runtime.on('executionContextDestroyed', params => {
             if (params.executionContextId === 1) {
                 this.terminateSession('Program ended');
             }
@@ -300,7 +300,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private supportsStepBack(): boolean {
-        return this._domains.has(<keyof Crdp.CrdpClient>'TimeTravel');
+        return this._domains.has(<keyof Crdp.ProtocolApi>'TimeTravel');
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
