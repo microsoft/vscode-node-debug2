@@ -81,12 +81,12 @@ function doBuild(buildNls, failOnError) {
         });
 }
 
-gulp.task('build', ['copy-scripts'], function () {
-    doBuild(true, true);
+gulp.task('build', function () {
+    return runSequence('clean', 'copy-scripts', () => doBuild(true, true));
 });
 
-gulp.task('dev-build', ['copy-scripts'], function () {
-    doBuild(false, false);
+gulp.task('dev-build', function () {
+    return runSequence('clean', 'copy-scripts', () => doBuild(false, false));
 });
 
 gulp.task('copy-scripts', () => {
