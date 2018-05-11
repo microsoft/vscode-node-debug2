@@ -142,7 +142,11 @@ gulp.task('vsce-publish', function () {
     return vsce.publish();
 });
 gulp.task('vsce-package', function () {
-    return vsce.createVSIX();
+    const usePackagePathOptionIndex = process.argv.findIndex(arg => arg === "--packagePath");
+    const options = (usePackagePathOptionIndex >= 0 && usePackagePathOptionIndex < process.argv.length)
+        ? { packagePath: process.argv[usePackagePathOptionIndex + 1] }
+        : {};
+    return vsce.createVSIX(options);
 });
 
 gulp.task('publish', function(callback) {
