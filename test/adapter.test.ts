@@ -385,7 +385,7 @@ suite('Node Debug Adapter etc', () => {
 
             // Before node 8.7, a stackframe before an async call is on the first line of the calling function, not the function decl line.
             // Same with 8.9.4 exactly. So just check for either one.
-            assert(frame.line === line || frame.line === line - 1);
+            assert(frame.line === line || frame.line === line - 1, `Expected line ${line} or ${line - 1}`);
         }
 
         /**
@@ -435,9 +435,8 @@ suite('Node Debug Adapter etc', () => {
             await dc.nextTo('step', { line: toLine });
         }
 
-        test('shows async stacks and steps correctly for native async/await', async () => {
-            if (utils.compareSemver(process.version, 'v7.6.0') < 0) {
-                // Skip test if the node version doesn't support native async/await
+        test('shows async stacks and steps correctly for native async/await, pre v10', async () => {
+            if (utils.compareSemver(process.version, 'v7.6.0') < 0 || utils.compareSemver(process.version, 'v10.0.0') >= 0) {
                 return Promise.resolve();
             }
 
@@ -468,5 +467,35 @@ suite('Node Debug Adapter etc', () => {
             assertStackFrame(stackTrace, 4, PROGRAM, 19);
             assertAsyncLabelCount(stackTrace, 4);
         });
+
+        // test.only('shows async stacks and steps correctly for native async/await', async () => {
+        //     if (utils.compareSemver(process.version, 'v10.0.0') < 0) {
+        //         return Promise.resolve();
+        //     }
+
+        //     const PROGRAM = path.join(DATA_ROOT, 'native-async-await/main.js');
+        //     await dc.hitBreakpoint({ program: PROGRAM, showAsyncStacks: true, skipFiles: ['<node_internals>/**'] }, { path: PROGRAM, line: 8 });
+
+        //     await stepOverNativeAwait(8, /*afterBp=*/true);
+        //     let stackTrace = await dc.stepInTo('step', { line: 13 });
+        //     assertStackFrame(stackTrace, 3, PROGRAM, 8);
+        //     assertStackFrame(stackTrace, 4, PROGRAM, 40);
+        //     assertAsyncLabelCount(stackTrace, 1);
+
+        //     await stepOverNativeAwait(13);
+        //     stackTrace = await dc.stepInTo('step', { line: 18 });
+        //     assertStackFrame(stackTrace, 3, PROGRAM, 8);
+        //     assertAsyncLabelCount(stackTrace, 2);
+
+        //     await stepOverNativeAwait(18);
+        //     stackTrace = await dc.stepInTo('step', { line: 23 });
+        //     assertStackFrame(stackTrace, 3, PROGRAM, 13);
+        //     assertAsyncLabelCount(stackTrace, 3);
+
+        //     await stepOverNativeAwait(23);
+        //     stackTrace = await dc.stepInTo('step', { line: 28 });
+        //     assertStackFrame(stackTrace, 3, PROGRAM, 18);
+        //     assertAsyncLabelCount(stackTrace, 4);
+        // });
     });
 });
