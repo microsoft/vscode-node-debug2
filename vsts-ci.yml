@@ -31,6 +31,24 @@ phases:
       verbose: false
       customCommand: 'run tslint'
 
+  - task: Npm@1
+    displayName: npm package
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: 'run package -- --packagePath="$(Build.BinariesDirectory)/vscode-node-debug2.vsix"'
+
+  - task: ArchiveFiles@2
+    displayName: Archive files
+    inputs:
+      includeRootFolder: false
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifacts: drop'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: drop
+      publishLocation: Container
 - phase: Windows
   queue: Hosted
   steps:
@@ -63,3 +81,21 @@ phases:
       verbose: false
       customCommand: 'run tslint'
 
+  - task: Npm@1
+    displayName: npm package
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: 'run package -- --packagePath="$(Build.BinariesDirectory)/vscode-node-debug2.vsix"'
+
+  - task: ArchiveFiles@2
+    displayName: Archive files
+    inputs:
+      includeRootFolder: false
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifacts: drop'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: drop
+      publishLocation: Container
