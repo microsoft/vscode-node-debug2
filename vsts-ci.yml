@@ -36,7 +36,7 @@ phases:
     inputs:
       command: custom
       verbose: false
-      customCommand: 'run package -- --packagePath=$(Build.BinariesDirectory)/vscode-node-debug2.vsix'
+      customCommand: 'run package -- --packagePath="$(Build.BinariesDirectory)/vscode-node-debug2.vsix"'
 
   - task: ArchiveFiles@2
     displayName: Archive files
@@ -86,7 +86,7 @@ phases:
     inputs:
       command: custom
       verbose: false
-      customCommand: 'run package -- --packagePath=$(Build.BinariesDirectory)/vscode-node-debug2.vsix'
+      customCommand: 'run package -- --packagePath="$(Build.BinariesDirectory)/vscode-node-debug2.vsix"'
 
   - task: ArchiveFiles@2
     displayName: Archive files
