@@ -1,6 +1,5 @@
 # Node Debug
-[![build status](https://travis-ci.org/Microsoft/vscode-node-debug2.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-node-debug2)
-[![Build status](https://ci.appveyor.com/api/projects/status/qrr2hff3eagw5k05?svg=true)](https://ci.appveyor.com/project/roblourens/vscode-node-debug2)
+[![Build Status](https://vscode.visualstudio.com/_apis/public/build/definitions/d3aa0b57-eb08-43b8-9aec-0c0a0d5d5ad0/8/badge)](https://vscode.visualstudio.com/vscode-node-debug2/_build/index?definitionId=8)
 
 This extension is bundled with Visual Studio Code and together with **Node Debug (legacy)** forms the [Node.js](https://nodejs.org) debugging experience.
 
