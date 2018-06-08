@@ -412,4 +412,20 @@ suite('Breakpoints', () => {
             });
         });
     });
+
+    suite('es modules', () => {
+        test('breakpoint in es module', () => {
+            const file2 = path.join(DATA_ROOT, 'es-modules/file2.mjs');
+            const line = 1;
+
+            return dc.hitBreakpoint({
+                program: file2,
+                cwd: path.join(DATA_ROOT, 'es-modules'),
+                runtimeArgs: ['--nolazy']
+            }, {
+                    path: file2,
+                    line: line
+                });
+        });
+    });
 });
