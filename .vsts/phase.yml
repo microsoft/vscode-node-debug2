@@ -1,0 +1,59 @@
+parameters:
+  name: ''
+  queueName: ''
+
+phases:
+- phase: ${{ parameters.name }}
+  queue:
+    name: ${{ parameters.queueName }}
+    demands:
+    - npm
+    - node.js
+  steps:
+  - task: NodeTool@0
+    displayName: Use Node 6.x
+
+  - task: Npm@1
+    displayName: npm install
+    inputs:
+      verbose: false
+
+  - task: Npm@1
+    displayName: npm build
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: 'run build'
+
+  - task: Npm@1
+    displayName: npm test
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: test
+
+  - task: Npm@1
+    displayName: npm tslint
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: 'run tslint'
+
+  - task: Npm@1
+    displayName: npm package
+    inputs:
+      command: custom
+      verbose: false
+      customCommand: 'run package -- --packagePath="$(Build.BinariesDirectory)/vscode-node-debug2.vsix"'
+
+  - task: ArchiveFiles@2
+    displayName: Archive files
+    inputs:
+      includeRootFolder: false
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifacts: drop'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: drop
+      publishLocation: Container
