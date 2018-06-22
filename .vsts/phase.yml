@@ -23,11 +23,12 @@ phases:
       customCommand: install --unsafe-perms
       verbose: false
 
-  - script: |
-      cd '$(Build.SourcesDirectory)'
+  - ${{ if eq(parameters.name, 'Linux') }}:
+    - script: |
+        cd '$(Build.SourcesDirectory)'
 
-      export npm_package_engines_vscode='^1.19.0'
-      node ./node_modules/vscode/bin/install
+        export npm_package_engines_vscode='^1.19.0'
+        node ./node_modules/vscode/bin/install
 
   - task: Npm@1
     displayName: npm build
