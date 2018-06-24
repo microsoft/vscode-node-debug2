@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession, IOnPausedResult } from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -524,7 +524,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.terminateSession(reason, undefined, restartArgs);
     }
 
-    protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<void> {
+    protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<IOnPausedResult> {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log(Date.now() / 1000 + ': Paused on entry');
@@ -541,7 +541,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             await this.getNodeProcessDetailsIfNeeded();
-            return this.sendInitializedEvent();
+            await this.sendInitializedEvent();
+            return { didPause: true };
         } else {
             return super.onPaused(notification, expectingStopReason);
         }
