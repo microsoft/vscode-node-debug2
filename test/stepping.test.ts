@@ -40,18 +40,6 @@ suite('Stepping', () => {
             assert.deepEqual(firstFrameIDs, secondFrameIDs);
         });
 
-        test('smart stepping steps over unmapped files', async () => {
-            const program = path.join(DATA_ROOT, 'sourcemaps-with-and-without/out/mapped.js');
-            const programSource = path.join(DATA_ROOT, 'sourcemaps-with-and-without/src/mapped.ts');
-
-            await dc.hitBreakpoint({ program, smartStep: true, sourceMaps: true }, { path: programSource, line: 7 });
-            await dc.stepInAndStop();
-            const stackTraceResponse = await dc.stackTraceRequest();
-            const firstFrame = stackTraceResponse.body.stackFrames[0];
-            assert.equal(firstFrame.source.path, programSource);
-            assert.equal(firstFrame.line, 4);
-        });
-
         test('smart stepping stops on exceptions in unmapped files', () => {
             const PROGRAM = path.join(DATA_ROOT, 'programWithException.js');
             const EXCEPTION_LINE = 6;
