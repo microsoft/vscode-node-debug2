@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "sourceRoot": "src",
+        "mapRoot": "out",
+        "outDir": "out",
+        "sourceMap": true
+    }
+}

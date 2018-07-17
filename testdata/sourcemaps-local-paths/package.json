@@ -1,0 +1,13 @@
+{
+  "name": "sourcemaps-local-paths",
+  "version": "1.0.0",
+  "description": "",
+  "author": "roblourens",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "tsc"
+  },
+  "dependencies": {
+    "typescript": "2.9.2"
+  }
+}

@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as assert from 'assert';
+import * as child_process from 'child_process';
 import * as path from 'path';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
@@ -305,6 +306,33 @@ suite('Breakpoints', () => {
             assert(bpRequest.body.breakpoints[0] && bpRequest.body.breakpoints[0].verified);
 
             await dc.continueTo('breakpoint', { line: BP_LINE, path: PROGRAM });
+        });
+
+        const execP = (command, options) => {
+            return new Promise((resolve, reject) => {
+                child_process.exec(command, options, (err, stdout) => {
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(stdout);
+                });
+            });
+        };
+
+        test('still resolves sourcemap paths when they are absolute local paths', async () => {
+            const TEST_ROOT = path.join(DATA_ROOT, 'sourcemaps-local-paths');
+
+            await execP('npm install', { cwd: TEST_ROOT });
+            const PROGRAM = path.join(DATA_ROOT, 'sourcemaps-local-paths/out/classes.js');
+            const TS_SOURCE = path.join(DATA_ROOT, 'sourcemaps-local-paths/src/classes.ts');
+            const TS_LINE = 17;
+
+            return dc.hitBreakpointUnverified({
+                program: PROGRAM,
+                outFiles: [path.join(DATA_ROOT, 'sourcemaps-local-paths/out/*.js')],
+                runtimeArgs: ['--nolazy']
+            }, { path: TS_SOURCE, line: TS_LINE });
         });
     });
 
