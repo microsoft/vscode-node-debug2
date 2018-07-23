@@ -75,6 +75,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const capabilities = super.initialize(args);
         capabilities.supportsLogPoints = true;
+        capabilities.supportsTerminateRequest = true;
         return capabilities;
     }
 
@@ -508,6 +509,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             this._nodeProcessId = 0;
+        }
+    }
+
+    public async terminate(args: DebugProtocol.TerminateArguments): Promise<void> {
+        if (!this.normalAttachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this._nodeProcessId > 0) {
+            process.kill(this._nodeProcessId, 'SIGINT');
         }
     }
 
