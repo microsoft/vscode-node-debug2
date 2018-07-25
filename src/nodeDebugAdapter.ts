@@ -76,6 +76,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const capabilities = super.initialize(args);
         capabilities.supportsLogPoints = true;
         capabilities.supportsTerminateRequest = true;
+        capabilities.supportsLoadedSourcesRequest = true;
         return capabilities;
     }
 
