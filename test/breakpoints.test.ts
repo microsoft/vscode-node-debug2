@@ -324,6 +324,7 @@ suite('Breakpoints', () => {
             const TEST_ROOT = path.join(DATA_ROOT, 'sourcemaps-local-paths');
 
             await execP('npm install', { cwd: TEST_ROOT });
+            await execP('npm run postinstall', { cwd: TEST_ROOT }); // This doesn't run automatically on Linux for some reason.
             const PROGRAM = path.join(DATA_ROOT, 'sourcemaps-local-paths/out/classes.js');
             const TS_SOURCE = path.join(DATA_ROOT, 'sourcemaps-local-paths/src/classes.ts');
             const TS_LINE = 17;
