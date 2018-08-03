@@ -324,6 +324,7 @@ suite('Breakpoints', () => {
             const TEST_ROOT = path.join(DATA_ROOT, 'sourcemaps-local-paths');
 
             console.log(await execP('npm install', { cwd: TEST_ROOT }));
+            console.log(await execP('npm run postinstall', { cwd: TEST_ROOT }));
             const PROGRAM = path.join(DATA_ROOT, 'sourcemaps-local-paths/out/classes.js');
             const TS_SOURCE = path.join(DATA_ROOT, 'sourcemaps-local-paths/src/classes.ts');
             const TS_LINE = 17;
