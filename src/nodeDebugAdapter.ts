@@ -75,7 +75,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const capabilities = super.initialize(args);
         capabilities.supportsLogPoints = true;
-        capabilities.supportsTerminateRequest = true;
+        capabilities.supportsTerminateRequest = process.platform !== 'win32' && !this.isExtensionHost();
+
         return capabilities;
     }
 
@@ -513,7 +514,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async terminate(args: DebugProtocol.TerminateArguments): Promise<void> {
-        if (!this.normalAttachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this._nodeProcessId > 0) {
+        if (!this._attachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this._nodeProcessId > 0) {
             process.kill(this._nodeProcessId, 'SIGINT');
         }
     }
