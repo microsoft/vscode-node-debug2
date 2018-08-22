@@ -64,6 +64,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return this._attachMode && !this.isExtensionHost();
     }
 
+    private get supportsTerminateRequest(): boolean {
+        return process.platform !== 'win32' && !this.isExtensionHost();
+    }
+
     public initialize(args: DebugProtocol.InitializeRequestArguments): DebugProtocol.Capabilities {
         this._adapterID = args.adapterID;
         this._promiseRejectExceptionFilterEnabled = this.isExtensionHost();
@@ -75,7 +79,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const capabilities = super.initialize(args);
         capabilities.supportsLogPoints = true;
-        capabilities.supportsTerminateRequest = process.platform !== 'win32' && !this.isExtensionHost();
+        capabilities.supportsTerminateRequest = this.supportsTerminateRequest;
 
         return capabilities;
     }
@@ -351,6 +355,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         this.logLaunchCommand(runtimeExecutable, launchArgs);
+        spawnOpts.detached = this.supportsTerminateRequest; // https://github.com/Microsoft/vscode/issues/57018
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
         return new Promise<void>((resolve, reject) => {
             this._nodeProcessId = nodeProcess.pid;
@@ -515,7 +520,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public async terminate(args: DebugProtocol.TerminateArguments): Promise<void> {
         if (!this._attachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this._nodeProcessId > 0) {
-            process.kill(this._nodeProcessId, 'SIGINT');
+            // -pid to kill the process group
+            // https://github.com/Microsoft/vscode/issues/57018
+            const groupPID = -this._nodeProcessId;
+            process.kill(groupPID, 'SIGINT');
         }
     }
 
