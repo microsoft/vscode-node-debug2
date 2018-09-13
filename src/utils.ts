@@ -8,9 +8,15 @@ import * as cp from 'child_process';
 
 const NODE_SHEBANG_MATCHER = new RegExp('#! */usr/bin/env +node');
 
+const JS_EXTENSIONS = ['.js', '.es6', '.jsx', '.mjs'];
+
 export function isJavaScript(aPath: string): boolean {
-    const name = path.basename(aPath).toLowerCase();
-    if (name.endsWith('.js') || name.endsWith('.mjs')) {
+    const ext = path.extname(aPath).toLowerCase();
+    if (ext) {
+        if (JS_EXTENSIONS.indexOf(ext) >= 0) {
+            return true;
+        }
+    } else if (path.basename(aPath).toLowerCase() === 'www') {
         return true;
     }
 
