@@ -523,7 +523,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             // -pid to kill the process group
             // https://github.com/Microsoft/vscode/issues/57018
             const groupPID = -this._nodeProcessId;
-            process.kill(groupPID, 'SIGINT');
+
+            try {
+                logger.log(`Sending SIGINT to ${groupPID}`);
+                process.kill(groupPID, 'SIGINT');
+            } catch (e) {
+                if (e.message === 'kill ESRCH') {
+                    logger.log(`Got 'kill ESRCH'. Sending SIGINT to ${this._nodeProcessId}`);
+                    process.kill(this._nodeProcessId, 'SIGINT');
+                }
+            }
         }
     }
 
