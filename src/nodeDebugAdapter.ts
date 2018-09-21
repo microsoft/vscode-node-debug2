@@ -85,6 +85,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
+        if (typeof args.enableSourceMapCaching !== 'boolean') {
+            args.enableSourceMapCaching = true;
+        }
+
         if (args.console && args.console !== 'internalConsole' && typeof args._suppressConsoleOutput === 'undefined') {
             args._suppressConsoleOutput = true;
         }
@@ -267,6 +271,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public async attach(args: IAttachRequestArguments): Promise<void> {
         try {
+            if (typeof args.enableSourceMapCaching !== 'boolean') {
+                args.enableSourceMapCaching = true;
+            }
+
             return super.attach(args);
         } catch (err) {
             if (err.format && err.format.indexOf('Cannot connect to runtime process') >= 0) {

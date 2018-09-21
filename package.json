@@ -14,7 +14,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "^6.7.17",
+    "vscode-chrome-debug-core": "^6.7.19",
     "vscode-debugadapter": "^1.32.0-pre.0",
     "vscode-nls": "^3.2.5"
   },
@@ -187,6 +187,11 @@
                 ],
                 "description": "%node.trace.description%",
                 "default": true
+              },
+              "enableSourceMapCaching": {
+                "type": "boolean",
+                "description": "%node.enableSourceMapCaching.description%",
+                "default": true
               }
             }
           }
@@ -356,6 +361,11 @@
                 ],
                 "description": "%node.launch.outputCapture.description%",
                 "default": "console"
+              },
+              "enableSourceMapCaching": {
+                "type": "boolean",
+                "description": "%node.enableSourceMapCaching.description%",
+                "default": true
               }
             }
           },
@@ -465,6 +475,11 @@
               "showAsyncStacks": {
                 "type": "boolean",
                 "description": "%node.showAsyncStacks.description%",
+                "default": true
+              },
+              "enableSourceMapCaching": {
+                "type": "boolean",
+                "description": "%node.enableSourceMapCaching.description%",
                 "default": true
               }
             }
