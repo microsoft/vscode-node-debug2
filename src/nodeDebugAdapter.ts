@@ -86,7 +86,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public async launch(args: ILaunchRequestArguments): Promise<void> {
         if (typeof args.enableSourceMapCaching !== 'boolean') {
-            args.enableSourceMapCaching = true;
+            args.enableSourceMapCaching = this.isExtensionHost();
         }
 
         if (args.console && args.console !== 'internalConsole' && typeof args._suppressConsoleOutput === 'undefined') {
