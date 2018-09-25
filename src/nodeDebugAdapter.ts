@@ -157,7 +157,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             programPath = path.normalize(programPath);
-            if (pathUtils.normalizeDriveLetter(programPath) !== pathUtils.realPath(programPath)) {
+            if (pathUtils.normalizeDriveLetter(programPath) !== pathUtils.realCasePath(programPath)) {
                 logger.warn(localize('program.path.case.mismatch.warning', 'Program path uses differently cased character as file on disk; this might result in breakpoints not being hit.'));
             }
         }
@@ -178,12 +178,16 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             // if working dir is given and if the executable is within that folder, we make the executable path relative to the working dir
             if (resolvedProgramPath) {
-                program = path.relative(cwd, resolvedProgramPath);
+                program = await pathUtils.isSymlinkedPath(cwd) ?
+                    resolvedProgramPath :
+                    path.relative(cwd, resolvedProgramPath);
             }
         } else if (resolvedProgramPath) {
             // if no working dir given, we use the direct folder of the executable
             cwd = path.dirname(resolvedProgramPath);
-            program = path.basename(resolvedProgramPath);
+            program = await pathUtils.isSymlinkedPath(cwd) ?
+                resolvedProgramPath :
+                path.basename(resolvedProgramPath);
         }
 
         const runtimeArgs = args.runtimeArgs || [];

@@ -69,7 +69,7 @@ export function pathCompare(path1: string, path2: string): boolean {
  * realPath does not handle '..' or '.' path segments and it does not take the locale into account.
  * Since a drive letter of a Windows path cannot be looked up, realPath normalizes the drive letter to lower case.
  */
-export function realPath(path: string): string {
+export function realCasePath(path: string): string {
 
     let dir = Path.dirname(path);
     if (path === dir) {    // end recursion
@@ -85,7 +85,7 @@ export function realPath(path: string): string {
         let found = entries.filter(e => e.toLowerCase() === name);    // use a case insensitive search
         if (found.length === 1) {
             // on a case sensitive filesystem we cannot determine here, whether the file exists or not, hence we need the 'file exists' precondition
-            let prefix = realPath(dir);   // recurse
+            let prefix = realCasePath(dir);   // recurse
             if (prefix) {
                 return Path.join(prefix, found[0]);
             }
@@ -93,7 +93,7 @@ export function realPath(path: string): string {
             // must be a case sensitive $filesystem
             const ix = found.indexOf(name);
             if (ix >= 0) {    // case sensitive
-                let prefix = realPath(dir);   // recurse
+                let prefix = realCasePath(dir);   // recurse
                 if (prefix) {
                     return Path.join(prefix, found[ix]);
                 }
@@ -103,6 +103,27 @@ export function realPath(path: string): string {
         // silently ignore error
     }
     return null;
+}
+
+export function isSymlinkedPath(path: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        FS.lstat(path, (err, stats) => {
+            if (err) {
+                reject(err);
+            }
+
+            if (stats.isSymbolicLink()) {
+                resolve(true);
+            } else {
+                const parent = Path.dirname(path);
+                if (parent === path) {
+                    resolve(false);
+                } else {
+                    resolve(isSymlinkedPath(parent));
+                }
+            }
+        });
+    });
 }
 
 /**
