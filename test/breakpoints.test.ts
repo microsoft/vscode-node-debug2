@@ -452,9 +452,64 @@ suite('Breakpoints', () => {
                 cwd: path.join(DATA_ROOT, 'es-modules'),
                 runtimeArgs: ['--nolazy']
             }, {
-                    path: file2,
-                    line: line
-                });
+                path: file2,
+                line: line
+            });
+        });
+    });
+
+    suite.only('symlinks', () => {
+        test('breakpoint in symlinked library module', () => {
+            const main = path.join(DATA_ROOT, 'symlinked-file/main.js');
+            const file2 = path.join(DATA_ROOT, 'symlinked-file/symlinkToSrc/file.js');
+            const line = 1;
+
+            return dc.hitBreakpointUnverified({
+                program: main,
+                cwd: path.join(DATA_ROOT, 'symlinked-file'),
+                runtimeArgs: ['--nolazy', '--preserve-symlinks']
+            }, {
+                path: file2,
+                line: line
+            });
+        });
+
+        test('breakpoint in symlinked main module', () => {
+            if (utils.compareSemver(process.version, 'v10.0.0') < 0) {
+                // --preserve-symlinks-main only supported after Node 10
+                return Promise.resolve();
+            }
+
+            const main = path.join(DATA_ROOT, 'symlinked-file/symlinkToSrc/file.js');
+            const line = 1;
+
+            return dc.hitBreakpointUnverified({
+                program: main,
+                cwd: path.join(DATA_ROOT, 'symlinked-file'),
+                runtimeArgs: ['--nolazy', '--preserve-symlinks', '--preserve-symlinks-main']
+            }, {
+                path: main,
+                line: line
+            });
+        });
+
+        test('breakpoint in symlinked cwd', () => {
+            if (utils.compareSemver(process.version, 'v10.0.0') < 0) {
+                // --preserve-symlinks-main only supported after Node 10
+                return Promise.resolve();
+            }
+
+            const main = path.join(DATA_ROOT, 'symlinked-file/symlinkToSrc/file.js');
+            const line = 1;
+
+            return dc.hitBreakpointUnverified({
+                program: main,
+                cwd: path.join(DATA_ROOT, 'symlinked-file/symlinkToSrc'),
+                runtimeArgs: ['--nolazy', '--preserve-symlinks', '--preserve-symlinks-main']
+            }, {
+                path: main,
+                line: line
+            });
         });
     });
 });
