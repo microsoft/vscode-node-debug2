@@ -115,7 +115,7 @@
                   "string",
                   "null"
                 ],
-                "description": "%extensionHost.launch.runtimeExecutable.description%",
+                "markdownDescription": "%extensionHost.launch.runtimeExecutable.description%",
                 "default": "${execPath}"
               },
               "args": {
@@ -136,7 +136,7 @@
                     "null"
                   ]
                 },
-                "description": "%extensionHost.launch.env.description%",
+                "markdownDescription": "%extensionHost.launch.env.description%",
                 "default": {}
               },
               "stopOnEntry": {
@@ -159,7 +159,7 @@
               },
               "outFiles": {
                 "type": "array",
-                "description": "%node.outFiles.description%",
+                "markdownDescription": "%node.outFiles.description%",
                 "items": {
                   "type": "string"
                 },
@@ -250,7 +250,7 @@
                   "string",
                   "null"
                 ],
-                "description": "%node.launch.runtimeExecutable.description%",
+                "markdownDescription": "%node.launch.runtimeExecutable.description%",
                 "default": null
               },
               "runtimeArgs": {

@@ -5,7 +5,7 @@
 
 	"node.sourceMaps.description": "Use JavaScript source maps (if they exist).",
 	"outDir.deprecationMessage": "Attribute 'outDir' is deprecated, use 'outFiles' instead.",
-	"node.outFiles.description": "If source maps are enabled, these glob patterns specify the generated JavaScript files. If a pattern starts with '!' the files are excluded. If not specified, the generated code is expected in the same directory as its source.",
+	"node.outFiles.description": "If source maps are enabled, these glob patterns specify the generated JavaScript files. If a pattern starts with `!` the files are excluded. If not specified, the generated code is expected in the same directory as its source.",
 	"node.stopOnEntry.description": "Automatically stop program after launch.",
 	"node.port.description": "Debug port to attach to. Default is 9229.",
 	"node.address.description": "TCP/IP address of debug port. Default is 'localhost'.",
@@ -28,15 +28,15 @@
 	"node.launch.console.description": "Where to launch the debug target: internal console, integrated terminal, or external terminal.",
 	"node.launch.args.description": "Command line arguments passed to the program.",
 	"node.launch.cwd.description": "Absolute path to the working directory of the program being debugged.",
-	"node.launch.runtimeExecutable.description": "Runtime to use. Either an absolute path or the name of a runtime available on the PATH. If ommitted 'node' is assumed.",
+	"node.launch.runtimeExecutable.description": "Runtime to use. Either an absolute path or the name of a runtime available on the PATH. If ommitted `node` is assumed.",
 	"node.launch.runtimeArgs.description": "Optional arguments passed to the runtime executable.",
-    "node.launch.env.description": "Environment variables passed to the program. The value 'null' removes the variable from the environment.",
+    "node.launch.env.description": "Environment variables passed to the program. The value `null` removes the variable from the environment.",
 	"node.launch.envFile.description": "Absolute path to a file containing environment variable definitions.",
 	"node.launch.outputCapture.description": "From where to capture output messages: The debug API, or stdout/stderr streams.",
 
 	"node.launch.config.name": "Launch",
 
-	"node.attach.processId.description": "Id of process to attach to.",
+	"node.attach.processId.description": "ID of process to attach to.",
 	"node.attach.localRoot.description": "The local source root that corresponds to the 'remoteRoot'.",
 	"node.attach.remoteRoot.description": "The source root of the remote host.",
 
