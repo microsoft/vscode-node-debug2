@@ -458,8 +458,12 @@ suite('Breakpoints', () => {
         });
     });
 
-    suite.only('symlinks', () => {
+    suite('symlinks', () => {
         test('breakpoint in symlinked library module', () => {
+            if (process.platform === 'win32') {
+                return Promise.resolve();
+            }
+
             const main = path.join(DATA_ROOT, 'symlinked-file/main.js');
             const file2 = path.join(DATA_ROOT, 'symlinked-file/symlinkToSrc/file.js');
             const line = 1;
@@ -475,7 +479,7 @@ suite('Breakpoints', () => {
         });
 
         test('breakpoint in symlinked main module', () => {
-            if (utils.compareSemver(process.version, 'v10.0.0') < 0) {
+            if (utils.compareSemver(process.version, 'v10.0.0') < 0 || process.platform === 'win32') {
                 // --preserve-symlinks-main only supported after Node 10
                 return Promise.resolve();
             }
@@ -494,7 +498,7 @@ suite('Breakpoints', () => {
         });
 
         test('breakpoint in symlinked cwd', () => {
-            if (utils.compareSemver(process.version, 'v10.0.0') < 0) {
+            if (utils.compareSemver(process.version, 'v10.0.0') < 0 || process.platform === 'win32') {
                 // --preserve-symlinks-main only supported after Node 10
                 return Promise.resolve();
             }
