@@ -1,14 +1,11 @@
 parameters:
   name: ''
-  queueName: ''
+  vmImage: ''
 
-phases:
-- phase: ${{ parameters.name }}
-  queue:
-    name: ${{ parameters.queueName }}
-    demands:
-    - npm
-    - node.js
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
   steps:
   - task: NodeTool@0
     displayName: Use Node 8.x
