@@ -396,6 +396,48 @@ suite('Breakpoints', () => {
                 dc.assertStoppedLocation('exception', { path: PROGRAM, line: UNCAUGHT_EXCEPTION_LINE } )
             ]);
         });
+
+        test('should not stop on exception in <node_internals> when skipFiles is used', async () => {
+            const program = path.join(DATA_ROOT, 'nodeInternalsCaughtException.js');
+
+            return Promise.all([
+                dc.waitForEvent('initialized').then(event => {
+                    return dc.setExceptionBreakpointsRequest({
+                        filters: ['all']
+                    });
+                }).then(response => {
+                    return dc.setBreakpointsRequest({ source: { path: program }, breakpoints: [{ line: 7 }]});
+                }).then(() => {
+                    return dc.configurationDoneRequest();
+                }),
+
+                dc.launch({ program, skipFiles: ['<node_internals>/**'] }),
+
+                // assert that we did not stop on the exception, but stopped on the breakpoint
+                dc.assertStoppedLocation('breakpoint', { path: program, line: 7 })
+            ]);
+        });
+
+        test('should still stop on exception in user code when skipFiles is used with <node_internals>', async () => {
+            const program = path.join(DATA_ROOT, 'programWithException.js');
+
+            return Promise.all([
+                dc.waitForEvent('initialized').then(event => {
+                    return dc.setExceptionBreakpointsRequest({
+                        filters: ['all']
+                    });
+                }).then(response => {
+                    return dc.setBreakpointsRequest({ source: { path: program }, breakpoints: [{ line: 11 }] });
+                }).then(() => {
+                    return dc.configurationDoneRequest();
+                }),
+
+                dc.launch({ program, skipFiles: ['<node_internals>/**'] }),
+
+                // assert that we did not stop on the exception, but stopped on the breakpoint
+                dc.assertStoppedLocation('exception', { path: program, line: 6 })
+            ]);
+        });
     });
 
     suite('exception scope', () => {

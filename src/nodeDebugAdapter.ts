@@ -899,7 +899,7 @@ const internalsRegex = new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}/(.*)`);
 function fixNodeInternalsSkipFilePattern(pattern: string): string {
     const internalsMatch = pattern.match(internalsRegex);
     if (internalsMatch) {
-        return `^(?!\/)(?![a-zA-Z]:)${CoreUtils.pathGlobToBlackboxedRegex(internalsMatch[1])}`;
+        return `^(?!\/)(?![a-zA-Z]:)(?!file:///)${CoreUtils.pathGlobToBlackboxedRegex(internalsMatch[1])}`;
     } else {
         return null;
     }
