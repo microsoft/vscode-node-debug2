@@ -531,6 +531,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async terminate(args: DebugProtocol.TerminateArguments): Promise<void> {
+        this._clientRequestedSessionEnd = true;
         if (!this._attachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this._nodeProcessId > 0) {
             // -pid to kill the process group
             // https://github.com/Microsoft/vscode/issues/57018
@@ -549,7 +550,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async terminateSession(reason: string, args?: DebugProtocol.DisconnectArguments): Promise<void> {
-        if (this.isExtensionHost() && args && typeof (<any>args).restart === 'boolean' && (<any>args).restart) {
+        if (this.isExtensionHost() && args && typeof args.restart === 'boolean' && args.restart) {
             this._nodeProcessId = 0;
         } else if (this._restartMode && !args)  {
             // If restart: true, only kill the process when the client has disconnected. 'args' present implies that a Disconnect request was received
@@ -557,7 +558,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         this.killNodeProcess();
-        const restartArgs = this._restartMode && !this._inShutdown ? { port: this._port } : undefined;
+        const restartArgs = this._restartMode && !this._clientRequestedSessionEnd ? { port: this._port } : undefined;
         return super.terminateSession(reason, undefined, restartArgs);
     }
 
