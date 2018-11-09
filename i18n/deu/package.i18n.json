@@ -28,7 +28,7 @@
 	"node.launch.console.description": "Gibt an, wo das Debugziel gestartet werden soll: interne Konsole, integriertes Terminal oder externes Terminal.",
 	"node.launch.args.description": "Befehlszeilenargumente, die an das Programm übergeben werden.",
 	"node.launch.cwd.description": "Der absolute Pfad zum Arbeitsverzeichnis des Programms, das debuggt wird.",
-	"node.launch.runtimeExecutable.description": "Die zu verwendende Runtime. Ein absoluter Pfad oder der Name einer in PATH verfügbaren Runtime. Wird die Runtime nicht angegeben, wird \"node\" angenommen.",
+	"node.launch.runtimeExecutable.description": "Die Runtime, die verwendet werden soll: Geben Sie entweder einen absoluten Pfad oder den Namen einer im Pfad verfügbaren Runtime an. Wenn keine Angabe erfolgt, wird \"node\" angenommen.",
 	"node.launch.runtimeArgs.description": "Optionale Argumente, die an die ausführbare Laufzeitdatei übergeben werden.",
 	"node.launch.env.description": "An das Programm übergebene Umgebungsvariablen. Der Wert \"null\" entfernt die Variable aus der Umgebung.",
 	"node.launch.envFile.description": "Absoluter Pfad zu einer Datei mit Definitionen für Umgebungsvariablen.",
