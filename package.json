@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug",
-  "version": "1.29.5",
+  "version": "1.30.0",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -488,9 +488,9 @@
                 "default": true
               },
               "_disableOptimisticBPs": {
-              	"type": "boolean",
-              	"description": "Don't set breakpoints in any file until a sourcemap has been loaded for that file.",
-              	"default": true
+                "type": "boolean",
+                "description": "Don't set breakpoints in any file until a sourcemap has been loaded for that file.",
+                "default": true
               }
             }
           }
