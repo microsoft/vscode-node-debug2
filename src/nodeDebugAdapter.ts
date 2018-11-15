@@ -293,7 +293,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected commonArgs(args: ICommonRequestArgs): void {
         args.sourceMapPathOverrides = getSourceMapPathOverrides(args.cwd, args.sourceMapPathOverrides);
         fixNodeInternalsSkipFiles(args);
-        args.showAsyncStacks = typeof args.showAsyncStacks === 'undefined' || args.showAsyncStacks;
+
+        args.smartStep = typeof args.smartStep === 'undefined' ? !this._isVSClient : args.smartStep;
 
         this._restartMode = args.restart;
         super.commonArgs(args);
