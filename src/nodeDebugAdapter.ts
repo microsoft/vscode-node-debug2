@@ -706,7 +706,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
         return super.validateBreakpointsPath(args).catch(e => {
-            if (!this._launchAttachArgs._disableOptimisticBPs && args.source.path && utils.isJavaScript(args.source.path)) {
+            if (!this._launchAttachArgs.disableOptimisticBPs && args.source.path && utils.isJavaScript(args.source.path)) {
                 return undefined;
             } else {
                 return Promise.reject(e);

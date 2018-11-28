@@ -19,7 +19,7 @@ export interface ICommonRequestArgs extends Core.ICommonRequestArgs {
     restart?: boolean;
 
     /** Don't set breakpoints in JS files that don't have sourcemaps */
-    _disableOptimisticBPs?: boolean;
+    disableOptimisticBPs?: boolean;
 }
 
 /**
