@@ -369,7 +369,7 @@
               },
               "disableOptimisticBPs": {
                 "type": "boolean",
-                "description": "Don't set breakpoints in any file until a sourcemap has been loaded for that file.",
+                "description": "%node.disableOptimisticBPs.description%",
                 "default": true
               }
             }
@@ -489,7 +489,7 @@
               },
               "disableOptimisticBPs": {
                 "type": "boolean",
-                "description": "Don't set breakpoints in any file until a sourcemap has been loaded for that file.",
+                "description": "%node.disableOptimisticBPs.description%",
                 "default": true
               }
             }

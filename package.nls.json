@@ -24,6 +24,8 @@
 	"node.restart.description": "Restart session after Node.js has terminated.",
 	"node.showAsyncStacks.description": "Show the async calls that led to the current call stack.",
 
+	"node.disableOptimisticBPs.description": "Don't set breakpoints in any file until a sourcemap has been loaded for that file.",
+
 	"node.launch.program.description": "Absolute path to the program.",
 	"node.launch.console.description": "Where to launch the debug target: internal console, integrated terminal, or external terminal.",
 	"node.launch.args.description": "Command line arguments passed to the program.",
