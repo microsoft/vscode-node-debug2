@@ -641,8 +641,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const timeout = this._launchAttachArgs.timeout;
 
         // Wait longer in launch mode - it definitely should be paused.
-        let count = this._attachMode ?
-            10 :
+        let count = this.normalAttachMode ? 10 :
             (typeof timeout === 'number' ?
                 Math.floor(timeout / checkPausedInterval) :
                 100);
