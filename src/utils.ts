@@ -21,7 +21,7 @@ export function isJavaScript(aPath: string): boolean {
     }
 
     try {
-        const buffer = new Buffer(30);
+        const buffer = Buffer.alloc(30);
         const fd = fs.openSync(aPath, 'r');
         fs.readSync(fd, buffer, 0, buffer.length, 0);
         fs.closeSync(fd);
