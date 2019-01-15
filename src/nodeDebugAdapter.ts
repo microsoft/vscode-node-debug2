@@ -351,7 +351,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
             // check whether there is one arg with a space
             const args: string[] = [];
-            for (const a of args) {
+            for (const a of launchArgs) {
                 if (a.indexOf(' ') > 0) {
                     args.push(`"${a}"`);
                     foundArgWithSpace = true;
