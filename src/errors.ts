@@ -34,6 +34,16 @@ export function cannotLaunchDebugTarget(_error: string): DebugProtocol.Message {
     });
 }
 
+export function cannotDebugExtension(_error: string): DebugProtocol.Message {
+    return new ErrorWithMessage({
+        id: 2035,
+        format: localize('VSND2035', 'Cannot debug extension ({0}).', '{_error}'),
+        variables: { _error },
+        showUser: true,
+        sendTelemetry: true
+    });
+}
+
 export function unknownConsoleType(consoleType: string): DebugProtocol.Message {
     return new ErrorWithMessage({
         id: 2028,

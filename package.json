@@ -106,7 +106,6 @@
         "configurationAttributes": {
           "launch": {
             "required": [
-              "runtimeExecutable",
               "args"
             ],
             "properties": {

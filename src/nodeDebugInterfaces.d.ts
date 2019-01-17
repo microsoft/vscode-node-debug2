@@ -72,4 +72,19 @@ export interface IAttachRequestArguments extends Core.IAttachRequestArgs, ICommo
     processId?: string;
 }
 
+/**
+ * This interface represents a single command line argument split into a "prefix" and a "path" half.
+ * The optional "prefix" contains arbitrary text and the optional "path" contains a file system path.
+ * Concatenating both results in the original command line argument.
+ */
+export interface ILaunchVSCodeArgument {
+    prefix?: string;
+    path?: string;
+}
+
+export interface ILaunchVSCodeArguments {
+    args: ILaunchVSCodeArgument[];
+    env?: { [key: string]: string | null; };
+}
+
 export type NodeDebugError = DebugProtocol.Message & Error;
