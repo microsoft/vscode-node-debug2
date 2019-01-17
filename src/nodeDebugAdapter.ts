@@ -260,7 +260,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     } else if (stat.isFile()) {
                         return { prefix: '--file-uri=', path: arg };
                     }
-                } catch(err) {
+                } catch (err) {
                     // file not found
                 }
                 return { path: arg }; // just return the path blindly and hope for the best...
