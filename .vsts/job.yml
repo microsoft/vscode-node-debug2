@@ -29,7 +29,6 @@ jobs:
         debugMode: false
       continueOnError: true
 
-
   - task: Npm@1
     displayName: npm install
     inputs:
