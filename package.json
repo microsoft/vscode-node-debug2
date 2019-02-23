@@ -24,7 +24,7 @@
     "del": "^2.2.2",
     "event-stream": "^3.3.4",
     "find-free-port": "^1.0.2",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-tslint": "^8.1.2",
     "gulp-typescript": "^3.1.3",
