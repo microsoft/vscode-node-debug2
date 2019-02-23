@@ -21,6 +21,15 @@ jobs:
       versionSpec: $(nodeVersion)
       checkLatest: true
 
+  - ${{ if eq(parameters.name, 'Windows') }}:
+    - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+      displayName: 'Run CredScan'
+      inputs:
+        verboseOutput: true
+        debugMode: false
+      continueOnError: true
+
+
   - task: Npm@1
     displayName: npm install
     inputs:
@@ -55,6 +64,11 @@ jobs:
       command: custom
       verbose: false
       customCommand: 'run tslint'
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+    inputs:
+      ignoreDirectories: 'testdata'
 
   - task: Npm@1
     displayName: npm package
