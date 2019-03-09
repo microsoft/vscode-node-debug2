@@ -9,3 +9,4 @@ typings/
 .browse.VC.db
 npm-debug.log
 package.nls.*.json
+testdata/sourcemaps-local-paths/out/*.js
