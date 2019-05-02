@@ -21,6 +21,9 @@ import * as wsl from './wslSupport';
 
 import * as nls from 'vscode-nls';
 import { FinishedStartingUpEventArguments } from 'vscode-chrome-debug-core/lib/src/executionTimingsReporter';
+
+import * as NiMS from './nodeInspectMetadataServer';
+
 let localize = nls.loadMessageBundle();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
@@ -387,6 +390,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         }
 
+        NiMS.addSession(launchArgs);
+        logger.warn('NiMS listening on ' + NiMS.getSocket());
+
         this.logLaunchCommand(runtimeExecutable, launchArgs);
         spawnOpts.detached = this.supportsTerminateRequest; // https://github.com/Microsoft/vscode/issues/57018
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
@@ -397,6 +403,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 const msg = `Node process error: ${error}`;
                 logger.error(msg);
                 this.terminateSession(msg);
+                NiMS.removeSession(launchArgs);
             });
             nodeProcess.on('exit', () => {
                 const msg = 'Target exited';
@@ -404,6 +411,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 if (!this.isExtensionHost()) {
                     this.terminateSession(msg);
                 }
+                NiMS.removeSession(launchArgs);
             });
             nodeProcess.on('close', (code) => {
                 const msg = 'Target closed';
@@ -411,6 +419,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 if (!this.isExtensionHost()) {
                     this.terminateSession(msg);
                 }
+                NiMS.removeSession(launchArgs);
             });
 
             const noDebugMode = (<ILaunchRequestArguments>this._launchAttachArgs).noDebug;
@@ -492,7 +501,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                     const r = line.match(/^\s*([\w\.\-]+)\s*=\s*(.*)?\s*$/);
                     if (r !== null) {
                         const key = r[1];
-                        if (!process.env[key]) {	// .env variables never overwrite existing variables (see #21169)
+                        if (!process.env[key]) {    // .env variables never overwrite existing variables (see #21169)
                             let value = r[2] || '';
                             if (value.length > 0 && value.charAt(0) === '"' && value.charAt(value.length - 1) === '"') {
                                 value = value.replace(/\\n/gm, '\n');
