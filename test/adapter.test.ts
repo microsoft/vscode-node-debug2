@@ -253,9 +253,9 @@ suite('Node Debug Adapter etc', () => {
                 .then(completions => assert(inCompletionsList(completions, 'global')));
         });
 
-        test('returns local vars', () => {
-            return testCompletions('')
-                .then(completions => assert(inCompletionsList(completions, 'num', 'str', 'arr', 'obj')));
+        test('returns local vars', async () => {
+            const completions = await testCompletions('');
+            assert(inCompletionsList(completions, 'num', 'str', 'arr', 'obj'));
         });
 
         test('returns methods', () => {

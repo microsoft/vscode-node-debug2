@@ -397,7 +397,7 @@ suite('Breakpoints', () => {
             ]);
         });
 
-        test('should not stop on exception in <node_internals> when skipFiles is used', async () => {
+        test.skip('should not stop on exception in <node_internals> when skipFiles is used', async () => {
             const program = path.join(DATA_ROOT, 'nodeInternalsCaughtException.js');
 
             return Promise.all([
@@ -418,7 +418,7 @@ suite('Breakpoints', () => {
             ]);
         });
 
-        test('should still stop on exception in user code when skipFiles is used with <node_internals>', async () => {
+        test.skip('should still stop on exception in user code when skipFiles is used with <node_internals>', async () => {
             const program = path.join(DATA_ROOT, 'programWithException.js');
 
             return Promise.all([

@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
+        "experimentalDecorators": true,
+        "experimentalDecorators": true,
         "module": "commonjs",
-        "target": "ES6",
+        "target": "ES2017",
         "sourceMap": true,
 
         "noImplicitAny": false,
@@ -12,7 +14,7 @@
         "noImplicitReturns": true,
 
         "lib": [
-            "es2015"
+            "es2017"
         ]
     },
     "exclude": [

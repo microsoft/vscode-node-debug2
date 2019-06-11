@@ -43,6 +43,9 @@
 			"request": "launch",
 			"protocol": "inspector",
 			"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+			"env": {
+				"TEST_DA_PORT": "4712",
+			},
 			"args": [ "--no-timeouts",
 				"-s", "2000",
 				"--colors",
@@ -50,7 +53,7 @@
 				"./out/test",
 				"-u", "tdd",
                 "-R", "node_modules/vscode-chrome-debug-core-testsupport/out/loggingReporter.js",
-				"--grep", ".*" ],
+				"--grep", "returns local vars"],
 			"cwd": "${workspaceFolder}",
 			"skipFiles": [
 				"<node_internals>/**/*.js"

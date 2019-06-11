@@ -4,6 +4,7 @@
 
 import { DebugProtocol } from 'vscode-debugprotocol';
 import * as Core from 'vscode-chrome-debug-core';
+import { MakePropertyRequired } from 'vscode-chrome-debug-core';
 
 type ConsoleType = 'internalConsole' | 'integratedTerminal' | 'externalTerminal';
 
@@ -63,7 +64,7 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
 /**
  * This interface should always match the schema found in the node-debug extension manifest.
  */
-export interface IAttachRequestArguments extends Core.IAttachRequestArgs, ICommonRequestArgs {
+export interface IAttachRequestArguments extends Core.IAttachRequestArgs, MakePropertyRequired<ICommonRequestArgs, 'port'> {
     /** Node's root directory. */
     remoteRoot?: string;
     /** VS Code's root directory. */
