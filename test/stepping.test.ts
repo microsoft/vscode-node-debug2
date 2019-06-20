@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 import * as testSetup from './testSetup';
 
-suite('Stepping', () => {
+suite.skip('Stepping', () => {
     const DATA_ROOT = testSetup.DATA_ROOT;
 
     let dc: ts.debugClient.ExtendedDebugClient;
@@ -193,7 +193,7 @@ suite('Stepping', () => {
             await dc.stepInTo('step', { path: sourceB, line: 3 });
         });
 
-        test.skip('can toggle skipping a non-sourcemapped file', async () => {
+        test('can toggle skipping a non-sourcemapped file', async () => {
             // Using this program, but run with sourcemaps disabled
             const program = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceA.js');
             const sourceB = path.join(DATA_ROOT, 'calls-between-sourcemapped-files/out/sourceB.js');

@@ -2,7 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession, IOnPausedResult } from 'vscode-chrome-debug-core';
+import { chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointsArgs,
+     CDTP, ChromeDebugSession, IFinishedStartingUpEventArguments, PausedEvent, parseResourceIdentifier } from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -20,7 +21,8 @@ import * as errors from './errors';
 import * as wsl from './wslSupport';
 
 import * as nls from 'vscode-nls';
-import { FinishedStartingUpEventArguments } from 'vscode-chrome-debug-core/lib/src/executionTimingsReporter';
+import { NodeDebugAdapterBase } from './nodeDebugAdapterBase';
+import { IOnPausedResult } from './v1-backwards-compatiblity/interfaces';
 let localize = nls.loadMessageBundle();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
@@ -30,7 +32,7 @@ const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
     'meteor://💻app/*': '${cwd}/*',
 };
 
-export class NodeDebugAdapter extends ChromeDebugAdapter {
+export class NodeDebugAdapter extends NodeDebugAdapterBase {
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
     private static NODE_TERMINATION_POLL_INTERVAL = 3000;
@@ -46,9 +48,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     // Flags relevant during init
     private _continueAfterConfigDone = true;
-    private _entryPauseEvent: Crdp.Debugger.PausedEvent;
+    private _entryPauseEvent: PausedEvent;
     private _waitingForEntryPauseEvent = true;
-    private _finishedConfig = false;
+    // TODO-V2: private _finishedConfig = false;
     private _handlingEarlyNodeMsgs = true;
     private _captureFromStd: boolean = false;
 
@@ -195,7 +197,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         const debugArgs = detectSupportedDebugArgsForLaunch(args, runtimeExecutable, args.env);
         let launchArgs = [];
-        if (!args.noDebug && !args.port) {
+        if (!args.noDebug) {
             // Always stop on entry to set breakpoints
             if (debugArgs === DebugArgs.Inspect_DebugBrk) {
                 launchArgs.push(`--inspect=${port}`);
@@ -210,10 +212,12 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs, program);
         // if using subsystem for linux, we will trick the debugger to map source files
         if (args.useWSL && !args.localRoot && !args.remoteRoot) {
-            this._pathTransformer.attach(<IAttachRequestArguments>{
-                remoteRoot: wslLaunchArgs.remoteRoot,
-                localRoot: wslLaunchArgs.localRoot
-            });
+            // TODO-V2:
+            throw new Error(`not yet implemented`);
+            // this._pathTransformer.attach(<IAttachRequestArguments>{
+            //     remoteRoot: wslLaunchArgs.remoteRoot,
+            //     localRoot: wslLaunchArgs.localRoot
+            // });
         }
 
         const envArgs = this.collectEnvFileArgs(args) || args.env;
@@ -323,7 +327,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     protected hookConnectionEvents(): void {
         super.hookConnectionEvents();
 
-        this.chrome.Runtime.on('executionContextDestroyed', params => {
+        this._protocolApi.Runtime.on('executionContextDestroyed', params => {
             if (params.executionContextId === 1) {
                 this.terminateSession('Program ended');
             }
@@ -339,7 +343,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private supportsStepBack(): boolean {
-        return this._domains.has(<keyof Crdp.ProtocolApi>'TimeTravel');
+        // TODO-V2:
+        return false;
+        // return this._domains.has(<keyof CDTP.ProtocolApi>'TimeTravel');
     }
 
     private launchInTerminal(termArgs: DebugProtocol.RunInTerminalRequestArguments): Promise<void> {
@@ -468,7 +474,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         });
     }
 
-    protected onConsoleAPICalled(params: Crdp.Runtime.ConsoleAPICalledEvent): void {
+    protected onConsoleAPICalled(params: CDTP.Runtime.ConsoleAPICalledEvent): void {
         // Once any console API message is received, we are done listening to initial stderr output
         this._handlingEarlyNodeMsgs = false;
 
@@ -519,14 +525,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     public async configurationDone(): Promise<void> {
-        if (!this.chrome) {
+        if (!this._protocolApi) {
             // It's possible to get this request after we've detached, see #21973
             return super.configurationDone();
         }
 
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
         // So tell the target to continue, or tell the client that we paused, as needed
-        this._finishedConfig = true;
+        // TODO-V2:
+        // this._finishedConfig = true;
         if (this._continueAfterConfigDone) {
             this._expectingStopReason = undefined;
             await this.continue(/*internal=*/true);
@@ -534,7 +541,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             await this.onPaused(this._entryPauseEvent);
         }
 
-        this.events.emit(ChromeDebugSession.FinishedStartingUpEventName, { requestedContentWasDetected: true } as FinishedStartingUpEventArguments);
+        this.events.emit(ChromeDebugSession.FinishedStartingUpEventName, { requestedContentWasDetected: true } as IFinishedStartingUpEventArguments);
         await super.configurationDone();
     }
 
@@ -583,7 +590,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return super.terminateSession(reason, undefined, restartArgs);
     }
 
-    protected async onPaused(notification: Crdp.Debugger.PausedEvent, expectingStopReason = this._expectingStopReason): Promise<IOnPausedResult> {
+    public async onPaused(notification: PausedEvent, expectingStopReason = this._expectingStopReason): Promise<IOnPausedResult> {
         // If we don't have the entry location, this must be the entry pause
         if (this._waitingForEntryPauseEvent) {
             logger.log(Date.now() / 1000 + ': Paused on entry');
@@ -613,6 +620,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return programPath;
         }
 
+        const programPathAsRI = parseResourceIdentifier(programPath);
         if (utils.isJavaScript(programPath)) {
             if (!sourceMaps) {
                 return programPath;
@@ -622,11 +630,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             // programPath is the generated file or whether it is the source (and we need source mapping).
             // Typically this happens if a tool like 'babel' or 'uglify' is used (because they both transpile js to js).
             // We use the source maps to find a 'source' file for the given js file.
-            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
-            if (generatedPath && generatedPath !== programPath) {
+            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPathAsRI);
+            if (generatedPath.textRepresentation && !generatedPath.isEquivalentTo(programPathAsRI)) {
                 // programPath must be source because there seems to be a generated file for it
                 logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
-                programPath = generatedPath;
+                programPath = generatedPath.textRepresentation;
             } else {
                 logger.log(`Launch: program '${programPath}' seems to be the generated file`);
             }
@@ -638,7 +646,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 return Promise.reject<string>(errors.cannotLaunchBecauseSourceMaps(programPath));
             }
 
-            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
+            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPathAsRI);
             if (!generatedPath) { // cannot find generated file
                 if (this._launchAttachArgs.outFiles || this._launchAttachArgs.outDir) {
                     return Promise.reject<string>(errors.cannotLaunchBecauseJsNotFound(programPath));
@@ -648,7 +656,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
 
             logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
-            return generatedPath;
+            return generatedPath.textRepresentation;
         }
     }
 
@@ -689,14 +697,15 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     /**
      * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
-     */
+     *//*
+    // TODO-V2:
     protected async addBreakpoints(url: string, breakpoints: InternalSourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
         const responses = await super.addBreakpoints(url, breakpoints);
         if (this._entryPauseEvent && !this._finishedConfig) {
             const entryLocation = this._entryPauseEvent.callFrames[0].location;
             const bpAtEntryLocationIdx = responses.findIndex(response => {
                 // Don't compare column location, because you can have a bp at col 0, then break at some other column
-                return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
+                return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.position.lineNumber &&
                     response.actualLocation.scriptId === entryLocation.scriptId;
             });
             const bpAtEntryLocation = bpAtEntryLocationIdx >= 0 && breakpoints[bpAtEntryLocationIdx];
@@ -722,6 +731,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         return responses;
     }
+    */
 
     protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
         return super.validateBreakpointsPath(args).catch(e => {
@@ -734,11 +744,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private async getNodeProcessDetailsIfNeeded(): Promise<void> {
-        if (this._loggedTargetVersion || !this.chrome) {
+        if (this._loggedTargetVersion || !this._protocolApi) {
             return Promise.resolve();
         }
 
-        const response = await this.chrome.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 })
+        const response = await this._protocolApi.Runtime.evaluate({ expression: '[process.pid, process.version, process.arch]', returnByValue: true, contextId: 1 })
             .catch(error => logger.error('Error evaluating `process.pid`: ' + error.message));
 
         if (!response) {
@@ -818,7 +828,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         logger.warn(cli);
     }
 
-    protected globalEvaluate(args: Crdp.Runtime.EvaluateRequest): Promise<Crdp.Runtime.EvaluateResponse> {
+    protected globalEvaluate(args: CDTP.Runtime.EvaluateRequest): Promise<CDTP.Runtime.EvaluateResponse> {
         // contextId: 1 - see https://github.com/nodejs/node/issues/8426
         if (!args.contextId) args.contextId = 1;
 
@@ -867,7 +877,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     protected getReadonlyOrigin(aPath: string): string {
-        return path.isAbsolute(aPath) || aPath.startsWith(ChromeDebugAdapter.EVAL_NAME_PREFIX) ?
+        return path.isAbsolute(aPath) || aPath.startsWith(NodeDebugAdapterBase.EVAL_NAME_PREFIX) ?
             localize('origin.from.node', 'read-only content from Node.js') :
             localize('origin.core.module', 'read-only core module');
     }

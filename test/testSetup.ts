@@ -7,6 +7,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as ts from 'vscode-chrome-debug-core-testsupport';
 import * as findFreePort from 'find-free-port';
+import { ILaunchRequestArguments } from '../src/nodeDebugInterfaces';
 
 const NIGHTLY_NAME = os.platform() === 'win32' ? 'node-nightly.cmd' : 'node-nightly';
 
@@ -20,7 +21,7 @@ function findPort(): Promise<number> {
     });
 }
 
-async function patchLaunchArgs(launchArgs: any): Promise<void> {
+async function patchLaunchArgs(launchArgs: ILaunchRequestArguments): Promise<void> {
     launchArgs.trace = 'verbose';
     if (process.version.startsWith('v6.2')) {
         launchArgs.runtimeExecutable = NIGHTLY_NAME;
@@ -39,6 +40,13 @@ export function setup(_opts?: { port?: number, alwaysDumpLogs?: boolean }) {
         type: 'node2',
         patchLaunchArgs
     }, _opts);
+
+    if (!opts.port) {
+        const daPort = process.env['TEST_DA_PORT'];
+        opts.port = daPort
+            ? parseInt(daPort, 10)
+            : undefined;
+    }
 
     return ts.setup(opts);
 }
