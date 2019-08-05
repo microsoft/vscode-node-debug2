@@ -210,7 +210,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         const wslLaunchArgs = wsl.createLaunchArg(args.useWSL, args.console === 'externalTerminal', cwd, runtimeExecutable, launchArgs, program);
         // if using subsystem for linux, we will trick the debugger to map source files
         if (args.useWSL && !args.localRoot && !args.remoteRoot) {
-            this._pathTransformer.attach(<IAttachRequestArguments>{
+            this.pathTransformer.attach(<IAttachRequestArguments>{
                 remoteRoot: wslLaunchArgs.remoteRoot,
                 localRoot: wslLaunchArgs.localRoot
             });
@@ -622,7 +622,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             // programPath is the generated file or whether it is the source (and we need source mapping).
             // Typically this happens if a tool like 'babel' or 'uglify' is used (because they both transpile js to js).
             // We use the source maps to find a 'source' file for the given js file.
-            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
+            const generatedPath = await this.sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
             if (generatedPath && generatedPath !== programPath) {
                 // programPath must be source because there seems to be a generated file for it
                 logger.log(`Launch: program '${programPath}' seems to be the source; launch the generated file '${generatedPath}' instead`);
@@ -638,7 +638,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
                 return Promise.reject<string>(errors.cannotLaunchBecauseSourceMaps(programPath));
             }
 
-            const generatedPath = await this._sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
+            const generatedPath = await this.sourceMapTransformer.getGeneratedPathFromAuthoredPath(programPath);
             if (!generatedPath) { // cannot find generated file
                 if (this._launchAttachArgs.outFiles || this._launchAttachArgs.outDir) {
                     return Promise.reject<string>(errors.cannotLaunchBecauseJsNotFound(programPath));
@@ -875,7 +875,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * If realPath is an absolute path or a URL, return realPath. Otherwise, prepend the node_internals marker
      */
-    protected realPathToDisplayPath(realPath: string): string {
+    public realPathToDisplayPath(realPath: string): string {
         if (!realPath.match(/VM\d+/) && !path.isAbsolute(realPath)) {
             return `${NodeDebugAdapter.NODE_INTERNALS}/${realPath}`;
         }
@@ -886,7 +886,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     /**
      * If displayPath starts with the NODE_INTERNALS indicator, strip it.
      */
-    protected displayPathToRealPath(displayPath: string): string {
+    public displayPathToRealPath(displayPath: string): string {
         const match = displayPath.match(new RegExp(`^${NodeDebugAdapter.NODE_INTERNALS}[\\\\/](.*)`));
         return match ? match[1] : super.displayPathToRealPath(displayPath);
     }
