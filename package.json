@@ -14,8 +14,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "vscode-chrome-debug-core": "^6.7.53",
-    "vscode-debugadapter": "^1.33.0-pre.2",
+    "vscode-chrome-debug-core": "^6.8.0",
+    "vscode-debugadapter": "^1.37.1",
     "vscode-nls": "^4.0.0"
   },
   "devDependencies": {
@@ -37,7 +37,7 @@
     "vscode": "^1.1.30",
     "vscode-chrome-debug-core-testsupport": "^4.0.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
-    "vscode-debugprotocol": "^1.32.0-pre.0",
+    "vscode-debugprotocol": "^1.37.0",
     "vscode-nls-dev": "^3.2.6"
   },
   "main": "./out/src/extension",
