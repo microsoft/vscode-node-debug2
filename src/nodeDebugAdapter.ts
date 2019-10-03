@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, ISetBreakpointResult, ISetBreakpointsArgs, Crdp, InternalSourceBreakpoint, ChromeDebugSession, IOnPausedResult } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as CoreUtils, logger, telemetry as CoreTelemetry, Crdp, ChromeDebugSession, IOnPausedResult } from 'vscode-chrome-debug-core';
 const telemetry = CoreTelemetry.telemetry;
 
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -21,6 +21,7 @@ import * as wsl from './wslSupport';
 
 import * as nls from 'vscode-nls';
 import { FinishedStartingUpEventArguments } from 'vscode-chrome-debug-core/lib/src/executionTimingsReporter';
+import { ReasonType } from 'vscode-chrome-debug-core/lib/src/chrome/stoppedEvent';
 let localize = nls.loadMessageBundle();
 
 const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
@@ -56,6 +57,34 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private _restartMode: boolean;
     private _isTerminated: boolean;
     private _adapterID: string;
+
+    get entryPauseEvent(): Crdp.Debugger.PausedEvent | undefined {
+        return this._entryPauseEvent;
+    }
+
+    get finishedConfig(): boolean {
+        return this._finishedConfig;
+    }
+
+    get continueAfterConfigDone(): boolean {
+        return this._continueAfterConfigDone;
+    }
+
+    set continueAfterConfigDone(v: boolean) {
+        this._continueAfterConfigDone = v;
+    }
+
+    get expectingStopReason(): ReasonType {
+        return this._expectingStopReason;
+    }
+
+    set expectingStopReason(v: ReasonType) {
+        this._expectingStopReason = v;
+    }
+
+    get launchAttachArgs(): ICommonRequestArgs {
+        return this._launchAttachArgs;
+    }
 
     /**
      * Returns whether this is a non-EH attach scenario
@@ -687,52 +716,6 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         return `Node (${this._nodeProcessId})`;
     }
 
-    /**
-     * Override addBreakpoints, which is called by setBreakpoints to make the actual call to Chrome.
-     */
-    protected async addBreakpoints(url: string, breakpoints: InternalSourceBreakpoint[]): Promise<ISetBreakpointResult[]> {
-        const responses = await super.addBreakpoints(url, breakpoints);
-        if (this._entryPauseEvent && !this._finishedConfig) {
-            const entryLocation = this._entryPauseEvent.callFrames[0].location;
-            const bpAtEntryLocationIdx = responses.findIndex(response => {
-                // Don't compare column location, because you can have a bp at col 0, then break at some other column
-                return response && response.actualLocation && response.actualLocation.lineNumber === entryLocation.lineNumber &&
-                    response.actualLocation.scriptId === entryLocation.scriptId;
-            });
-            const bpAtEntryLocation = bpAtEntryLocationIdx >= 0 && breakpoints[bpAtEntryLocationIdx];
-
-            if (bpAtEntryLocation) {
-                let conditionPassed = true;
-                if (bpAtEntryLocation.condition) {
-                    const evalConditionResponse = await this.evaluateOnCallFrame(bpAtEntryLocation.condition, this._entryPauseEvent.callFrames[0]);
-                    conditionPassed = !evalConditionResponse.exceptionDetails && (!!evalConditionResponse.result.objectId || !!evalConditionResponse.result.value);
-                }
-
-                if (conditionPassed) {
-                    // There is some initial breakpoint being set to the location where we stopped on entry, so need to pause even if
-                    // the stopOnEntry flag is not set
-                    logger.log('Got a breakpoint set in the entry location, so will stop even though stopOnEntry is not set');
-                    this._continueAfterConfigDone = false;
-                    this._expectingStopReason = 'breakpoint';
-                } else {
-                    logger.log('Breakpoint condition at entry location did not evaluate to truthy value');
-                }
-            }
-        }
-
-        return responses;
-    }
-
-    protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
-        return super.validateBreakpointsPath(args).catch(e => {
-            if (!this._launchAttachArgs.disableOptimisticBPs && args.source.path && utils.isJavaScript(args.source.path)) {
-                return undefined;
-            } else {
-                return Promise.reject(e);
-            }
-        });
-    }
-
     private async getNodeProcessDetailsIfNeeded(): Promise<void> {
         if (this._loggedTargetVersion || !this.chrome) {
             return Promise.resolve();
@@ -871,7 +854,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             localize('origin.from.node', 'read-only content from Node.js') :
             localize('origin.core.module', 'read-only core module');
     }
-
+    
     /**
      * If realPath is an absolute path or a URL, return realPath. Otherwise, prepend the node_internals marker
      */
