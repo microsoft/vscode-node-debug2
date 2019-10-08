@@ -5,35 +5,43 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
+import * as match from 'minimatch';
 
 const NODE_SHEBANG_MATCHER = new RegExp('#! */usr/bin/env +node');
 
-const JS_EXTENSIONS = ['.js', '.es6', '.jsx', '.mjs'];
+/**
+ * Checks whether a file is a loadable JavaScript file.
+ */
+export class JavaScriptDeterminant {
+    private static readonly defaultPatterns = ['*.js', '*.es6', '*.jsx', '*.mjs'];
+    private customPatterns: ReadonlyArray<string> = [];
 
-export function isJavaScript(aPath: string): boolean {
-    const ext = path.extname(aPath).toLowerCase();
-    if (ext) {
-        if (JS_EXTENSIONS.indexOf(ext) >= 0) {
-            return true;
-        }
-    } else if (path.basename(aPath).toLowerCase() === 'www') {
-        return true;
+    public updatePatterns(patterns: ReadonlyArray<string>) {
+        this.customPatterns = patterns;
     }
 
-    try {
-        const buffer = Buffer.alloc(30);
-        const fd = fs.openSync(aPath, 'r');
-        fs.readSync(fd, buffer, 0, buffer.length, 0);
-        fs.closeSync(fd);
-        const line = buffer.toString();
-        if (NODE_SHEBANG_MATCHER.test(line)) {
-            return true;
-        }
-    } catch (e) {
-        // silently ignore problems
+    public isJavaScript(aPath: string) {
+        const basename = path.basename(aPath);
+        const matchesPattern = [
+            ...JavaScriptDeterminant.defaultPatterns,
+            ...this.customPatterns,
+        ].some(pattern => match(basename, pattern, { nocase: true }));
+
+        return matchesPattern || this.isShebang(aPath);
     }
 
-    return false;
+    private isShebang(aPath: string) {
+        try {
+            const buffer = Buffer.alloc(30);
+            const fd = fs.openSync(aPath, 'r');
+            fs.readSync(fd, buffer, 0, buffer.length, 0);
+            fs.closeSync(fd);
+            const line = buffer.toString();
+            return NODE_SHEBANG_MATCHER.test(line)
+        } catch (e) {
+            return false;
+        }
+    }
 }
 
 export function random(low: number, high: number): number {

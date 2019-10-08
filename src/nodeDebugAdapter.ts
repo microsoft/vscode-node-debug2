@@ -9,7 +9,6 @@ import { DebugProtocol } from 'vscode-debugprotocol';
 import { OutputEvent, CapabilitiesEvent } from 'vscode-debugadapter';
 import { ErrorWithMessage } from 'vscode-chrome-debug-core/out/src/errors';
 
-import * as match from 'minimatch';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
@@ -42,6 +41,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     protected _launchAttachArgs: ICommonRequestArgs;
 
+    private _jsDeterminant = new utils.JavaScriptDeterminant();
     private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
@@ -61,6 +61,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     get entryPauseEvent(): Crdp.Debugger.PausedEvent | undefined {
         return this._entryPauseEvent;
+    }
+
+    get jsDeterminant(): utils.JavaScriptDeterminant {
+        return this._jsDeterminant;
     }
 
     get finishedConfig(): boolean {
@@ -194,7 +198,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         this._captureFromStd = args.outputCapture === 'std';
 
-        const resolvedProgramPath = await this.resolveProgramPath(programPath, args.sourceMaps, args.__debuggablePatterns);
+        if (args.__debuggablePatterns) {
+            this._jsDeterminant.updatePatterns(args.__debuggablePatterns);
+        }
+
+        const resolvedProgramPath = await this.resolveProgramPath(programPath, args.sourceMaps);
         let program: string;
         let cwd = args.cwd;
         if (cwd) {
@@ -637,13 +645,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
-    private async resolveProgramPath(programPath: string, sourceMaps: boolean, filePatterns: string[]): Promise<string> {
+    private async resolveProgramPath(programPath: string, sourceMaps: boolean): Promise<string> {
         logger.verbose(`Launch: Resolving programPath: ${programPath}`);
         if (!programPath) {
             return programPath;
         }
 
-        if (filePatterns.some(pattern => match(path.basename(programPath), pattern, { nocase: true }))) {
+        if (this.jsDeterminant.isJavaScript(programPath)) {
             if (!sourceMaps) {
                 return programPath;
             }

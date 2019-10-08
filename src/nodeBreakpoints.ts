@@ -49,7 +49,7 @@ export class NodeBreakpoints extends Breakpoints {
 
     protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
         return super.validateBreakpointsPath(args).catch(e => {
-            if (!this.nodeDebugAdapter.launchAttachArgs.disableOptimisticBPs && args.source.path && utils.isJavaScript(args.source.path)) {
+            if (!this.nodeDebugAdapter.launchAttachArgs.disableOptimisticBPs && args.source.path && this.nodeDebugAdapter.jsDeterminant.isJavaScript(args.source.path)) {
                 return undefined;
             } else {
                 return Promise.reject(e);
