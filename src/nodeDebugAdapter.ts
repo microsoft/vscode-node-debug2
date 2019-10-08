@@ -9,6 +9,7 @@ import { DebugProtocol } from 'vscode-debugprotocol';
 import { OutputEvent, CapabilitiesEvent } from 'vscode-debugadapter';
 import { ErrorWithMessage } from 'vscode-chrome-debug-core/out/src/errors';
 
+import * as match from 'minimatch';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
@@ -193,7 +194,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
         this._captureFromStd = args.outputCapture === 'std';
 
-        const resolvedProgramPath = await this.resolveProgramPath(programPath, args.sourceMaps);
+        const resolvedProgramPath = await this.resolveProgramPath(programPath, args.sourceMaps, args.__debuggablePatterns);
         let program: string;
         let cwd = args.cwd;
         if (cwd) {
@@ -636,13 +637,13 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
     }
 
-    private async resolveProgramPath(programPath: string, sourceMaps: boolean): Promise<string> {
+    private async resolveProgramPath(programPath: string, sourceMaps: boolean, filePatterns: string[]): Promise<string> {
         logger.verbose(`Launch: Resolving programPath: ${programPath}`);
         if (!programPath) {
             return programPath;
         }
 
-        if (utils.isJavaScript(programPath)) {
+        if (filePatterns.some(pattern => match(path.basename(programPath), pattern, { nocase: true }))) {
             if (!sourceMaps) {
                 return programPath;
             }
@@ -854,7 +855,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             localize('origin.from.node', 'read-only content from Node.js') :
             localize('origin.core.module', 'read-only core module');
     }
-    
+
     private isExtensionHost(): boolean {
         return this._adapterID === 'extensionHost2' || this._adapterID === 'extensionHost';
     }
