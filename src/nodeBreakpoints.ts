@@ -4,7 +4,6 @@
 
 import { Breakpoints, chromeConnection, InternalSourceBreakpoint, ISetBreakpointResult, ISetBreakpointsArgs, logger, ScriptContainer } from 'vscode-chrome-debug-core';
 import { NodeDebugAdapter } from './nodeDebugAdapter';
-import * as utils from './utils';
 
 export class NodeBreakpoints extends Breakpoints {
     constructor(private nodeDebugAdapter: NodeDebugAdapter, chromeConnection: chromeConnection.ChromeConnection) {
