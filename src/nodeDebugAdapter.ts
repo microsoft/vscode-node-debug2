@@ -562,6 +562,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return super.configurationDone();
         }
 
+        await this._breakpoints.breakpointsQueueDrained;
+
         // This message means that all breakpoints have been set by the client. We should be paused at this point.
         // So tell the target to continue, or tell the client that we paused, as needed
         this._finishedConfig = true;
