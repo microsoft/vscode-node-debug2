@@ -41,6 +41,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     protected _launchAttachArgs: ICommonRequestArgs;
 
+    private _jsDeterminant = new utils.JavaScriptDeterminant();
     private _loggedTargetVersion: boolean;
     private _nodeProcessId: number;
     private _pollForNodeProcess: boolean;
@@ -60,6 +61,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     get entryPauseEvent(): Crdp.Debugger.PausedEvent | undefined {
         return this._entryPauseEvent;
+    }
+
+    get jsDeterminant(): utils.JavaScriptDeterminant {
+        return this._jsDeterminant;
     }
 
     get finishedConfig(): boolean {
@@ -192,6 +197,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         }
 
         this._captureFromStd = args.outputCapture === 'std';
+
+        if (args.__debuggablePatterns) {
+            this._jsDeterminant.updatePatterns(args.__debuggablePatterns);
+        }
 
         const resolvedProgramPath = await this.resolveProgramPath(programPath, args.sourceMaps);
         let program: string;
@@ -642,7 +651,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             return programPath;
         }
 
-        if (utils.isJavaScript(programPath)) {
+        if (this.jsDeterminant.isJavaScript(programPath)) {
             if (!sourceMaps) {
                 return programPath;
             }
@@ -854,7 +863,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             localize('origin.from.node', 'read-only content from Node.js') :
             localize('origin.core.module', 'read-only core module');
     }
-    
+
     private isExtensionHost(): boolean {
         return this._adapterID === 'extensionHost2' || this._adapterID === 'extensionHost';
     }
