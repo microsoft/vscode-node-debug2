@@ -37,7 +37,7 @@ export class JavaScriptDeterminant {
             fs.readSync(fd, buffer, 0, buffer.length, 0);
             fs.closeSync(fd);
             const line = buffer.toString();
-            return NODE_SHEBANG_MATCHER.test(line)
+            return NODE_SHEBANG_MATCHER.test(line);
         } catch (e) {
             return false;
         }
