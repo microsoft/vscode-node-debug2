@@ -58,6 +58,9 @@ export interface ILaunchRequestArguments extends Core.ILaunchRequestArgs, ICommo
 
     // When node version is detected by node-debug
     __nodeVersion?: string;
+
+    // A list of glob patterns that can be debugged by the extension.
+    __debuggablePatterns: string[];
 }
 
 /**

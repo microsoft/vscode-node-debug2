@@ -4,7 +4,6 @@
 
 import { Breakpoints, chromeConnection, InternalSourceBreakpoint, ISetBreakpointResult, ISetBreakpointsArgs, logger, ScriptContainer } from 'vscode-chrome-debug-core';
 import { NodeDebugAdapter } from './nodeDebugAdapter';
-import * as utils from './utils';
 
 export class NodeBreakpoints extends Breakpoints {
     constructor(private nodeDebugAdapter: NodeDebugAdapter, chromeConnection: chromeConnection.ChromeConnection) {
@@ -49,7 +48,7 @@ export class NodeBreakpoints extends Breakpoints {
 
     protected validateBreakpointsPath(args: ISetBreakpointsArgs): Promise<void> {
         return super.validateBreakpointsPath(args).catch(e => {
-            if (!this.nodeDebugAdapter.launchAttachArgs.disableOptimisticBPs && args.source.path && utils.isJavaScript(args.source.path)) {
+            if (!this.nodeDebugAdapter.launchAttachArgs.disableOptimisticBPs && args.source.path && this.nodeDebugAdapter.jsDeterminant.isJavaScript(args.source.path)) {
                 return undefined;
             } else {
                 return Promise.reject(e);
