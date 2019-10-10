@@ -856,7 +856,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             localize('origin.from.node', 'read-only content from Node.js') :
             localize('origin.core.module', 'read-only core module');
     }
-    
+
     private isExtensionHost(): boolean {
         return this._adapterID === 'extensionHost2' || this._adapterID === 'extensionHost';
     }
