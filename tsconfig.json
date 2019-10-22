@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "experimentalDecorators": true,
-        "experimentalDecorators": true,
         "module": "commonjs",
         "target": "ES2017",
         "sourceMap": true,
