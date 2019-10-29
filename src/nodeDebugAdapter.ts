@@ -6,7 +6,7 @@ import { ChromeDebugAdapter, chromeUtils, ISourceMapPathOverrides, utils as Core
 const telemetry = CoreTelemetry.telemetry;
 
 import { DebugProtocol } from 'vscode-debugprotocol';
-import { OutputEvent, CapabilitiesEvent } from 'vscode-debugadapter';
+import { OutputEvent, CapabilitiesEvent, Event } from 'vscode-debugadapter';
 import { ErrorWithMessage } from 'vscode-chrome-debug-core/out/src/errors';
 
 import * as path from 'path';
@@ -31,6 +31,23 @@ const DefaultSourceMapPathOverrides: ISourceMapPathOverrides = {
     'meteor://💻app/*': '${cwd}/*',
 };
 
+export class ProcessEvent extends Event implements DebugProtocol.ProcessEvent {
+    body: {
+        name: string;
+        systemProcessId?: number;
+        isLocalProcess?: boolean;
+        startMethod?: 'launch' | 'attach' | 'attachForSuspendedLaunch';
+        pointerSize?: number;
+    };
+
+    public constructor(name: string, systemProcessId?: number) {
+        super('process');
+        this.body = {
+            name,
+            systemProcessId
+        };
+    }
+}
 export class NodeDebugAdapter extends ChromeDebugAdapter {
     private static NODE = 'node';
     private static RUNINTERMINAL_TIMEOUT = 5000;
@@ -85,6 +102,18 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     set expectingStopReason(v: ReasonType) {
         this._expectingStopReason = v;
+    }
+
+    private get nodeProcessId(): number {
+        return this._nodeProcessId;
+    }
+
+    private set nodeProcessId(id: number) {
+        this._nodeProcessId = id;
+
+        if (id !== 0) {
+            this.session.sendEvent(new ProcessEvent('', id));
+        }
     }
 
     get launchAttachArgs(): ICommonRequestArgs {
@@ -320,7 +349,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             this._session.sendRequest('launchVSCode', launchVSCodeArgs, NodeDebugAdapter.RUNINTERMINAL_TIMEOUT, response => {
                 if (response.success) {
                     if (response.body && typeof response.body.processId === 'number') {
-                        this._nodeProcessId = response.body.processId;
+                        this.nodeProcessId = response.body.processId;
                     }
                     resolve();
                 } else {
@@ -429,7 +458,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
         spawnOpts.detached = this.supportsTerminateRequest; // https://github.com/Microsoft/vscode/issues/57018
         const nodeProcess = cp.spawn(runtimeExecutable, launchArgs, spawnOpts);
         return new Promise<void>((resolve, reject) => {
-            this._nodeProcessId = nodeProcess.pid;
+            this.nodeProcessId = nodeProcess.pid;
             nodeProcess.on('error', (error) => {
                 reject(errors.cannotLaunchDebugTarget(errors.toString()));
                 const msg = `Node process error: ${error}`;
@@ -579,32 +608,32 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private killNodeProcess(): void {
-        if (this._nodeProcessId && !this.normalAttachMode) {
-            if (this._nodeProcessId === 1) {
+        if (this.nodeProcessId && !this.normalAttachMode) {
+            if (this.nodeProcessId === 1) {
                 logger.log('Not killing launched process. It has PID=1');
             } else {
-                logger.log('Killing process with id: ' + this._nodeProcessId);
-                utils.killTree(this._nodeProcessId);
+                logger.log('Killing process with id: ' + this.nodeProcessId);
+                utils.killTree(this.nodeProcessId);
             }
 
-            this._nodeProcessId = 0;
+            this.nodeProcessId = 0;
         }
     }
 
     public async terminate(args: DebugProtocol.TerminateArguments): Promise<void> {
         this._clientRequestedSessionEnd = true;
-        if (!this._attachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this._nodeProcessId > 0) {
+        if (!this._attachMode && !(<ILaunchRequestArguments>this._launchAttachArgs).useWSL && this.nodeProcessId > 0) {
             // -pid to kill the process group
             // https://github.com/Microsoft/vscode/issues/57018
-            const groupPID = -this._nodeProcessId;
+            const groupPID = -this.nodeProcessId;
 
             try {
                 logger.log(`Sending SIGINT to ${groupPID}`);
                 process.kill(groupPID, 'SIGINT');
             } catch (e) {
                 if (e.message === 'kill ESRCH') {
-                    logger.log(`Got 'kill ESRCH'. Sending SIGINT to ${this._nodeProcessId}`);
-                    process.kill(this._nodeProcessId, 'SIGINT');
+                    logger.log(`Got 'kill ESRCH'. Sending SIGINT to ${this.nodeProcessId}`);
+                    process.kill(this.nodeProcessId, 'SIGINT');
                 }
             }
         }
@@ -612,10 +641,10 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
 
     public async terminateSession(reason: string, args?: DebugProtocol.DisconnectArguments): Promise<void> {
         if (this.isExtensionHost() && args && typeof args.restart === 'boolean' && args.restart) {
-            this._nodeProcessId = 0;
+            this.nodeProcessId = 0;
         } else if (this._restartMode && !args)  {
             // If restart: true, only kill the process when the client has disconnected. 'args' present implies that a Disconnect request was received
-            this._nodeProcessId = 0;
+            this.nodeProcessId = 0;
         }
 
         this.killNodeProcess();
@@ -724,7 +753,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     protected threadName(): string {
-        return `Node (${this._nodeProcessId})`;
+        return `Node (${this.nodeProcessId})`;
     }
 
     private async getNodeProcessDetailsIfNeeded(): Promise<void> {
@@ -753,8 +782,8 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         } else {
             const [pid, version, arch] = response.result.value;
-            if (!this._nodeProcessId) {
-                this._nodeProcessId = pid;
+            if (!this.nodeProcessId) {
+                this.nodeProcessId = pid;
             }
 
             if (this._pollForNodeProcess) {
@@ -783,9 +812,9 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     private startPollingForNodeTermination(): void {
         const intervalId = setInterval(() => {
             try {
-                if (this._nodeProcessId) {
+                if (this.nodeProcessId) {
                     // kill with signal=0 just test for whether the proc is alive. It throws if not.
-                    process.kill(this._nodeProcessId, 0);
+                    process.kill(this.nodeProcessId, 0);
                 } else {
                     clearInterval(intervalId);
                 }
