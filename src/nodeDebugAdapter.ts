@@ -314,7 +314,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             if (arg.startsWith('-')) {
                 // arg is an option
                 const pair = arg.split('=', 2);
-                if (pair.length === 2 && (fs.existsSync(pair[1]) || fs.existsSync(pair[1] + '.js')) {
+                if (pair.length === 2 && (fs.existsSync(pair[1]) || fs.existsSync(pair[1] + '.js'))) {
                     return { prefix: pair[0] + '=', path: pair[1] };
                 }
                 return { prefix: arg };
