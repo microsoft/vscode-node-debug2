@@ -29,7 +29,7 @@ async function patchLaunchArgs(launchArgs: any): Promise<void> {
     if (!launchArgs.port) {
         launchArgs.port = await findPort();
         launchArgs.runtimeArgs = launchArgs.runtimeArgs || [];
-        launchArgs.runtimeArgs.push(`--inspect=${launchArgs.port}`, '--debug-brk');
+        launchArgs.runtimeArgs.push(`--inspect-brk=${launchArgs.port}`);
     }
 }
 
