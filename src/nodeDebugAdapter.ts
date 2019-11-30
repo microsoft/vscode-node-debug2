@@ -782,6 +782,11 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
             }
         } else {
             const [pid, version, arch] = response.result.value;
+            if (typeof pid !== 'number') {
+                logger.log(`Node returned a pid of ${pid}. Will try again later.`);
+                return;
+            }
+
             if (!this.nodeProcessId) {
                 this.nodeProcessId = pid;
             }
