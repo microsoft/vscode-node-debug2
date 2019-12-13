@@ -44,6 +44,8 @@
   },
   "main": "./out/src/extension",
   "activationEvents": [
+    "onDebug:extensionHost",
+    "onDebugResolve:extensionHost",
     "onCommand:extension.node-debug2.toggleSkippingFile"
   ],
   "scripts": {
@@ -78,6 +80,15 @@
         "language": "javascriptreact"
       }
     ],
+    "configuration": {
+      "properties": {
+        "debug.extensionHost.useV3": {
+          "type": "boolean",
+					"description": "%debug.extensionHost.useV3.description%",
+					"default": false
+        }
+      }
+    },
     "debuggers": [
       {
         "type": "extensionHost",
