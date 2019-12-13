@@ -29,6 +29,7 @@ class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurati
     resolveDebugConfiguration(_folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
         const useV3 = vscode.workspace.getConfiguration().get('debug.extensionHost.useV3', false);
         if (useV3) {
+            debugConfiguration['__workspaceFolder'] = '${workspaceFolder}';
             debugConfiguration.type = 'pwa-extensionHost';
         }
 
