@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug",
-  "version": "1.41.3",
+  "version": "1.42.0",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -84,8 +84,8 @@
       "properties": {
         "debug.extensionHost.useV3": {
           "type": "boolean",
-					"description": "%debug.extensionHost.useV3.description%",
-					"default": false
+          "description": "%debug.extensionHost.useV3.description%",
+          "default": false
         }
       }
     },
