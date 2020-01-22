@@ -27,7 +27,9 @@ function toggleSkippingFile(path: string|number): void {
 
 class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
     resolveDebugConfiguration(_folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
-        const useV3 = vscode.workspace.getConfiguration().get('debug.extensionHost.useV3', false);
+        const useV3 = vscode.workspace.getConfiguration().get('debug.extensionHost.useV3', false)
+            || vscode.workspace.getConfiguration().get('debug.javascript.usePreview', false);
+
         if (useV3) {
             debugConfiguration['__workspaceFolder'] = '${workspaceFolder}';
             debugConfiguration.type = 'pwa-extensionHost';
