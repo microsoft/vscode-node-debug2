@@ -513,14 +513,6 @@
         "command": "extension.node-debug2.toggleSkippingFile",
         "title": "%toggle.skipping.this.file%"
       }
-    ],
-    "keybindings": [
-      {
-        "command": "extension.node-debug.pickLoadedScript",
-        "key": "ctrl+f4",
-        "mac": "cmd+f4",
-        "when": "debugType == 'node2'"
-      }
     ]
   }
 }
