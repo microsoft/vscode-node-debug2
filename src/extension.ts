@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
-function toggleSkippingFile(path: string|number): void {
+function toggleSkippingFile(path: string | number): void {
     if (!path) {
         const activeEditor = vscode.window.activeTextEditor;
         path = activeEditor && activeEditor.document.fileName;
@@ -27,8 +27,8 @@ function toggleSkippingFile(path: string|number): void {
 
 class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
     resolveDebugConfiguration(_folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
-        const useV3 = vscode.workspace.getConfiguration().get('debug.extensionHost.useV3', false)
-            || vscode.workspace.getConfiguration().get('debug.javascript.usePreview', false);
+        const config = vscode.workspace.getConfiguration();
+        const useV3 = (config.get('debug.extensionHost.useV3') || config.get('debug.javascript.usePreview')) ?? isInsiders();
 
         if (useV3) {
             debugConfiguration['__workspaceFolder'] = '${workspaceFolder}';
@@ -37,4 +37,10 @@ class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurati
 
         return debugConfiguration;
     }
+}
+
+function isInsiders() {
+    return vscode.env.uriScheme === 'vscode-insiders'
+        || vscode.env.uriScheme === 'code-oss'
+        || vscode.env.uriScheme === 'vscode-exploration';
 }
