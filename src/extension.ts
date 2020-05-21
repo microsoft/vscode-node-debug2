@@ -26,11 +26,12 @@ function toggleSkippingFile(path: string | number): void {
 }
 
 class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
-    resolveDebugConfiguration(_folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
+    resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
         const useV3 = getWithoutDefault('debug.extensionHost.useV3') ?? getWithoutDefault('debug.javascript.usePreview') ?? isInsiders();
 
         if (useV3) {
-            debugConfiguration['__workspaceFolder'] = '${workspaceFolder}';
+            folder = folder || (vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0] : undefined);
+            debugConfiguration['__workspaceFolder'] = folder?.uri.fsPath;
             debugConfiguration.type = 'pwa-extensionHost';
         }
 
