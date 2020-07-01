@@ -26,7 +26,7 @@ function toggleSkippingFile(path: string | number): void {
 }
 
 class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
-    resolveDebugConfiguration(_folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
+    resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
         const useV3 = getWithoutDefault('debug.extensionHost.useV3') ?? getWithoutDefault('debug.javascript.usePreview') ?? true;
 
         if (useV3) {
