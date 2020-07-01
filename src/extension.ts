@@ -26,8 +26,8 @@ function toggleSkippingFile(path: string | number): void {
 }
 
 class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
-    resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
-        const useV3 = getWithoutDefault('debug.extensionHost.useV3') ?? getWithoutDefault('debug.javascript.usePreview') ?? isInsiders();
+    resolveDebugConfiguration(_folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
+        const useV3 = getWithoutDefault('debug.extensionHost.useV3') ?? getWithoutDefault('debug.javascript.usePreview') ?? true;
 
         if (useV3) {
             folder = folder || (vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0] : undefined);
@@ -42,10 +42,4 @@ class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurati
 function getWithoutDefault<T>(setting: string): T | undefined {
     const info = vscode.workspace.getConfiguration().inspect<T>(setting);
     return info?.workspaceValue ?? info?.globalValue;
-}
-
-function isInsiders() {
-    return vscode.env.uriScheme === 'vscode-insiders'
-        || vscode.env.uriScheme === 'code-oss'
-        || vscode.env.uriScheme === 'vscode-exploration';
 }
