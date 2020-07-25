@@ -1,3 +1,7 @@
+**Important note:** By default, this extension now delegates to [the new js-debug extension](http://github.com/microsoft/vscode-js-debug) which is built-in to VS Code. Please file issues on that repo. To revert to the old behavior, you can set `"debug.javascript.usePreview": false` in your settings.
+
+---
+
 # Node Debug
 [![Build Status](https://vscode.visualstudio.com/_apis/public/build/definitions/d3aa0b57-eb08-43b8-9aec-0c0a0d5d5ad0/8/badge)](https://vscode.visualstudio.com/vscode-node-debug2/_build/index?definitionId=8)
 
