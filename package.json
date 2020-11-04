@@ -11,6 +11,7 @@
   "author": {
     "name": "Microsoft Corporation"
   },
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "license": "MIT",
   "private": true,
   "dependencies": {
