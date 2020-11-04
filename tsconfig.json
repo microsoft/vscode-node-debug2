@@ -4,6 +4,10 @@
         "target": "ES6",
         "sourceMap": true,
 
+        "declaration": true,
+
+        "outDir": "out",
+
         "noImplicitAny": false,
         "removeComments": false,
         "noUnusedLocals": true,
