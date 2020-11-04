@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug",
-  "version": "1.42.5",
+  "version": "2.0.0",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -13,7 +13,6 @@
   },
   "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "license": "MIT",
-  "private": true,
   "dependencies": {
     "minimatch": "^3.0.4",
     "vscode-chrome-debug-core": "^6.8.9",
