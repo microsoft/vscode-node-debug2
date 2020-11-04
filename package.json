@@ -42,7 +42,7 @@
     "vscode-debugprotocol": "^1.37.0",
     "vscode-nls-dev": "^3.3.1"
   },
-  "main": "./out/src/extension",
+  "main": "./out/src/index",
   "activationEvents": [
     "onDebug:extensionHost",
     "onDebugResolve:extensionHost",
