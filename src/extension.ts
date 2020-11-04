@@ -5,6 +5,10 @@
 import * as vscode from 'vscode';
 import * as Core from 'vscode-chrome-debug-core';
 
+import { NodeDebugAdapter } from './nodeDebugAdapter';
+
+export { NodeDebugAdapter };
+
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.node-debug2.toggleSkippingFile', toggleSkippingFile));
     context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('extensionHost', new ExtensionHostDebugConfigurationProvider()));
