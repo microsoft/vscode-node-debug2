@@ -11,7 +11,7 @@
   "author": {
     "name": "Microsoft Corporation"
   },
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "publishConfig": { "registry": "https://npm.pkg.github.com/jovinjijo" },
   "license": "MIT",
   "dependencies": {
     "minimatch": "^3.0.4",
@@ -65,7 +65,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-node-debug2.git"
+    "url": "https://github.com/jovinjijo/vscode-node-debug2.git"
   },
   "bugs": {
     "url": "https://github.com/Microsoft/vscode-node-debug2/issues"
