@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "Node Debug",
-  "version": "1.42.5",
+  "version": "1.42.6",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
@@ -12,9 +12,9 @@
     "name": "Microsoft Corporation"
   },
   "workspaceTrust": {
-		"request": "onDemand",
+    "request": "onDemand",
     "description": "%workspaceTrust%"
-	},
+  },
   "license": "MIT",
   "private": true,
   "dependencies": {
