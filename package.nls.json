@@ -2,6 +2,7 @@
 	"extension.description": "Node.js debugging support",
 
 	"node.label": "Node.js v6.3+ via Inspector Protocol",
+	"workspaceTrust": "Trust is required to debug code in this workspace.",
 
 	"node.sourceMaps.description": "Use JavaScript source maps (if they exist).",
 	"outDir.deprecationMessage": "Attribute 'outDir' is deprecated, use 'outFiles' instead.",

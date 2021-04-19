@@ -11,6 +11,10 @@
   "author": {
     "name": "Microsoft Corporation"
   },
+  "workspaceTrust": {
+		"request": "onDemand",
+    "description": "%workspaceTrust%"
+	},
   "license": "MIT",
   "private": true,
   "dependencies": {
