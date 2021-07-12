@@ -22,7 +22,7 @@
   "private": true,
   "dependencies": {
     "minimatch": "^3.0.4",
-    "vscode-chrome-debug-core": "^6.8.9",
+    "vscode-chrome-debug-core": "^6.8.11",
     "vscode-debugadapter": "^1.40.0",
     "vscode-nls": "^4.0.0"
   },
@@ -43,7 +43,7 @@
     "mocha": "^7.1.2",
     "tslint": "^5.7.0",
     "typescript": "^3.9.3",
-    "vsce": "^1.57.1",
+    "vsce": "^1.95.1",
     "vscode-chrome-debug-core-testsupport": "^4.0.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
     "vscode-debugprotocol": "^1.37.0",
