@@ -22,7 +22,7 @@
   "private": true,
   "dependencies": {
     "minimatch": "^3.0.4",
-    "vscode-chrome-debug-core": "^6.8.9",
+    "vscode-chrome-debug-core": "^6.8.11",
     "vscode-debugadapter": "^1.40.0",
     "vscode-nls": "^4.0.0"
   },
