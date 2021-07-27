@@ -25,13 +25,10 @@ function toggleSkippingFile(path: string | number): void {
     }
 }
 
-const useNewSettings = ['debug.extensionHost.useV3', 'debug.javascript.usePreview'];
 
 class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
     resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration): vscode.ProviderResult<vscode.DebugConfiguration> {
-        const useV3 = useNewSettings.some(getWithoutDefault) ?? true;
-
-        if (useV3) {
+        if (useV3()) {
             folder = folder || (vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0] : undefined);
             debugConfiguration['__workspaceFolder'] = folder?.uri.fsPath;
             debugConfiguration.type = 'pwa-extensionHost';
@@ -41,6 +38,12 @@ class ExtensionHostDebugConfigurationProvider implements vscode.DebugConfigurati
 
         return debugConfiguration;
     }
+}
+
+const v3Setting = 'debug.javascript.usePreview';
+
+function useV3() {
+    return getWithoutDefault(v3Setting) ?? true;
 }
 
 function getWithoutDefault<T>(setting: string): T | undefined {
@@ -57,20 +60,22 @@ async function annoyingDeprecationNotification() {
 
     const useNewDebugger = 'Upgrade';
     hasShownDeprecation = true;
-    const result = await vscode.window.showWarningMessage("You're using an old Node.js debugger which will be deprecated soon. Please upgrade to our new debugger, and file issues if you run into any problems", useNewDebugger);
+    const inspect = vscode.workspace.getConfiguration().inspect(v3Setting);
+    const isWorkspace = inspect?.workspaceValue === false;
+    const result = await vscode.window.showWarningMessage(
+        `You're using a ${isWorkspace ? 'workspace' : 'user'} setting to use VS Code's legacy Node.js debugger, which will be removed soon. Please update your settings using the "Upgrade" button to use our modern debugger.`,
+        useNewDebugger,
+    );
 
     if (result !== useNewDebugger) {
         return;
     }
 
     const config = vscode.workspace.getConfiguration();
-    for (const setting of useNewSettings) {
-        const inspect = config.inspect(setting);
-        if (inspect.globalValue === false) {
-            config.update(setting, true, vscode.ConfigurationTarget.Global);
-        }
-        if (inspect.workspaceValue === false) {
-            config.update(setting, true, vscode.ConfigurationTarget.Workspace);
-        }
+    if (inspect?.globalValue === false) {
+        config.update(v3Setting, true, vscode.ConfigurationTarget.Global);
+    }
+    if (inspect?.workspaceValue === false) {
+        config.update(v3Setting, true, vscode.ConfigurationTarget.Workspace);
     }
 }
