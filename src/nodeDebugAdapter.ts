@@ -901,7 +901,7 @@ export class NodeDebugAdapter extends ChromeDebugAdapter {
     }
 
     private isExtensionHost(): boolean {
-        return this._adapterID === 'extensionHost2' || this._adapterID === 'extensionHost';
+        return this._adapterID === 'extensionHost2' || this._adapterID === 'legacy-extensionHost';
     }
 }
 

@@ -36,7 +36,7 @@ async function patchLaunchArgs(launchArgs: any): Promise<void> {
 export function setup(_opts?: { port?: number, alwaysDumpLogs?: boolean }) {
     const opts = Object.assign(<ts.ISetupOpts>{
         entryPoint: './out/src/nodeDebug.js',
-        type: 'node2',
+        type: 'legacy-node2',
         patchLaunchArgs
     }, _opts);
 

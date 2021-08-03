@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Launch Program",
-            "type": "node2",
+            "type": "legacy-node2",
             "request": "launch",
             "program": "${workspaceFolder}/out/bundle.js",
             "cwd": "${workspaceFolder}",

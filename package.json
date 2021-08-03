@@ -1,6 +1,6 @@
 {
   "name": "node-debug2",
-  "displayName": "Node Debug",
+  "displayName": "[Deprecated] Node Debug",
   "version": "1.42.10",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
@@ -51,8 +51,8 @@
   },
   "main": "./out/src/extension",
   "activationEvents": [
-    "onDebug:extensionHost",
-    "onDebugResolve:extensionHost",
+    "onDebug:legacy-extensionHost",
+    "onDebugResolve:legacy-extensionHost",
     "onCommand:extension.node-debug2.toggleSkippingFile"
   ],
   "scripts": {
@@ -67,8 +67,8 @@
     "package": "gulp package"
   },
   "engines": {
-    "vscode": "^1.47.0",
-    "node": ">=6.3.0"
+    "vscode": "^1.60.0-insider",
+    "node": ">=10"
   },
   "repository": {
     "type": "git",
@@ -88,30 +88,11 @@
     ],
     "debuggers": [
       {
-        "type": "extensionHost",
+        "type": "legacy-extensionHost",
         "label": "VS Code Extension Development",
         "program": "./out/src/nodeDebug.js",
         "runtime": "node",
         "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
-        "configurationSnippets": [
-          {
-            "label": "%extensionHost.snippet.launch.label%",
-            "description": "%extensionHost.snippet.launch.description%",
-            "body": {
-              "type": "extensionHost",
-              "request": "launch",
-              "name": "%extensionHost.launch.config.name%",
-              "runtimeExecutable": "^\"\\${execPath}\"",
-              "args": [
-                "^\"--extensionDevelopmentPath=\\${workspaceFolder}\""
-              ],
-              "outFiles": [
-                "^\"\\${workspaceFolder}/out/**/*.js\""
-              ],
-              "preLaunchTask": "npm"
-            }
-          }
-        ],
         "configurationAttributes": {
           "launch": {
             "required": [
@@ -206,7 +187,7 @@
         }
       },
       {
-        "type": "node2",
+        "type": "legacy-node2",
         "label": "Node.js v6.3+",
         "program": "./out/src/nodeDebug.js",
         "runtime": "node",
