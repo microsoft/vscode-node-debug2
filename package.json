@@ -1,7 +1,7 @@
 {
   "name": "node-debug2",
   "displayName": "[Deprecated] Node Debug",
-  "version": "1.42.10",
+  "version": "1.43.0",
   "publisher": "ms-vscode",
   "description": "%extension.description%",
   "icon": "images/node-debug-icon.png",
