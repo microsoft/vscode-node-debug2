@@ -43,7 +43,7 @@
     "mocha": "^7.1.2",
     "tslint": "^5.7.0",
     "typescript": "^3.9.3",
-    "vsce": "^1.95.1",
+    "vsce": "^2.15.0",
     "vscode-chrome-debug-core-testsupport": "^4.0.0",
     "vscode-debugadapter-testsupport": "^1.25.0",
     "vscode-debugprotocol": "^1.37.0",
