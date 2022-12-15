@@ -39,7 +39,7 @@
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^5.0.0",
     "gulp-util": "^3.0.5",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "mocha": "^7.1.2",
     "tslint": "^5.7.0",
     "typescript": "^3.9.3",
